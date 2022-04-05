@@ -1,5 +1,19 @@
 using ExcelReaders
 
+#--------------------------------Import data file structure-----------------------------------
+# 1 - Scenario we are in
+# 2 - Folder path for profiles and techno_eco data
+# 3 - Data import and location of the data in the excel files (techno_eco, used units, hourly profiles, scenarios/sensitivity)
+# 4 - Removal from the imported data of elements not used in the energy system
+# 5 - Subsets definition
+# 6 - Define scenario data and change the original data file depending on the scenario
+# 7 - After scenario/senstivity change, put techno-economics data into vectors
+# 8 - Overwrite data for some specific scenario features
+# 9 - Define piece-wise functions for techno-eco data
+#10 - Put hourly profiles into matrices
+
+#------------------------------- 1 - Scenario we are in---------------------------------------
+
 Scenario_name = All_Scenario_name[N_scen]
 Scenario = All_Scenario[N_scen]
 Fuel = All_fuel[N_scen]
@@ -17,13 +31,13 @@ Write_flows = All_Write_flows[N_scen]
 
 Configuration_scenario = Fuel*"_"*Electrolyser
 
-#---------------------------------Folder path---------------------------------------
+#-------------------2 - Folder path for profiles and techno_eco data ---------------------------------------
 #Techno-economics data
-Datafile_techno_economics = joinpath(Inputs_folder,Project*"_"*Inputs_file*".xlsx")
+Datafile_techno_economics = joinpath(Inputs_folder,Project*"_"*Inputs_file*".xls")
 #Profile data
-Datafile_profile = joinpath(Profile_folder,Profile_name,Profile_name*".xlsx") #Sheet name in the excel file
+Datafile_profile = joinpath(Profile_folder,Profile_name,Profile_name*".xls") #Sheet name in the excel file
 
-#--------------------------------Data reading----------------------------------
+#------3 - Data import and location of the data in the excel files (techno_eco, used units, hourly profiles, scenarios/sensitivity)----------------------------------
 
 #Techno-economics
 Data_units = readxlsheet(Datafile_techno_economics,Input_data)
@@ -71,7 +85,7 @@ L1_sd= Scenarios_def_index[1]+1
 C0_sd = Scenarios_def_index[2]
 Scenario_def_parameters = Data_scenarios_def[L1_sd-1,C0_sd+1:end]
 
-#----------------------------Elements that can be used in the energy system----------------------------------
+#-----------------------4 - Removal from the imported data of elements not used in the energy system----------------------------------
 
 Name_all_units = Data_units[L1:end,Units_index[2]] ; U_all = length(Name_all_units)
 C_Selected_Unit= findfirst(x -> x == Configuration_scenario, Configuration_list)
@@ -83,14 +97,18 @@ NoSelected_Unit = NoSelected_Unit[setdiff(1:end, Selected_Unit), :]
 Data_units = Data_units[setdiff(1:end, NoSelected_Unit .+ (L1-1)), :]
 Name_selected_units = Data_units[L1:end,Units_index[2]]
 
-#---------------------------Subsets definition : Names have to correspond with the Excel file !
+#------------------------5 - Subsets definition --------------------------------------------
+
+#All subset vectors
 Subsets = Data_units[L1:end,Subsets_index[2]] ; nSubsets = length(Subsets)
 Subsets_2 = Data_units[L1:end,Subsets_2_index[2]]
 Subsets_reactants = Data_units[L1:end,Subsets_reactant_index[2]] ; nSubReac = length(Subsets_reactants)
 Subsets_price = Data_price_profile[Subsets_price_index[1],Subsets_price_index[2]+1:end]
 Subsets_flux = Data_flux_profile[Subsets_flux_index[1],Subsets_flux_index[2]+1:end] ; nSubf= length(Subsets_flux) # Number of flux profiles
 
-#---------------------------------Subsets techno-economics------------------------
+#******************************************************************************
+# Subsets related to techno-economics
+
 # Reactant used to produce the main product (chemical reactions)
 Reactants = round.(Int,zeros(nSubReac))
 for i=1:nSubsets, j=1:nSubReac
@@ -123,7 +141,9 @@ Tanks = findall(x -> x == "Tank", Subsets) ; nST = length(Tanks) # Storage tank 
 Stor_in = findall(x -> x == "Stor_in", Subsets) # Storage input/output
 Stor_out = findall(x -> x == "Stor_out", Subsets)
 
-#-----------------------------------Price data----------------------------
+#******************************************************************************
+# Subsets related to price profiles
+
 #Hourly electricity prices
 Grid_buy_p = findall(x -> x == "Grid_buy", Subsets_price) ; nGb = length(Grid_buy_p)
 #Fixed electricity prices
@@ -132,7 +152,8 @@ Grid_buy = findall(x -> x == "Grid_buy", Subsets_2)
 O2_sell = findall(x -> x == "O2_sell", Subsets_2) ; nO2s = length(O2_sell)
 Heat_sell = findall(x -> x == "Heat_sell", Subsets_2) ; nHs = length(Heat_sell)
 
-#------------------------------------------Scenario data---------------------------------------
+#---6 - Define scenario data and change the original data file depending on the scenario------------------------------------
+
 Parameters_name = Data_units[Parameters_index[1],Parameters_index[2]+1:end] ; nPar = length(Parameters_name) #Base case data parameters
 Parameters_year = Data_units[Year_index[1],Year_index[2]+1:end]
 
@@ -177,7 +198,7 @@ for i=1:nCurscen
     Data_units[L1-1+L_to_change[i],C0 + C_to_change[i]] = New_value[i]
 end
 
-#--------------------------------#Techno-economics data-------------------------
+#---- 7 - Put techno-economics data after scenario/senstivity change into vectors-------------------------
 
 # Get the column index by comparing the name to the one in the excel file: they have to be the same !
 C_Used_Unit = findfirst(x -> x == "Used (1 or 0)", Parameters_name)
@@ -222,7 +243,7 @@ Fuel_Buying_fixed = Data_units[L1:end,C0 + C_FBp] #Fixed fuel buying price
 Demand = Data_units[L1:end,C0 + C_demand] #Output fuel demand
 Annuity_factor = Data_units[L1:end,C0 + C_annuity] #Check the Excel for detailled calculations
 
-#-------------------------------------- Scenarios data -------------------------------------------
+#------8 - Overwrite data for some specific scenario features-------------------
 if Option_fixed_heat_sale == false
     for i=1:nHs
         Fuel_Selling_fixed[Heat_sell[i]] = 0
@@ -234,14 +255,18 @@ if Option_fixed_oxygen_sale == false
         Fuel_Selling_fixed[O2_sell[i]] = 0
     end
 end
+#---- 10 - Put profiles into matrices -------------------------
 
-#-------------------------------Flux Profiles -------------------------
+#******************************************************************************
+#Flux profiles
 
 Flux_Profile = zeros(nSubf,T)
 for u = 1:nSubf, t=1:T
     Flux_Profile[u,t] = Data_flux_profile[L0_f+Time[t], C0_f+u]
 end
-#----------------------------Price profiles--------------------------
+
+#******************************************************************************
+# Price profiles
 
 nSubp = length(Subsets_price) # Number of price profiles
 

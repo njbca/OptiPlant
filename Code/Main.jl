@@ -14,7 +14,7 @@ Inputs_file = "All_data"
 # Scenario set (same name as exceel sheet)
 Scenarios_set = "Scenarios" ; include("ImportScenarios.jl")
 # Scenario under study (all between N_scen_0 and N_scen_end)
-N_scen_0 = 1 ; N_scen_end = 1+0*N_scenarios # or N_scen_end = N_scenarios for total number of scenarios
+N_scen_0 = 1 ; N_scen_end = N_scenarios # or N_scen_end = N_scenarios for total number of scenarios
 #Studied hours (max 8760). When there is maintenance hours are out
 #TMend = 4000-4876 : 90% time working ; T = 4000-4761 : 8000 hours
 TMstart = 4000 ; TMend = 4876 ; Tbegin = 72 ; Tfinish=8760 #Time maintenance starts/end ; Time within plants can operate at 0% load (in case of no renewable power the first 3 days)

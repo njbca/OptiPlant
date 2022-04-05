@@ -1,6 +1,6 @@
 using ExcelReaders
 
-Datafile_inputs = joinpath(Inputs_folder,Project*"_"*Inputs_file*".xlsx")
+Datafile_inputs = joinpath(Inputs_folder,Project*"_"*Inputs_file*".xls")
 Data_scenarios = readxlsheet(Datafile_inputs,Scenarios_set)
 
 L1_scenario = findfirst(x -> x == "Scenario number", Data_scenarios)[1] + 1
