@@ -7,7 +7,7 @@ Project = "Base"
 all_csv_files = "All_results"
 # Folder paths for data acquisition and writing
 Main_folder = "C:/Users/njbca/Documents/Models/OptiPlantGitHub" ; 
-cd(joinpath(Main_folder,"envgit")) ; Pkg.activate(pwd()) ; #Activate the environment from the folder
+#cd(joinpath(Main_folder,"envgit")) ; Pkg.activate(pwd()) ; #Activate the environment from the folder
 cd(joinpath(Main_folder,"Code")) ; #Go back to the code folder
 using JuMP, Gurobi, CSV, DataFrames ; #Use necessary packages
 
