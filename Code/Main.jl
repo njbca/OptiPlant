@@ -1,4 +1,4 @@
-using JuMP, Gurobi, CSV, DataFrames
+using Pkg
 
 #------------------------------Problem set up------------------------------------
 #Project name
@@ -6,7 +6,11 @@ Project = "Base"
 # Folder name for all csv file
 all_csv_files = "All_results"
 # Folder paths for data acquisition and writing
-Main_folder = "C:/Users/njbca/Documents/Models/OptiPlantGitHub"
+Main_folder = "C:/Users/njbca/Documents/Models/OptiPlantGitHub" ; 
+cd(joinpath(Main_folder,"envgit")) ; Pkg.activate(pwd()) ; #Activate the environment from the folder
+cd(joinpath(Main_folder,"Code")) ; #Go back to the code folder
+using JuMP, Gurobi, CSV, DataFrames ; #Use necessary packages
+
 Profile_folder = joinpath(Main_folder,Project,"Data","Profiles") ; #mkpath(Profile_folder)
 Inputs_folder = joinpath(Main_folder,Project,"Data","Inputs") ; #mkpath(Techno_economics_folder)
 Inputs_file = "All_data"
@@ -14,7 +18,7 @@ Inputs_file = "All_data"
 # Scenario set (same name as exceel sheet)
 Scenarios_set = "Scenarios" ; include("ImportScenarios.jl")
 # Scenario under study (all between N_scen_0 and N_scen_end)
-N_scen_0 = 1 ; N_scen_end = N_scenarios # or N_scen_end = N_scenarios for total number of scenarios
+N_scen_0 = 1 ; N_scen_end = 1 # or N_scen_end = N_scenarios for total number of scenarios
 #Studied hours (max 8760). When there is maintenance hours are out
 #TMend = 4000-4876 : 90% time working ; T = 4000-4761 : 8000 hours
 TMstart = 4000 ; TMend = 4876 ; Tbegin = 72 ; Tfinish=8760 #Time maintenance starts/end ; Time within plants can operate at 0% load (in case of no renewable power the first 3 days)
@@ -27,6 +31,8 @@ Currency_factor = 1 # 1.12 for dollar 2019 #All input data are in Euro 2019
 
 #--------------------- Main code -------------------------
 N_scen = N_scen_0
+
+
 
 while N_scen < N_scen_end + 1 #Run the optimization model for all scenarios
 
@@ -136,7 +142,7 @@ while N_scen < N_scen_end + 1 #Run the optimization model for all scenarios
       for u=1:U, t=1:T
           Solution_X[t,u] = JuMP.value.(X[u,Time[t]])
       end
-      df_flow = DataFrame([Infos Time Solution_X Sc_tot])
+      df_flow = DataFrame([Infos Time Solution_X Sc_tot],:auto)
       #Headlines
       rename!(df_flow,["Informations";"Time";Unit_tag;"Electricity consumption"])
       #File name
@@ -147,7 +153,7 @@ while N_scen < N_scen_end + 1 #Run the optimization model for all scenarios
 
     #-----------------------Techno_economical data used------------------------
 
-    df_techno_eco = DataFrame(Data_units[Parameters_index[1]:end,Subsets_index[2]:end])
+    df_techno_eco = DataFrame(Data_units[Parameters_index[1]:end,Subsets_index[2]:end],:auto)
     techno_eco = "Data_$N_scen.csv"
     CSV.write(joinpath(Data_used_folder,techno_eco),df_techno_eco ; writeheader = false)
 
@@ -197,7 +203,7 @@ while N_scen < N_scen_end + 1 #Run the optimization model for all scenarios
     df_results = DataFrame([Scenario, Name_selected_units, R_year,R_location,
     R_fuel,R_electrolyser, R_capacity, R_invest,
     R_invest_year, R_fixOM, R_varOM, R_fuelprice,R_cost_unit, R_production,
-    R_sold, R_El_cons, R_prodcost_syst, R_prodcost_unit, R_load_av, R_FLH, R_elec_cost])
+    R_sold, R_El_cons, R_prodcost_syst, R_prodcost_unit, R_load_av, R_FLH, R_elec_cost],:auto)
     results = "Scenario_$N_scen.csv"
     Result_name = ["Scenario","Type of unit","Year","Location","Fuel","Electrolyser",
     "Installed capacity(MW or t/h)","Total investment(MEuros)",

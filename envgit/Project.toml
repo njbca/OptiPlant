@@ -1,0 +1,11 @@
+name = "envgit"
+uuid = "e32e5de0-6e54-4622-bfc8-42f8f679ff07"
+authors = ["njbca <ncampion@protonmail.com>"]
+version = "0.1.0"
+
+[deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+ExcelReaders = "c04bee98-12a5-510c-87df-2a230cb6e075"
+Gurobi = "2e9cd046-0924-5485-92f1-d5272153d98b"
+JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
