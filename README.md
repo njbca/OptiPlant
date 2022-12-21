@@ -25,7 +25,7 @@ The article describing the model, data and underlying assumptions can be found h
 
 ``"Data"`` folder contains all the necessary data to run the model. In ``"Profiles"``, you can define the normalized hourly power profiles (between 0 and 1) for a specific location and the hourly grid electricity prices (the excel file and the folder should have the same name). The type of file used should be ``.xls``.
 
-In ``"Inputs"``there is a file called like "project folder"_"file name.xls". This one containts all the techno-economic assumptions and scenarios definitions.
+In ``"Inputs"``there is a file called like "project folder"_"file name.xls". This one contains all the techno-economic assumptions and scenarios definitions.
 
 ### Filling the inputs data file
 
@@ -37,7 +37,7 @@ In ``"Inputs"``there is a file called like "project folder"_"file name.xls". Thi
 
 4- In the ``"Scenarios"`` sheet, define which scenarios you want to run and the assumptions.
 
-5- Save all the files you changed..
+5- Save all the files you changed.
 
 ### Run the model
 
@@ -47,7 +47,7 @@ In ``"Inputs"``there is a file called like "project folder"_"file name.xls". Thi
 
 3- Define which scenarios from the "Scenarios" sheet you want to run.
 
-4- Set the maintenance hours of the plant and the number of hours for the simulation (max 8760). The starting time (Tbegin) is the time from which all units must operates above their minimal loads. 
+4- Set the maintenance hours of the plant and the number of hours for the simulation (max 8760). The starting time (Tbegin) is the time from which all units must operate above their minimal loads. 
 
 5- Choose the currency change if needed (all input data are currently in €2019).
 
