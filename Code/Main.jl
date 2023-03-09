@@ -1,4 +1,4 @@
-using Pkg
+using Pkg, JuMP, Gurobi, CSV, DataFrames ; #Use necessary packages
 
 #------------------------------Problem set up------------------------------------
 #Project name
@@ -7,9 +7,10 @@ Project = "Base"
 all_csv_files = "All_results"
 # Folder paths for data acquisition and writing
 Main_folder = "C:/Users/njbca/Documents/Models/OptiPlantGitHub" ; 
+#These commands may be used the first time to activate the environment provided
+
 #cd(joinpath(Main_folder,"envgit")) ; Pkg.activate(pwd()) ; #Activate the environment from the folder
-cd(joinpath(Main_folder,"Code")) ; #Go back to the code folder
-using JuMP, Gurobi, CSV, DataFrames ; #Use necessary packages
+#cd(joinpath(Main_folder,"Code")) ; #Go back to the code folder
 
 Profile_folder = joinpath(Main_folder,Project,"Data","Profiles") ; #mkpath(Profile_folder)
 Inputs_folder = joinpath(Main_folder,Project,"Data","Inputs") ; #mkpath(Techno_economics_folder)
