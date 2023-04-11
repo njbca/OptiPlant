@@ -1,57 +1,102 @@
 # OptiPlant
 
+OptiPlant is a tool that enables the user 
+to model Power-to-X fuel production systems with a high variety of customizable input parameters and to optimize them according to different criteria. 
+The model works under the ‘dynamic power supply and system optimization’ approach (DPS-Syst-Opt).
+
 The current model optimize the operation and investment of an e-ammonia plant.
 The plant can be powered by solar, wind or the grid. All the data in the files are valid for near future (2020-2025) and large scale plant. 
 
-The article describing the model, data and underlying assumptions can be found here : https://doi.org/10.1016/j.rser.2022.113057
+An article that describes the model, the input data, and the underlying assumptions is: 
 
-## Installation
+Campion, N., Nami, H., Swisher, P. R., Vang Hendriksen, P., & Münster, M. (2023). 
+Techno-economic assessment of green ammonia production with different wind and solar potentials. 
+Renewable and Sustainable Energy Reviews, 173, 113057. 
+https://doi.org/10.1016/j.rser.2022.113057
 
-1- Install a code editor like [VSCode](https://code.visualstudio.com/). Atom may also work. 
+## Software Installation
 
-2- Install [Julia](https://julialang.org/downloads/) and add it in VSCode. 
+A detailed installation guide for the software needed to run OptiPlant is included in this page under the name: 
+**1) Installation guide: software needed to run OptiPlant tool**.
 
-3- Download all the Optiplant github folder and unzip. 
+Download the document and follow the steps to install all the necessary software.
 
-4- Install all the necessary Julia packages: ExcelReaders, JuMP, CSV, DataFrames, Gurobi. Other solvers may be used but solving time may be higher and the user may need to run the model with representative days or weeks instead of a full year. Use ``Pkg.add("PackageName")``  in Julia to install the different packages and their dependencies.
+The detailed step-by-step instructions described in the installation guide can be simplified as:
 
-5- To use the environment provided, uncomment the line ``cd(joinpath(Main_folder,"envgit")) ; Pkg.activate(pwd())`` in the ``Main.jl`` file (Code folder)
+1- Download and install [Julia](https://julialang.org/downloads/)
 
-## Using the model
+2- Download and install a code editor like [VSCode](https://code.visualstudio.com/). Add the *Julia* extension in the code editor.
 
-### Description of the folder structure
+3- Get a license and install the [Gurobi](https://www.gurobi.com/downloads/) package. You need to activate it using the grbgetkey.
 
-``"Base"`` is the main "project" folder. If you want to create another project, copy the ``"Base"`` folder and rename it to your preference. 
+4- Add and install other packages to your VSCode environment such as: JuMP, CSV, ExcelReaders, Plots,...
 
-``"Data"`` folder contains all the necessary data to run the model. In ``"Profiles"``, you can define the normalized hourly power profiles (between 0 and 1) for a specific location and the hourly grid electricity prices (the excel file and the folder should have the same name). The type of file used should be ``.xls``.
 
-In ``"Inputs"``there is a file called like "project folder"_"file name.xls". This one contains all the techno-economic assumptions and scenarios definitions.
+## Running the OptiPlant tool model
 
-### Filling the inputs data file
+A detailed OptiPlant user guide is included in this page under the name: 
+**2) OptiPlant tool: User guide**.
 
-1- Fill the ``"Data_base_case"`` sheet with your own techno-economic data (if you changes names in red, it is also necessary to change the Import_data or Import_scenarios julia code).
+The detailed step-by-step instructions described in the user guide can be simplified as:
 
-2- In the ``"Selected_units"`` data sheets you can decide to exclude some units from the optimization run (make sure to avoid solving infeasibility by doing so).
+1- Download all the Optiplant Github folder (Go to the green 'Code' button on this page, and click on 'Download ZIP').
 
-3- In the ``"Scenarios_definition"`` sheet, define your scenario name and which data are changed in this scenario compared to the values indicated in the "Data_base_case" sheet.
+2- Insert/change the desired input parameters (files inside ``"Data"`` folder) and run the *Julia* code files to get the results/outcomes 
+-see sections below-. 
 
-4- In the ``"Scenarios"`` sheet, define which scenarios you want to run and the assumptions.
 
-5- Save all the files you changed.
+### *Description of the folder structure:*
 
-### Run the model
+``"BASE"`` is the main "project" folder. If you want to create another project, copy this folder and rename it to your preference. 
+It includes the subfolders ``"Data"`` and ``"Results"``.
 
-1- Go to the code folder and open the ``"Main"`` julia file.
+``"Data"`` folder contains all the necessary data to run the model. In the subfolder ``"Profiles"``, one can check and modify the wind/solar profiles 
+and the electricity prices of different locations during different years The type of files used should be ``.xls``. In the subfolder ``"Inputs"``there are excel 
+different excel sheets where one can check and modify the input data for different study-case scenarios such as: units conforming for the PtX plant, 
+their techno-economic information, the operation strategy of the plant,etc.
 
-2- In the problem set up section change the "Main folder" to the path of your Optiplant folder.
+``"RESULTS"`` folder has the results/outputs of the simulation. A new folder will be created any time a simulation is run, and
+its name would correspond to the one written in the ‘Inputs excel sheet’. Includes different subfolders: Data used,
+Hourly results and Main results.
 
-3- Define which scenarios from the "Scenarios" sheet you want to run.
 
-4- Set the maintenance hours of the plant and the number of hours for the simulation (max 8760). The starting time (Tbegin) is the time from which all units must operate above their minimal loads. 
+``"CODE"`` includes four Julia scripts named ImportData.jl, ImportScenarios.jl, Main.jl, and Main stochastic.jl
 
-5- Choose the currency change if needed (all input data are currently in €2019).
 
-6-Run.
+A more detailed description of each folder and their files can be found in the **2) OptiPlant tool: User guide**
 
-7-Results appears as CSVs in a result folder previously specified in the ``"Scenarios"`` sheet. Running again without changing the destination folder will overwrite the previous results. 
+
+### *Filling the inputs data file:* 
+
+Go to the ``"Inputs"``subfolder and open or create a copy of any of the template files found there. Next, do the following:
+
+a) Fill the ``"Data_base_case"`` sheet with your own techno-economic data (if you changes names in red, it is also necessary to change the 
+*Import_data* or *Import_scenarios* julia code files). 
+
+b) In the ``"Selected_units"`` data sheets you can decide to exclude some units from the optimization run (make sure to avoid solving infeasibility by doing so).
+
+c) In the ``"Scenarios_definition"`` sheet, define your scenario(s) name(s) and which data are changed in this scenario compared to the values indicated in the "Data_base_case" sheet.
+
+d) In the ``"Scenarios ***"`` sheet -create one if needed-, define which scenarios you want to run and the assumptions 
+(update the name of this excel sheet on the *Main* julia code files).. 
+
+e) Save all the files you changed.
+
+Additional information on how the input data files work is included in the **2) OptiPlant tool: User guide**
+
+
+### *Run the model:* 
+
+Go to the ``"CODE"`` folder and open the ``"Main.jl"``,  ``"ImportData.jl"``, and ``"ImportScenarios.jl"`` files. Do the following changes on the ``"Main.jl"`` file:
+
+a) Change the "Main folder" to the correct directory path of your Optiplant folder (make sure the path directories for the other two code files are also correctly written).
+
+b) Define/rewrite the name of which scenarios from the "Scenarios" excel sheet (input data) you want to run.
+
+c) Modify the maintenance hours of the plant and the number of working hours for the simulation (max 8760) and/or the currency change, if needed (all input data are currently in €2019).
+
+e) Run the code.
+
+
+Results appears as CSVs in a result folder previously specified in the ``"Scenarios"`` excel sheet (input adta). Running again without changing the destination folder will overwrite the previous results. 
 
