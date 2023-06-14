@@ -1,0 +1,12 @@
+name = "env"
+uuid = "975a0816-bc0f-4c14-ba90-b5afa0af3014"
+authors = ["njbca <ncampion@protonmail.com>"]
+version = "0.1.0"
+
+[deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+HiGHS = "87dc4568-4c63-4d18-b0c0-bb2238e4078b"
+JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
+Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+XLSX = "fdbf4ff8-1666-58a4-91e7-1b58723a45e0"
