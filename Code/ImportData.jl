@@ -208,6 +208,7 @@ Heat_sell = findall(x -> x == "Heat_sell", Subsets_2) ; nHs = length(Heat_sell)
 
 #---6 - Define scenario data and change the original data file depending on the scenario------------------------------------
 Parameters_name = Data_units[Parameters_index[1],Parameters_index[2]+1:end] ; nPar = length(Parameters_name) #Base case data parameters
+Parameters_year = [isa(x, String) ? x : string(x) for x in Data_units[Year_index[1],Year_index[2]+1:end]] #Base case year parameters
 
 Name_Year = Array{String,1}(undef,nPar)
 for i=1:nPar
