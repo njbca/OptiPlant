@@ -1,4 +1,4 @@
-using JuMP, CSV, DataFrames, XLSX, HiGHS
+using JuMP, CSV, DataFrames, XLSX, HiGHS #using Gurobi
 #Choose a solver
 Solver = "HiGHS" #Write "Gurobi" or "HiGHS".
 #Open julia terminal with VS Code: Alt J Alt O 
@@ -7,9 +7,9 @@ Solver = "HiGHS" #Write "Gurobi" or "HiGHS".
 #Project name
 Project = "Base"
 # Folder name for all csv file
-all_csv_files = "Results_biofuel_publication"
+all_csv_files = "Results"
 # Folder paths for data acquisition and writing
-Main_folder = "C:/Users/anle/OptiPlant-BioFuel-paperpublication" ; ; #Fill with your own Optiplant folder location
+Main_folder = "C:/Users/..../YOUR_FOLDER_PATH" ; ; #Fill with your own Optiplant folder location
 Profiles_folder = joinpath(Main_folder,Project,"Data","Profiles") ;
 Inputs_folder = joinpath(Main_folder,Project,"Data","Inputs") ; 
 Inputs_file = "Bornholm_2030_small_scale_scenario_data"
@@ -20,7 +20,7 @@ Scenarios_set =  "ScenariosToRun" ; include("ImportScenarios.jl")
 N_scen_0 = 1 ; N_scen_end = 1 # or N_scen_end = N_scenarios for total number of scenarios
 #Studied hours (max 8760). When there is maintenance hours are out
 #TMend = 4000-4876 : 90% time working ; T = 4000-4761 : 8000 hours ; T=4675-5011 : 2 weeks maintenance in summer
-TMstart = 4000 ; TMend = 4876 ; Tbegin = 72 ; Tfinish=8760 #Time maintenance starts/end ; Tbegin: Time within plants can operate at 0% load (in case of no renewable power the first 3 days)
+TMstart = 4438 ; TMend = 4876 ; Tbegin = 72 ; Tfinish=8760 #Time maintenance starts/end ; Tbegin: Time within plants can operate at 0% load (in case of no renewable power the first 3 days)
 Time = vcat(collect(1:TMstart),collect(TMend:Tfinish)) ; T = length(Time)
 Tstart = vcat(collect(1:TMstart),collect(TMend:Tfinish)) ;
 if Tbegin >= 2
@@ -69,7 +69,6 @@ while N_scen < N_scen_end + 1 #Run the optimization model for all scenarios
 
  #Costs equation
  @constraint(Model_LP, Costs == sum(Fuel_Buying_fixed[u]*Bought[u,t] for u=1:U, t in Time)
- + sum(Price_Profile[Grid_buy_p[u],t]*Bought[Grid_buy[u],Time[t]] for u=1:nGb,t=1:T)
  + sum((Invest[u]*Annuity_factor[u] + FixOM[u])*Capacity[u] for u=1:U)
  + sum(VarOM[u] * X[u,t] for u=1:U,t in Time)
  - sum(Fuel_Selling_fixed[u]*Sold[u,t] for u=1:U,t in Time)
