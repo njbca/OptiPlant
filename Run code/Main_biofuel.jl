@@ -1,5 +1,4 @@
-using JuMP, CSV, DataFrames, XLSX, Pavito
-import Ipopt, GLPK, HiGHS
+using JuMP, CSV, DataFrames, XLSX, HiGHS
 #Choose a solver
 Solver = "HiGHS" #Write "Gurobi" or "HiGHS".
 #Open julia terminal with VS Code: Alt J Alt O 
