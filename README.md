@@ -7,12 +7,19 @@ The model works under the ‘dynamic power supply and system optimization’ app
 The current model optimize the operation and investment of an e-ammonia or e-methanol plant.
 The plant can be powered by solar, wind or the grid. All the data in the files "Data_ammonia_paper" are valid for near future (2020-2025) and large scale plant. 
 
-The article that describes the model, the input data, and the underlying assumptions is: 
+The article that uses and describes the model, the input data, and the underlying assumptions is: 
 
 Campion, N., Nami, H., Swisher, P. R., Vang Hendriksen, P., & Münster, M. (2023). 
 Techno-economic assessment of green ammonia production with different wind and solar potentials. 
 Renewable and Sustainable Energy Reviews, 173, 113057. 
 https://doi.org/10.1016/j.rser.2022.113057
+
+Antoine Letoffet, Nicolas Campion, Moritz Böhme, Claus Dalsgaard Jensen, Jesper Ahrenfeldt, Lasse Røngaard Clausen (2024).
+Techno-economic assessment of upgraded pyrolysis bio-oils for future marine fuels,
+Energy Conversion and Management, Volume 306, 118225.
+ISSN 0196-8904.
+https://doi.org/10.1016/j.enconman.2024.118225.
+(https://www.sciencedirect.com/science/article/pii/S0196890424001663)
 
 ## Software Installation
 
@@ -37,7 +44,7 @@ A detailed walk-through on how to use OptiPlant is also included within the docu
 
 The detailed step-by-step instructions described in the user guide can be simplified as:
 
-1- Download all the OptiPlant ZIP folder from https://github.com/njbca/OptiPlant (Go to the green 'Code' button on this page, and click on 'Download ZIP').
+1- Download all the OptiPlant ZIP folder from https://github.com/njbca/OptiPlant/tree/OptiPlant-upgraded-bio-oils (Go to the green 'Code' button on this page, and click on 'Download ZIP').
 
 2- Modify/tune the parameters found in the Base > Data folder: Techno-economical data ('Inputs') and/or wind and solar profiles, and electricity prices ('Profiles')  
 
