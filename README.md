@@ -5,14 +5,9 @@ to model Power-to-X fuel production systems with a high variety of customizable 
 The model works under the ‘dynamic power supply and system optimization’ approach (DPS-Syst-Opt).
 
 The current model optimize the operation and investment of an e-ammonia or e-methanol plant.
-The plant can be powered by solar, wind or the grid. All the data in the files "Data_ammonia_paper" are valid for near future (2020-2025) and large scale plant. 
+The plant can be powered by solar, wind or the grid. All the data in the files "Bornholm_2030_large_scale_scenario_data" or "Bornholm_2030_small_scale_scenario_data" are valid for near future (2030). 
 
 The article that uses and describes the model, the input data, and the underlying assumptions is: 
-
-Campion, N., Nami, H., Swisher, P. R., Vang Hendriksen, P., & Münster, M. (2023). 
-Techno-economic assessment of green ammonia production with different wind and solar potentials. 
-Renewable and Sustainable Energy Reviews, 173, 113057. 
-https://doi.org/10.1016/j.rser.2022.113057
 
 Antoine Letoffet, Nicolas Campion, Moritz Böhme, Claus Dalsgaard Jensen, Jesper Ahrenfeldt, Lasse Røngaard Clausen (2024).
 Techno-economic assessment of upgraded pyrolysis bio-oils for future marine fuels,
