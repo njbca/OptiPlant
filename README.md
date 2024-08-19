@@ -16,8 +16,8 @@ https://doi.org/10.1016/j.rser.2022.113057
 
 All the data in the files "Data_ammonia_paper" are valid for near future (2020-2025) and large scale plant.
 
-The tool have been used to lead techno-economic assessment of [upgraded pyrolysis bio-oils](https://doi.org/10.1016/j.enconman.2024.118225) and [DME](https://doi.org/10.1021/acs.energyfuels.4c00311) 
-Other related work are also available [here](https://orbit.dtu.dk/en/persons/nicolas-jean-bernard-campion/publications/)
+The tool have been used to lead techno-economic assessments of [upgraded pyrolysis bio-oils](https://doi.org/10.1016/j.enconman.2024.118225) and [DME](https://doi.org/10.1021/acs.energyfuels.4c00311). 
+Other related works are also available [here](https://orbit.dtu.dk/en/persons/nicolas-jean-bernard-campion/publications/)
 
 ## Software Installation
 
@@ -39,7 +39,7 @@ The detailed step-by-step instructions described in the user guide can be simpli
 
 ## Running the OptiPlant tool model
 
-A detailed walk-through on how to use OptiPlant is also included within the document **OPTIPLANT tool-user guide** found in the folder this page.
+A detailed walk-through on how to use OptiPlant is also included within the document **"OPTIPLANT tool-user guide"** found in the folder this page.
 
 The detailed step-by-step instructions described in the user guide can be simplified as:
 
