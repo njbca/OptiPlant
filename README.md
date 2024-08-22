@@ -2,21 +2,27 @@
 
 OptiPlant is a tool that enables the user 
 to model Power-to-X fuel production systems with a high variety of customizable input parameters and to optimize them according to different criteria. 
-The model works under the ‘dynamic power supply and system optimization’ approach (DPS-Syst-Opt).
+The tool is adapted to investigate a larger number of scenarios and system configurations in a single run. 
 
-The current model optimize the operation and investment of an e-ammonia or e-methanol plant.
-The plant can be powered by solar, wind or the grid. All the data in the files "Data_ammonia_paper" are valid for near future (2020-2025) and large scale plant. 
+The current model optimize the operation and investment of an e-ammonia, e-methanol or upgraded pyrolysis oil plant.
+The plant can be powered by solar, wind and/or the grid.  
 
-The article that describes the model, the input data, and the underlying assumptions is: 
+The article that describes the model, the input data, and the underlying assumptions for ammonia production is: 
 
 Campion, N., Nami, H., Swisher, P. R., Vang Hendriksen, P., & Münster, M. (2023). 
 Techno-economic assessment of green ammonia production with different wind and solar potentials. 
 Renewable and Sustainable Energy Reviews, 173, 113057. 
 https://doi.org/10.1016/j.rser.2022.113057
 
+All the data in the files "Data_ammonia_paper" are valid for near future (2020-2025) and large scale plant.
+
+The tool have been used to lead techno-economic assessments of [upgraded pyrolysis bio-oils](https://doi.org/10.1016/j.enconman.2024.118225) and [DME](https://doi.org/10.1021/acs.energyfuels.4c00311). 
+Other related works are also available [here](https://orbit.dtu.dk/en/persons/nicolas-jean-bernard-campion/publications/)
+
 ## Software Installation
 
-A detailed installation guide for the software needed to run OptiPlant is included within the document **OPTIPLANT tool. User guide** found in this page.
+A detailed installation guide for the software needed to run OptiPlant is included within the document **OPTIPLANT tool-User guide** that can be found inside
+the folder ``"User-guide"`` on this page.
 
 Download the user guide and follow the steps to install all the necessary software.
 
@@ -33,7 +39,7 @@ The detailed step-by-step instructions described in the user guide can be simpli
 
 ## Running the OptiPlant tool model
 
-A detailed walk-through on how to use OptiPlant is also included within the document **OPTIPLANT tool. User guide** found in this page.
+A detailed walk-through on how to use OptiPlant is also included within the document **"OPTIPLANT tool-user guide"** found in the folder this page.
 
 The detailed step-by-step instructions described in the user guide can be simplified as:
 
