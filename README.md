@@ -14,9 +14,14 @@ Techno-economic assessment of green ammonia production with different wind and s
 Renewable and Sustainable Energy Reviews, 173, 113057. 
 https://doi.org/10.1016/j.rser.2022.113057
 
-All the data in the files "Data_ammonia_paper" are valid for near future (2020-2025) and large scale plant.
+The tool includes concentrated solar power (CSP) technologies and thermal energy storage (TES), method, input data and assumptions are explained in the article:
 
-The tool have been used to lead techno-economic assessments of [upgraded pyrolysis bio-oils](https://doi.org/10.1016/j.enconman.2024.118225) and [DME](https://doi.org/10.1021/acs.energyfuels.4c00311). 
+Campion, N., Alvarez, R., Bruce, J. & Münster, M. (2025)
+The potential role of concentrated solar power for off-grid green hydrogen and ammonia production.
+Renewable Energy
+https://doi.org/10.1016/j.renene.2024.121410
+
+The tool have also been used to lead techno-economic assessments of [upgraded pyrolysis bio-oils](https://doi.org/10.1016/j.enconman.2024.118225) and [DME](https://doi.org/10.1021/acs.energyfuels.4c00311). 
 Other related works are also available [here](https://orbit.dtu.dk/en/persons/nicolas-jean-bernard-campion/publications/)
 
 ## Software Installation
