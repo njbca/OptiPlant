@@ -30,6 +30,11 @@ N_scen_0 = 1 ; N_scen_end = 1 # or N_scen_end = N_scenarios for total number of 
 #Studied hours (max 8760). When there is maintenance hours are out
 #TMend = 4000-4876 : 90% time working ; T = 4000-4761 : 8000 hours ; T=4675-5011 : 2 weeks maintenance in summer
 TMstart = 4000 ; TMend = 4001 ; Tbegin = 240 ; Tfinish=8712 #Time maintenance starts/end ; Tbegin: Time within plants can operate at 0% load (in case of no renewable power the first 3 days)
+
+#Values used in the papers "Techno-economic assessment of green ammonia production with different wind and solar potentials" 
+#and "The potential role of concentrated solar power for off-grid green hydrogen and ammonia production":
+#TMstart = 4000 ; TMend = 4876 ; Tbegin = 72 ; Tfinish=8760
+
 Time = vcat(collect(1:TMstart),collect(TMend:Tfinish)) ; T = length(Time)
 Tstart = vcat(collect(1:TMstart),collect(TMend:Tfinish)) ;
 if Tbegin >= 2
