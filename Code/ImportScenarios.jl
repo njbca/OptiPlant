@@ -19,9 +19,11 @@ C_Scenario = findfirst(x -> x == "Scenario", Data_scenarios)[2]
 C_location = findfirst(x -> x == "Location", Data_scenarios)[2]
 C_fuel = findfirst(x -> x == "Fuel", Data_scenarios)[2]
 C_CO2_capture = findfirst(x -> x == "CO2 capture", Data_scenarios)[2]
+C_CSP_tech = (isnothing(findfirst(x -> x == "CSP tech", Data_scenarios)) ? nothing : findfirst(x -> x == "CSP tech", Data_scenarios)[2])
 C_year_data = findfirst(x -> x == "Year data", Data_scenarios)[2]
 C_profile_folder_name = findfirst(x -> x == "Profile folder name", Data_scenarios)[2]
 C_name_profile = findfirst(x -> x == "Profile name", Data_scenarios)[2]
+C_power_TS = (isnothing(findfirst(x -> x == "Profile time series", Data_scenarios)) ? nothing : findfirst(x -> x == "Profile time series", Data_scenarios)[2])
 C_electrolyser = findfirst(x -> x == "Electrolyser", Data_scenarios)[2]
 C_input_data = findfirst(x -> x == "Input data sheet", Data_scenarios)[2]
 
@@ -38,9 +40,11 @@ All_Scenario = [isa(x, String) ? x : string(x) for x in Data_scenarios[L1_scenar
 All_location = [isa(x, String) ? x : string(x) for x in Data_scenarios[L1_scenario:end , C_location]]
 All_fuel = [isa(x, String) ? x : string(x) for x in Data_scenarios[L1_scenario:end , C_fuel]]
 All_CO2_capture = [isa(x, String) ? x : string(x) for x in Data_scenarios[L1_scenario:end , C_CO2_capture]]
+All_CSP_tech = (isnothing(C_CSP_tech) ? nothing : [isa(x, String) ? x : string(x) for x in Data_scenarios[L1_scenario:end , C_CSP_tech]])
 All_year_data = [isa(x, String) ? x : string(x) for x in Data_scenarios[L1_scenario:end , C_year_data]]
 All_profile_name = [isa(x, String) ? x : string(x) for x in Data_scenarios[L1_scenario:end , C_name_profile]]
 All_profile_folder_name = [isa(x, String) ? x : string(x) for x in Data_scenarios[L1_scenario:end , C_profile_folder_name]]
+All_power_TS = (isnothing(C_power_TS) ? nothing : [isa(x, String) ? x : string(x) for x in Data_scenarios[L1_scenario:end , C_power_TS]])
 All_electrolyser = [isa(x, String) ? x : string(x) for x in Data_scenarios[L1_scenario:end , C_electrolyser]]
 All_Input_data = [isa(x, String) ? x : string(x) for x in Data_scenarios[L1_scenario:end , C_input_data]]
 All_results_folder = [isa(x, String) ? x : string(x) for x in Data_scenarios[L1_scenario:end , C_results_folder]]

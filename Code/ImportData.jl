@@ -22,6 +22,12 @@ Profile_folder_name = All_profile_folder_name[N_scen]
 Location = All_location[N_scen]
 Electrolyser = All_electrolyser[N_scen]
 CO2_capture = All_CO2_capture[N_scen]
+if ! isnothing(All_CSP_tech)
+    CSP_tech = All_CSP_tech[N_scen]
+end
+if ! isnothing(All_power_TS)
+    Power_TS = All_power_TS[N_scen]
+end
 csv_files = All_results_folder[N_scen]
 Input_data = All_Input_data[N_scen] # Sheet name in the data excel file
 Option_max_capacity = All_Option_max_capacity[N_scen]
@@ -31,7 +37,11 @@ Option_fixed_oxygen_sale = All_Option_fixed_oxygen_sale[N_scen]
 Option_fixed_heat_sale = All_Option_fixed_heat_sale[N_scen]
 Write_flows = All_Write_flows[N_scen]
 
-Configuration_scenario = Fuel*"_"*Electrolyser*"_"*CO2_capture
+if isnothing(All_CSP_tech)
+    Configuration_scenario = Fuel*"_"*Electrolyser*"_"*CO2_capture
+else
+    Configuration_scenario = Fuel*"_"*Electrolyser*"_"*CO2_capture*"_"*CSP_tech
+end
 
 #-------------------2 - Folder path for profiles and techno_eco data ---------------------------------------
 #Techno-economics data
@@ -89,6 +99,7 @@ Fuel_En_cont_list =  Data_selected_units[L1_fec-1,C0_fec+1:end]
 Data_flux_profile =  read_xlsx(Datafile_profile,"Flux")
 
 Locations_flux_index = findfirst(x -> x == "Locations" , Data_flux_profile)
+TS_flux_index = (isnothing(findfirst(x -> x == "Profile time series", Data_flux_profile)) ? nothing : findfirst(x -> x == "Profile time series", Data_flux_profile))
 Subsets_flux_index = findfirst(x -> x == "Subsets" , Data_flux_profile)
 Index_position_flux = findfirst(x -> x == "Index", Data_flux_profile) # To locate where the subset names will be in the excel file
 L0_f = Index_position_flux[1]
@@ -137,6 +148,17 @@ Selected_flux = findall(x -> x == Location || x == "All", All_locations_flux)
 NoSelected_flux = collect(1:Loc_all_flux)
 NoSelected_flux = NoSelected_flux[setdiff(1:end, Selected_flux), :] 
 Data_flux_profile = Data_flux_profile[:, setdiff(1:end, NoSelected_flux .+ C0_f)]
+
+#Look which power time series is selected and remove profile columns not affiliated with this location
+
+if ! isnothing(TS_flux_index)
+    All_TS_flux = Data_flux_profile[TS_flux_index[1],TS_flux_index[2]+1:end] ; Loc_all_TS = length(All_TS_flux)
+    Selected_flux = findall(x -> x == Power_TS || x == "All", All_TS_flux)
+    NoSelected_flux = collect(1:Loc_all_TS)
+    NoSelected_flux = NoSelected_flux[setdiff(1:end, Selected_flux), :] 
+    Data_flux_profile = Data_flux_profile[:, setdiff(1:end, NoSelected_flux .+ C0_f)]
+end
+
 
 #Do the same with electricity price
 
@@ -275,6 +297,7 @@ C_demand = findfirst(x -> x == "Yearly demand (kg fuel)", Parameters_name)
 C_H2_balance = findfirst(x -> x == "H2 balance", Parameters_name)
 C_El_balance = findfirst(x -> x == "El balance", Parameters_name)
 C_Heat_balance = findfirst(x -> x == "Heat balance", Parameters_name)
+C_CSP_balance = findfirst(x -> x == "CSP balance", Parameters_name)
 C_Max_Cap = findfirst(x -> x == "Max Capacity", Parameters_name)
 C_Load_min = findfirst(x -> x == "Load min (% of max capacity)", Parameters_name)
 C_Ramp_up = findfirst(x -> x == "Ramp up (% of capacity /h)", Parameters_name)
@@ -284,7 +307,7 @@ C_Sc_nom = findfirst(x -> x == "Electrical consumption (kWh/output)", Parameters
 C_Prod_rate = findfirst(x -> x == "Fuel production rate (kg output/kg input)", Parameters_name)
 C_invest = findfirst(x -> x == "Investment (EUR/Capacity installed)", Parameters_name)
 C_FixOM = findfirst(x -> x == "Fixed cost (EUR/Capacity installed/y)", Parameters_name)
-C_VarOM = findfirst(x -> x == "Variable cost (EUR/Output)", Parameters_name)
+C_VarOM = findfirst(x -> x == "Variable cost (EUR/output)", Parameters_name)
 C_FSp = findfirst(x -> x == "Fuel selling price (EUR/output)", Parameters_name)
 C_FBp = findfirst(x -> x == "Fuel buying price (EUR/output)", Parameters_name)
 C_annuity = findfirst(x -> x == "Annuity factor", Parameters_name)
@@ -296,6 +319,7 @@ Unit_tag = Array{String}(Data_units[L1:end, C0 + C_Unit_tag])  # Head-lines for 
 Fuel_energy_content = Fuel_En_cont_list[C_Fuel_energy_content] # Get the fuel energy content of the fuel in the current scenario
 H2_balance = Data_units[L1:end , C0 + C_H2_balance]
 El_balance = Data_units[L1:end , C0 + C_El_balance]
+CSP_balance = (isnothing(C_CSP_balance) ? nothing : Data_units[L1:end , C0 + C_CSP_balance])
 Heat_balance = Data_units[L1:end, C0 + C_Heat_balance]
 Heat_generated = Data_units[L1:end, C0 + C_Heat_generated] #Excess that can be recovered per unit
 Max_Cap = Data_units[L1:end , C0 + C_Max_Cap] # Maximum capacity that can be installed per element of the energy system

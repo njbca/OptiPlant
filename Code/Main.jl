@@ -1,7 +1,7 @@
 using JuMP, CSV, DataFrames, XLSX
 
 #Choose a solver
-Solver = "HiGHS" #Write "Gurobi" or "HiGHS".
+Solver = "Gurobi" #Write "Gurobi" or "HiGHS".
 
 #Load corresponding package
 if Solver == "Gurobi" 
@@ -19,18 +19,18 @@ Project = "Base"
 # Folder name for all csv file
 all_csv_files = "All_results"
 # Folder paths for data acquisition and writing
-Main_folder = "C:/.../OptiPlant-master/OptiPlant-master" ; #Fill with your own Optiplant folder location
+Main_folder = "C:/Users/njbca/Documents/Models/OptiPlantGitHub"
+#Main_folder = "C:/.../OptiPlant-master/OptiPlant-master" ; #Fill with your own Optiplant folder location
 Profiles_folder = joinpath(Main_folder,Project,"Data","Profiles") ;
 Inputs_folder = joinpath(Main_folder,Project,"Data","Inputs") ; 
-Inputs_file = "Input_data_example"
-
+Inputs_file = "Meas_vs_sim_data"
 # Scenario set (same name as exceel sheet)
 Scenarios_set =  "ScenariosToRun" ; include("ImportScenarios.jl")
 # Scenario under study (all between N_scen_0 and N_scen_end)
-N_scen_0 = 1 ; N_scen_end = 1 # or N_scen_end = N_scenarios for total number of scenarios
+N_scen_0 = 82 ; N_scen_end = N_scenarios # or N_scen_end = N_scenarios for total number of scenarios
 #Studied hours (max 8760). When there is maintenance hours are out
 #TMend = 4000-4876 : 90% time working ; T = 4000-4761 : 8000 hours ; T=4675-5011 : 2 weeks maintenance in summer
-TMstart = 4000 ; TMend = 4876 ; Tbegin = 72 ; Tfinish=8760 #Time maintenance starts/end ; Tbegin: Time within plants can operate at 0% load (in case of no renewable power the first 3 days)
+TMstart = 4000 ; TMend = 4001 ; Tbegin = 240 ; Tfinish=8712 #Time maintenance starts/end ; Tbegin: Time within plants can operate at 0% load (in case of no renewable power the first 3 days)
 Time = vcat(collect(1:TMstart),collect(TMend:Tfinish)) ; T = length(Time)
 Tstart = vcat(collect(1:TMstart),collect(TMend:Tfinish)) ;
 if Tbegin >= 2
@@ -117,6 +117,10 @@ while N_scen < N_scen_end + 1 #Run the optimization model for all scenarios
   @constraint(Model_LP,[t in Time],sum(H2_balance[u]*X[u,t] for u=1:U)==0)
   # Heat balance
   @constraint(Model_LP,[t in Time],sum(Heat_balance[u]*Heat_generated[u]*X[u,t] for u=1:U)==0)
+  # CSP balance
+  if ! isnothing(CSP_balance)
+  @constraint(Model_LP,[t in Time], sum(CSP_balance[u]*X[u,t] for u=1:U)==0)
+  end
   # Storages balance
   @constraint(Model_LP,[i=1:nST,t=1:T], X[Tanks[i],Time[t]] == (t>Time[1] ? X[Tanks[i],Time[t-1]] : 0) + X[Stor_in[i],Time[t]] - X[Stor_out[i],Time[t]])
 
@@ -149,8 +153,19 @@ while N_scen < N_scen_end + 1 #Run the optimization model for all scenarios
     Infos[4] = "Fuel: "*Fuel
     Infos[5] = "Electrolyser: "*Electrolyser
     Infos[6] = "CO2 capture: "*CO2_capture
+    if ! isnothing(All_CSP_tech)
+      Infos[7] = "CSP tech: "*CSP_tech
+    else
+      Infos[7] = " "
+    end
 
-    for i=7:T
+    if ! isnothing(All_power_TS)
+      Infos[7] = "Power time series: "*Power_TS
+    else
+      Infos[7] = " "
+    end
+
+    for i=8:T
       Infos[i] = " "
     end
 
@@ -192,6 +207,12 @@ while N_scen < N_scen_end + 1 #Run the optimization model for all scenarios
     R_fuel = Array{String,1}(undef,U) ; R_electrolyser = Array{String,1}(undef,U) ;
     R_CO2_capture = Array{String,1}(undef,U) ; R_profile = Array{String,1}(undef,U) ;
     R_elec_cost = zeros(U) ; R_scenario = Array{String,1}(undef,U);
+    if ! isnothing(All_CSP_tech)
+      R_CSP_tech = Array{String,1}(undef,U);
+    end
+    if ! isnothing(All_power_TS)
+      R_power_TS = Array{String,1}(undef,U);
+    end
 
     for u=1:nGb
       R_fuelprice_t[Grid_buy[u]] = sum(Price_Profile[Grid_buy_p[u],t]*JuMP.value.(Bought[Grid_buy[u],Time[t]]) for t=1:T)*10^-6*Currency_factor
@@ -205,6 +226,12 @@ while N_scen < N_scen_end + 1 #Run the optimization model for all scenarios
         R_fuel[u] = Fuel
         R_electrolyser[u] = Electrolyser
         R_CO2_capture[u] = CO2_capture
+        if ! isnothing(All_CSP_tech)
+          R_CSP_tech[u] = CSP_tech
+        end
+        if ! isnothing(All_power_TS)
+          R_power_TS[u] = Power_TS
+        end
         R_capacity[u] = JuMP.value.(Capacity[u])*10^-3 #In MW for unit producing electricity, in t/h for other units, in t for hydrogen storage, in MWh for batteries
         R_invest[u] = Invest[u]*JuMP.value.(Capacity[u])*10^-6*Currency_factor #In M€ (€ is default but currency factor can be applied)
         R_invest_year[u] = R_invest[u]*Annuity_factor[u] #Annulized investment in M€
@@ -234,20 +261,53 @@ while N_scen < N_scen_end + 1 #Run the optimization model for all scenarios
       R_elec_cost[u] = R_elec_cost_1
     end
 
-    df_results = DataFrame([R_scenario, Name_selected_units, R_year,R_location, R_profile, 
-    R_fuel,R_electrolyser,R_CO2_capture, R_capacity, R_invest, R_invest_year, R_fixOM, R_varOM,
-    R_fuelprice, R_cost_unit, R_production,R_sold, R_El_cons,
-    R_prodcost_fuel, R_prodcost_fuel_GJ, R_prodcost_fuel_MWh,R_prodcost_perunit,
-    R_load_av, R_FLH,R_elec_cost], :auto)
-    results = "Scenario_$N_scen.csv"
-    Result_name = ["Scenario","Type of unit","Year data","Location","Profile","Fuel","Electrolyser",
-    "CO2 capture", "Installed capacity (MW (electrical unit), t/h (non electrical), MWh (batteries), t (h2 tank))","Total investment(MEuros)",
-    "Annualised investment(MEuros)", "Fixed O&M(MEuros)", "Variable O&M(MEuros)",
-    "Fuel cost(MEuros)","Cost per unit(MEuros)","Production(kton or GWh)","Sale (MEuros)",
-    "Electricity consumption(GWh)", "Production cost fuel (Euros/kgfuel)",
-    "Production cost fuel (Euros/GJfuel)","Production cost fuel (Euros/MWhfuel)",
-    "Production cost per unit (Euros/kg or kWh output)", "Load average","Full load hours", "Av electricity cost(Euros/MWh)"]
-    rename!(df_results, Result_name)
+    if ! isnothing(All_CSP_tech)
+      df_results = DataFrame([R_scenario, Name_selected_units, R_year,R_location, R_profile, 
+      R_fuel,R_electrolyser,R_CO2_capture, R_CSP_tech, R_capacity, R_invest, R_invest_year, R_fixOM, R_varOM,
+      R_fuelprice, R_cost_unit, R_production,R_sold, R_El_cons,
+      R_prodcost_fuel, R_prodcost_fuel_GJ, R_prodcost_fuel_MWh,R_prodcost_perunit,
+      R_load_av, R_FLH,R_elec_cost], :auto)
+      results = "Scenario_$N_scen.csv"
+      Result_name = ["Scenario","Type of unit","Year data","Location","Profile","Fuel","Electrolyser",
+      "CO2 capture", "CSP technology","Installed capacity (MW (electrical unit), t/h (non electrical), MWh (batteries), t (h2 tank))","Total investment(MEuros)",
+      "Annualised investment(MEuros)", "Fixed O&M(MEuros)", "Variable O&M(MEuros)",
+      "Fuel cost(MEuros)","Cost per unit(MEuros)","Production(kton or GWh)","Sale (MEuros)",
+      "Electricity consumption(GWh)", "Production cost fuel (Euros/kgfuel)",
+      "Production cost fuel (Euros/GJfuel)","Production cost fuel (Euros/MWhfuel)",
+      "Production cost per unit (Euros/kg or kWh output)", "Load average","Full load hours", "Av electricity cost(Euros/MWh)"]
+      rename!(df_results, Result_name)
+    elseif ! isnothing(All_power_TS)
+      df_results = DataFrame([R_scenario, Name_selected_units, R_year,R_location, R_profile, R_power_TS,
+      R_fuel,R_electrolyser,R_CO2_capture, R_capacity, R_invest, R_invest_year, R_fixOM, R_varOM,
+      R_fuelprice, R_cost_unit, R_production,R_sold, R_El_cons,
+      R_prodcost_fuel, R_prodcost_fuel_GJ, R_prodcost_fuel_MWh,R_prodcost_perunit,
+      R_load_av, R_FLH,R_elec_cost], :auto)
+      results = "Scenario_$N_scen.csv"
+      Result_name = ["Scenario","Type of unit","Year data","Location","Profile","Power time series","Fuel","Electrolyser",
+      "CO2 capture", "Installed capacity (MW (electrical unit), t/h (non electrical), MWh (batteries), t (h2 tank))","Total investment(MEuros)",
+      "Annualised investment(MEuros)", "Fixed O&M(MEuros)", "Variable O&M(MEuros)",
+      "Fuel cost(MEuros)","Cost per unit(MEuros)","Production(kton or GWh)","Sale (MEuros)",
+      "Electricity consumption(GWh)", "Production cost fuel (Euros/kgfuel)",
+      "Production cost fuel (Euros/GJfuel)","Production cost fuel (Euros/MWhfuel)",
+      "Production cost per unit (Euros/kg or kWh output)", "Load average","Full load hours", "Av electricity cost(Euros/MWh)"]
+      rename!(df_results, Result_name)
+    else
+      df_results = DataFrame([R_scenario, Name_selected_units, R_year,R_location, R_profile,
+      R_fuel,R_electrolyser,R_CO2_capture, R_capacity, R_invest, R_invest_year, R_fixOM, R_varOM,
+      R_fuelprice, R_cost_unit, R_production,R_sold, R_El_cons,
+      R_prodcost_fuel, R_prodcost_fuel_GJ, R_prodcost_fuel_MWh,R_prodcost_perunit,
+      R_load_av, R_FLH,R_elec_cost], :auto)
+      results = "Scenario_$N_scen.csv"
+      Result_name = ["Scenario","Type of unit","Year data","Location","Profile","Fuel","Electrolyser",
+      "CO2 capture", "Installed capacity (MW (electrical unit), t/h (non electrical), MWh (batteries), t (h2 tank))","Total investment(MEuros)",
+      "Annualised investment(MEuros)", "Fixed O&M(MEuros)", "Variable O&M(MEuros)",
+      "Fuel cost(MEuros)","Cost per unit(MEuros)","Production(kton or GWh)","Sale (MEuros)",
+      "Electricity consumption(GWh)", "Production cost fuel (Euros/kgfuel)",
+      "Production cost fuel (Euros/GJfuel)","Production cost fuel (Euros/MWhfuel)",
+      "Production cost per unit (Euros/kg or kWh output)", "Load average","Full load hours", "Av electricity cost(Euros/MWh)"]
+      rename!(df_results, Result_name)
+    end
+
     CSV.write(joinpath(Main_result_folder,results),df_results)
     CSV.write(joinpath(Main_all_results_folder,results),df_results)
   else
