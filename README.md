@@ -14,7 +14,7 @@ Techno-economic assessment of green ammonia production with different wind and s
 Renewable and Sustainable Energy Reviews, 173, 113057. 
 https://doi.org/10.1016/j.rser.2022.113057
 
-The tool includes concentrated solar power (CSP) technologies and thermal energy storage (TES), method, input data and assumptions are explained in the article:
+The tool now includes concentrated solar power (CSP) technologies and thermal energy storage (TES). Methods, input data and assumptions are explained in:
 
 Campion, N., Alvarez, R., Bruce, J. & Münster, M. (2025)
 The potential role of concentrated solar power for off-grid green hydrogen and ammonia production.
