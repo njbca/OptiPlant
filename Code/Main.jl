@@ -19,15 +19,14 @@ Project = "Base"
 # Folder name for all csv file
 all_csv_files = "All_results"
 # Folder paths for data acquisition and writing
-Main_folder = "C:/Users/njbca/Documents/Models/OptiPlantGitHub"
-#Main_folder = "C:/.../OptiPlant-master/OptiPlant-master" ; #Fill with your own Optiplant folder location
+Main_folder = "C:/.../OptiPlant-master/OptiPlant-master" ; #Fill with your own Optiplant folder location
 Profiles_folder = joinpath(Main_folder,Project,"Data","Profiles") ;
 Inputs_folder = joinpath(Main_folder,Project,"Data","Inputs") ; 
-Inputs_file = "Meas_vs_sim_data"
+Inputs_file = "Input_data_example"
 # Scenario set (same name as exceel sheet)
 Scenarios_set =  "ScenariosToRun" ; include("ImportScenarios.jl")
 # Scenario under study (all between N_scen_0 and N_scen_end)
-N_scen_0 = 82 ; N_scen_end = N_scenarios # or N_scen_end = N_scenarios for total number of scenarios
+N_scen_0 = 1 ; N_scen_end = 1 # or N_scen_end = N_scenarios for total number of scenarios
 #Studied hours (max 8760). When there is maintenance hours are out
 #TMend = 4000-4876 : 90% time working ; T = 4000-4761 : 8000 hours ; T=4675-5011 : 2 weeks maintenance in summer
 TMstart = 4000 ; TMend = 4001 ; Tbegin = 240 ; Tfinish=8712 #Time maintenance starts/end ; Tbegin: Time within plants can operate at 0% load (in case of no renewable power the first 3 days)
