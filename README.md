@@ -45,8 +45,8 @@ The detailed step-by-step instructions described in the user guide can be simpli
 
 6- Know you can (finally!) test run the model: open the Main.jl Julia file found in the Run Code folder. Edit the code changing the folder directory (depending on the place where you stored the unzipped file on your PC). Run the code file.
 
-7- Check the obtained outcomes (CSV) in the defined drectory inside the Base > Results folder. Import the CSV data to the ‘Results’ excel file found in the same folder to process and visualize the model outcomes
-  
+7- Check the obtained outcomes (CSV) in the defined directory inside the Base > Results folder. Import the CSV data to the ``"Results_general.xlsm"`` excel file found in the same folder to process and visualize the model outcomes. 
+The files ``"Results_mvssim.xlsm"`` and ``"R_mvssim_sensitities.xlsm"`` are for extracting the results specific to the input data file "Meas_vs_sim_data" and [this study](Add link).
 
 ## Using the OptiPlant tool
 
@@ -118,4 +118,4 @@ e) Run the code.
 
 
 Results appears as CSVs in a result folder previously specified in the ``"Scenarios"`` excel sheet (input data). Running again without changing the destination folder will overwrite the previous results. 
-Import the CSV data to the ‘Results’ excel file found in the same folder to process and visualize the model outcomes
+Import the CSV data to the ``"Results_general.xlsm"`` excel file found in the same folder to process and visualize the model outcomes.
