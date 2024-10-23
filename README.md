@@ -33,19 +33,21 @@ Download the user guide and follow the steps to install all the necessary softwa
 
 The detailed step-by-step instructions described in the user guide can be simplified as follows:
 
-1- Download all the OptiPlant ZIP folder from https://github.com/njbca/OptiPlant (Go to the green 'Code' button on this page, and click on 'Download ZIP'). Unzip the folder.
+1- Download all the OptiPlant ZIP folder from https://github.com/njbca/OptiPlant (Go to the green 'Code' button on this page, and click on 'Download ZIP'). Unzip the folder. If you are familiar with GitHub you can also Fork the repository.
 
-2- Download and install [Julia](https://julialang.org/downloads/)
+2- Download and install [Julia](https://julialang.org/downloads/). Add Julia to PATH **ONLY if** you had VS Code already installed.
 
-3- Download and install a code editor like [VSCode](https://code.visualstudio.com/). Add the *Julia* extension in the code editor.
+3- Download and install a code editor like [VSCode](https://code.visualstudio.com/). Make sure to select the "Add to PATH" option when installing. 
 
-4- Add and install the necessary packages to your VSCode environment such as: JuMP, HiGHS, XLSX, DataFrames and CSV. To do so write `]` in the Julia/REPL prompt to open the package manager. Then write `add *Package name*`.
+4- Add the *Julia* extension in the code editor (Extensions marketplace on the left sidebar).
 
-5- (optional)- Get a license and install the [Gurobi](https://www.gurobi.com/downloads/) package. You need to activate it using the grbgetkey.
+5- Add and install the necessary packages to your VSCode environment such as: JuMP, HiGHS, XLSX, DataFrames and CSV. To do so write `]` in the Julia/REPL prompt to open the package manager. Then write `add *Package name*`.
 
-6- Know you can (finally!) test run the model: open the Main.jl Julia file found in the Run Code folder. Edit the code changing the folder directory (depending on the place where you stored the unzipped file on your PC). Run the code file.
+6- (optional)- Get a license and install the [Gurobi](https://www.gurobi.com/downloads/) package. You need to activate it using the grbgetkey.
 
-7- Check the obtained outcomes (CSV) in the defined directory inside the Base > Results folder. Import the CSV data to the ``"Results_general.xlsm"`` excel file found in the same folder to process and visualize the model outcomes. 
+7- Know you can (finally!) test run the model: open the Main.jl Julia file found in the Run Code folder. Edit the code changing the folder directory (depending on the place where you stored the unzipped file on your PC). Run the code file.
+
+8- Check the obtained outcomes (CSV) in the defined directory inside the Base > Results folder. Import the CSV data to the ``"Results_general.xlsm"`` excel file found in the same folder to process and visualize the model outcomes. 
 The files ``"Results_mvssim.xlsm"`` and ``"R_mvssim_sensitities.xlsm"`` are for extracting the results specific to the input data file "Meas_vs_sim_data" and [this study](Add link).
 
 ## Using the OptiPlant tool
