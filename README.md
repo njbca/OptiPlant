@@ -14,12 +14,7 @@ Techno-economic assessment of green ammonia production with different wind and s
 Renewable and Sustainable Energy Reviews, 173, 113057. 
 https://doi.org/10.1016/j.rser.2022.113057
 
-The tool now includes concentrated solar power (CSP) technologies and thermal energy storage (TES). Methods, input data (in "Data_CSP_paper") and assumptions are explained in:
-
-Campion, N., Alvarez, R., Bruce, J. & Münster, M. (2025)
-The potential role of concentrated solar power for off-grid green hydrogen and ammonia production.
-Renewable Energy
-https://doi.org/10.1016/j.renene.2024.121410
+The tool now includes concentrated solar power (CSP) technologies and thermal energy storage (TES). Methods, input data (in "Data_CSP_paper") and assumptions are explained in: https://doi.org/10.1016/j.renene.2024.121410
 
 The tool have also been used to lead techno-economic assessments of [upgraded pyrolysis bio-oils](https://doi.org/10.1016/j.enconman.2024.118225) (see the specific branch) and [DME](https://doi.org/10.1021/acs.energyfuels.4c00311). 
 Other related works are also available [here](https://orbit.dtu.dk/en/persons/nicolas-jean-bernard-campion/publications/)
@@ -33,7 +28,7 @@ Download the user guide and follow the steps to install all the necessary softwa
 
 The detailed step-by-step instructions described in the user guide can be simplified as follows:
 
-1- Download all the OptiPlant ZIP folder from https://github.com/njbca/OptiPlant (Go to the green 'Code' button on this page, and click on 'Download ZIP'). Unzip the folder. If you are familiar with GitHub you can also Fork the repository.
+1- Download all the OptiPlant ZIP folder from https://github.com/njbca/OptiPlant (Go to the green 'Code' button on this page, and click on 'Download ZIP'). Unzip the folder. If you are using GitHub you can also Fork and Clone the repository.
 
 2- Download and install [Julia](https://julialang.org/downloads/). Add Julia to PATH **ONLY if** you had VS Code already installed.
 
