@@ -1,7 +1,7 @@
 using JuMP, CSV, DataFrames, XLSX
 
 #Choose a solver
-Solver = "Gurobi" #Write "Gurobi" or "HiGHS".
+Solver = "HiGHS" #Write "Gurobi" or "HiGHS".
 
 #Load corresponding package
 if Solver == "Gurobi" 
@@ -21,31 +21,30 @@ all_csv_files = "All_results"
 
 # Folder paths for data acquisition and writing
 
-#Main_folder = "C:/.../OptiPlant-master/OptiPlant-master" ; #Fill with your own Optiplant folder location
-Main_folder = "C:/Users/njbca/Documents/Models/OptiPlantGitHub"
+Main_folder = "C:/.../OptiPlant-master/OptiPlant-master" ; #Fill with your own Optiplant folder location
 Profiles_folder = joinpath(Main_folder,Project,"Data","Profiles") ;
 Inputs_folder = joinpath(Main_folder,Project,"Data","Inputs") ; 
 
 #Select the relevant input data file
 
-#Inputs_file = "Input_data_example"
+Inputs_file = "Input_data_example"
 #Inputs_file = "Data_ammonia_paper"
 #Inputs_file = "Data_CSP_paper"
-Inputs_file = "Meas_vs_sim_data"
+#Inputs_file = "Meas_vs_sim_data"
 
 # Scenario set (same name as exceel sheet)
-Scenarios_set =  "Scenarios_sensitivities" ; include("ImportScenarios.jl")
+Scenarios_set =  "ScenariosToRun" ; include("ImportScenarios.jl")
 # Scenario under study (all between N_scen_0 and N_scen_end)
-N_scen_0 = 17 ; N_scen_end = N_scenarios # or N_scen_end = N_scenarios for total number of scenarios
+N_scen_0 = 1 ; N_scen_end = 1 # or N_scen_end = N_scenarios for total number of scenarios
 
 #Studied hours (max 8760). Maintenance hours are out of the simulation
 #TMstart-TMend = 4000-4876 : 90% time working ; T = 4000-4761 : 8000 hours ; T=4675-5011 : 2 weeks maintenance in summer
-TMstart = 4000 ; TMend = 4001 ; Tbegin = 240 ; Tfinish=8712 #Time maintenance starts/end ; Tbegin: Time within plants can operate at 0% load (in case of limited renewable power the first 10 days)
+#TMstart = 4000 ; TMend = 4001 ; Tbegin = 240 ; Tfinish=8712 #Time maintenance starts/end ; Tbegin: Time within plants can operate at 0% load (in case of limited renewable power the first 10 days)
 
 #Values used in the papers "Techno-economic assessment of green ammonia production with different wind and solar potentials" 
 #and "The potential role of concentrated solar power for off-grid green hydrogen and ammonia production":
 
-#TMstart = 4000 ; TMend = 4876 ; Tbegin = 72 ; Tfinish=8760
+TMstart = 4000 ; TMend = 4876 ; Tbegin = 72 ; Tfinish=8760
 
 Currency_factor = 1 # 1.12 for dollar 2019 #All input data are in Euro 2019
 
