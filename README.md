@@ -16,8 +16,8 @@ https://doi.org/10.1016/j.rser.2022.113057
 
 The tool now includes concentrated solar power (CSP) technologies and thermal energy storage (TES). Methods, input data (in "Data_CSP_paper") and assumptions are explained in: https://doi.org/10.1016/j.renene.2024.121410
 
-The tool have also been developed to lead techno-economic assessments of [upgraded pyrolysis bio-oils](https://doi.org/10.1016/j.enconman.2024.118225) (see the specific branch) and [DME](https://doi.org/10.1021/acs.energyfuels.4c00311). 
-The tool has been used [in this study](https://doi.org/10.1016/j.rser.2024.115044) and a more [specialized version](https://github.com/giumonros/Measured-vs-simulated-PV/tree/main) have been developped to study the influence of using measured or simulated solar PV data on hydrogen techno-economic assessments (input file "Meas_vs_sim_data").
+The tool have also been used to lead techno-economic assessments of [upgraded pyrolysis bio-oils](https://doi.org/10.1016/j.enconman.2024.118225) (see the specific branch) and [DME](https://doi.org/10.1021/acs.energyfuels.4c00311). 
+The tool has been used [here](https://doi.org/10.1016/j.rser.2024.115044) and a more [specialized version](https://github.com/giumonros/Measured-vs-simulated-PV/tree/main) have been developed to study the influence of using measured or simulated solar PV data on hydrogen techno-economic assessments (input file "Meas_vs_sim_data").
 Other related works are also available [here](https://orbit.dtu.dk/en/persons/nicolas-jean-bernard-campion/publications/)
 
 ## Quick guide for software installation and model test run
