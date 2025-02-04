@@ -154,9 +154,6 @@ while N_scen < N_scen_end + 1 #Run the optimization model for all scenarios
 
   # solve
   optimize!(Model_LP)
- 
-  #Start counter
-  #start_time = time_ns()
   
   #--------------------------Results output------------------------------------------
   if termination_status(Model_LP) == MOI.OPTIMAL
@@ -334,6 +331,3 @@ while N_scen < N_scen_end + 1 #Run the optimization model for all scenarios
 global N_scen += 1 #Increment and run the script for another scenario
 
 end
-
-#Finish time
-#elapsed_time = (time_ns() - start_time) * 1e-9 # Convert to seconds

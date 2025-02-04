@@ -17,6 +17,7 @@ https://doi.org/10.1016/j.rser.2022.113057
 The tool now includes concentrated solar power (CSP) technologies and thermal energy storage (TES). Methods, input data (in "Data_CSP_paper") and assumptions are explained in: https://doi.org/10.1016/j.renene.2024.121410
 
 The tool have also been used to lead techno-economic assessments of [upgraded pyrolysis bio-oils](https://doi.org/10.1016/j.enconman.2024.118225) (see the specific branch) and [DME](https://doi.org/10.1021/acs.energyfuels.4c00311). 
+The tool has been used [here](https://doi.org/10.1016/j.rser.2024.115044) and a more [specialized version](https://github.com/giumonros/Measured-vs-simulated-PV/tree/main) have been developped to study the influence of using measured or simulated solar PV data on hydrogen techno-economic assessments (input file "Meas_vs_sim_data").
 Other related works are also available [here](https://orbit.dtu.dk/en/persons/nicolas-jean-bernard-campion/publications/)
 
 ## Quick guide for software installation and model test run
@@ -43,7 +44,7 @@ The detailed step-by-step instructions described in the user guide can be simpli
 7- Know you can (finally!) test run the model: open the Main.jl Julia file found in the Run Code folder. Edit the code changing the folder directory (depending on the place where you stored the unzipped file on your PC). Run the code file.
 
 8- Check the obtained outcomes (CSV) in the defined directory inside the Base > Results folder. Import the CSV data to the ``"Results_general.xlsm"`` excel file found in the same folder to process and visualize the model outcomes. 
-The files ``"Results_mvssim.xlsm"`` and ``"R_mvssim_sensitities.xlsm"`` are for extracting the results specific to the input data file "Meas_vs_sim_data" and [this study](Add link).
+The files ``"Results_mvssim.xlsm"`` and ``"R_mvssim_sensitities.xlsm"`` are for extracting the results specific to the input data file "Meas_vs_sim_data" and [this study](https://doi.org/10.1016/j.rser.2024.115044).
 
 ## Using the OptiPlant tool
 
