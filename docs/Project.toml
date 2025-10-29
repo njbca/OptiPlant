@@ -1,0 +1,14 @@
+name = "OptiPlantDocs"
+uuid = "a1b2c3d4-0000-0000-0000-000000000000"
+authors = ["OptiPlant Documentation"]
+
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+
+[compat]
+julia = "1.11"
+
+# This Project.toml is used to build the documentation site.
+# What to fill:
+# - Pin Documenter or other docs-only deps here if you need reproducible builds.
+# - Ensure the `OptiPlantPtX` UUID matches the package UUID in the repository.
