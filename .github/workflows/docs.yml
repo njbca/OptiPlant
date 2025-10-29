@@ -1,0 +1,38 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Debug: show runner workspace and repo info
+        run: |
+          echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY"
+          echo "GITHUB_WORKSPACE=$(pwd)"
+          echo "Listing root files:"
+          ls -la
+          echo "Listing docs folder (if present):"
+          ls -la docs || true
+      - name: Setup Julia
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: '1.11'
+      - name: Install dependencies
+        run: |
+          julia -e 'using Pkg; Pkg.activate("docs"); Pkg.instantiate()'
+      - name: Build documentation
+        run: |
+          julia --project=docs docs/make.jl
+      - name: Upload docs
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/build

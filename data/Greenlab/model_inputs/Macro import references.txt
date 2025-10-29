@@ -1,0 +1,134 @@
+Sub Import_comments()
+    '
+    ' Import_comments Macro
+    '
+    Dim sheetsInput As String
+    Dim Source_sheet_name As String
+    Dim Destination_sheet_name As String
+    Dim Source_sheet As Worksheet
+    Dim Destination_sheet As Worksheet
+    
+    sheetsInput = InputBox("Enter source and destination sheet names separated by a comma (e.g. Sheet1,Sheet2):", "Sheet Name", "Data_base_case,Ref_base_case")
+    Source_sheet_name = Trim(Split(sheetsInput, ",")(0))
+    Destination_sheet_name = Trim(Split(sheetsInput, ",")(1))
+    
+    On Error Resume Next
+    Set Source_sheet = ThisWorkbook.Worksheets(Source_sheet_name)
+    If Source_sheet Is Nothing Then
+        MsgBox "Sheet not found. Please enter a valid source sheet name."
+        Exit Sub
+    End If
+    
+    On Error Resume Next
+    Set Destination_sheet = ThisWorkbook.Worksheets(Destination_sheet_name)
+    If Destination_sheet Is Nothing Then
+        MsgBox "Sheet not found. Please enter a valid destination sheet name."
+        Exit Sub
+    End If
+    
+    'Copy input data sheet in this worksheet
+    
+    Sheets(Source_sheet_name).Select
+    Cells.Select
+    Selection.Copy
+    Sheets(Destination_sheet_name).Select
+    Range("A1").Select
+    ActiveSheet.Paste
+    Range("A1:D3").Select
+    Application.CutCopyMode = False
+    Selection.ClearContents
+    
+    
+    'Replace values from Ref_base_case with comments from Data_Base_case
+    Dim src As Worksheet
+    Dim dest As Worksheet
+    Dim cmtSrc As Comment
+    Dim cmtDest As Comment
+    Dim rng As Range
+    Dim cell As Range
+    
+    Set src = ThisWorkbook.Sheets(Source_sheet_name)
+    Set dest = ThisWorkbook.Sheets(Destination_sheet_name)
+    
+    ' Loop through all comments in source sheet
+    For Each cmtSrc In src.Comments
+        ' Check if source comment text is not empty
+        If Trim(cmtSrc.Text) <> "" Then
+            ' Check if destination cell already has a comment
+            If dest.Cells(cmtSrc.Parent.Row, cmtSrc.Parent.Column).Comment Is Nothing Then
+                ' Add comment to destination cell
+                Set cmtDest = dest.Cells(cmtSrc.Parent.Row, cmtSrc.Parent.Column).AddComment(cmtSrc.Text)
+                cmtDest.Shape.TextFrame.Characters.Font.Bold = False
+            End If
+        End If
+    Next cmtSrc
+    
+    'Remove the author name from all comments
+    Dim cmt As Comment
+    For Each cmt In ActiveSheet.Comments
+        Dim commentText As String
+        commentText = cmt.Text
+        ' Remove author name and colon
+        commentText = Replace(commentText, cmt.Author & ":", "")
+        ' Remove newline character
+        commentText = Replace(commentText, Chr(10), "")
+        cmt.Text Text:=commentText
+    Next cmt
+    
+    'Replace values with comments in destination sheet
+    Set rng = dest.UsedRange
+    For Each cell In rng.Cells
+        If Not cell.Comment Is Nothing Then
+            cell.Value = cell.Comment.Text
+        End If
+    Next cell
+    
+    'Delete all the comments from the sheet
+    
+    For Each cmt In ActiveSheet.Comments
+        cmt.Delete
+    Next cmt
+    
+    'Replace all values without comment (all the numerical values) by a zero
+    
+    For Each cell In rng
+        If IsNumeric(cell.Value) And Not IsEmpty(cell.Value) Or IsError(cell.Value) Then
+            cell.Value = 0
+        End If
+    Next cell
+
+    'Save the file as xlsx
+    
+    Dim originalPath As String
+    Dim originalName As String
+    Dim newXLSXPath As String
+    
+    ' Get the path and name of the original .xlsm file
+    originalPath = ThisWorkbook.Path
+    originalName = ThisWorkbook.Name
+    
+    ' Remove "_macro" from the file name
+    Dim newName As String
+    newName = Replace(originalName, "_macro", "", , , vbTextCompare)
+    
+    ' Create the new .xlsx file path
+    newXLSXPath = originalPath & "\" & Left(newName, Len(newName) - 5) & ".xlsx"
+    
+    ' Disable display of alerts (warnings)
+    Application.DisplayAlerts = False
+    
+    ' Save the current workbook as .xlsx
+    ThisWorkbook.SaveAs newXLSXPath, FileFormat:=51 ' 51 corresponds to .xlsx format
+    
+    ' Re-enable display of alerts
+    Application.DisplayAlerts = True
+    
+    ' Close the new .xlsx file without saving changes
+    newWorkbook.Close SaveChanges:=False
+    
+    ' Close the original .xlsm file
+    ThisWorkbook.Close SaveChanges:=False
+   
+  
+End Sub
+

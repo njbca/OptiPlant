@@ -1,0 +1,51 @@
+FG,Phase,BG,Method Family,Impact Category,Score,Unit
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,acidification,-3.08E-15,mol H+-Eq
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,climate change,-9.67E-13,kg CO2-Eq
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,climate change: biogenic,-1.24E-26,kg CO2-Eq
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,climate change: fossil,-9.67E-13,kg CO2-Eq
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,climate change: land use and land use change,6.14E-26,kg CO2-Eq
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,ecotoxicity: freshwater,-5.25E-12,CTUe
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,"ecotoxicity: freshwater, inorganics",-1.30E-17,CTUe
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,"ecotoxicity: freshwater, organics",-5.25E-12,CTUe
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,energy resources: non-renewable,-1.43E-24,"MJ, net calorific value"
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,eutrophication: freshwater,-4.38E-28,kg P-Eq
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,eutrophication: marine,-1.62E-15,kg N-Eq
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,eutrophication: terrestrial,-1.77E-14,mol N-Eq
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,human toxicity: carcinogenic,-1.71E-30,CTUh
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,"human toxicity: carcinogenic, inorganics",-1.71E-30,CTUh
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,"human toxicity: carcinogenic, organics",-1.36E-33,CTUh
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,human toxicity: non-carcinogenic,-3.93E-22,CTUh
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,"human toxicity: non-carcinogenic, inorganics",-1.49E-26,CTUh
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,"human toxicity: non-carcinogenic, organics",-3.93E-22,CTUh
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,ionising radiation: human health,-1.15E-23,kBq U235-Eq
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,land use,-3.69E-10,dimensionless
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,material resources: metals/minerals,-2.85E-24,kg Sb-Eq
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,ozone depletion,-2.32E-30,kg CFC-11-Eq
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,particulate matter formation,-5.23E-20,disease incidence
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,photochemical oxidant formation: human health,-2.32E-14,kg NMVOC-Eq
+Elec_Coal,Infra,ecoinvent-3.10-cutoff,EF v3.1,water use,-8.90E-13,m3 world Eq deprived
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,acidification,-7.21E-26,mol H+-Eq
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,climate change,1.95E-16,kg CO2-Eq
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,climate change: biogenic,-6.12E-35,kg CO2-Eq
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,climate change: fossil,1.95E-16,kg CO2-Eq
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,climate change: land use and land use change,-8.53E-36,kg CO2-Eq
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,ecotoxicity: freshwater,6.56E-18,CTUe
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,"ecotoxicity: freshwater, inorganics",1.70E-18,CTUe
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,"ecotoxicity: freshwater, organics",4.85E-18,CTUe
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,energy resources: non-renewable,-7.62E-33,"MJ, net calorific value"
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,eutrophication: freshwater,1.40E-19,kg P-Eq
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,eutrophication: marine,-3.79E-26,kg N-Eq
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,eutrophication: terrestrial,-4.15E-25,mol N-Eq
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,human toxicity: carcinogenic,3.36E-30,CTUh
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,"human toxicity: carcinogenic, inorganics",-1.20E-34,CTUh
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,"human toxicity: carcinogenic, organics",3.36E-30,CTUh
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,human toxicity: non-carcinogenic,4.87E-26,CTUh
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,"human toxicity: non-carcinogenic, inorganics",4.65E-26,CTUh
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,"human toxicity: non-carcinogenic, organics",2.19E-27,CTUh
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,ionising radiation: human health,6.60E-17,kBq U235-Eq
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,land use,9.68E-15,dimensionless
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,material resources: metals/minerals,3.76E-21,kg Sb-Eq
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,ozone depletion,-7.40E-42,kg CFC-11-Eq
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,particulate matter formation,2.43E-25,disease incidence
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,photochemical oxidant formation: human health,-5.41E-25,kg NMVOC-Eq
+Elec_Coal,Use,ecoinvent-3.10-cutoff,EF v3.1,water use,2.39E-16,m3 world Eq deprived
