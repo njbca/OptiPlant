@@ -4,15 +4,16 @@
 
 [![Build Status](https://github.com/SebastianBanda1/OptiPlant/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/SebastianBanda1/OptiPlant/actions/workflows/CI.yml?query=branch%3Amain)
 [![Julia Version](https://img.shields.io/badge/julia-1.11+-blue.svg)](https://julialang.org)
-[![Documentation](https://img.shields.io/badge/docs-stable-blue.svg)](https://sebastianbanda1.github.io/OptiPlant/stable/)
+[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://sebastianbanda1.github.io/OptiPlant/)
 [![License](https://img.shields.io/github/license/SebastianBanda1/OptiPlant)](https://github.com/SebastianBanda1/OptiPlant/blob/main/LICENSE)
 
 OptiPlant can be used to model and optimize Power-to-X fuel production systems with a high variety of customizable input parameters. The tool is adapted to investigate a large number of scenarios and system configurations in a single run. Please cite https://doi.org/10.1016/j.rser.2022.113057 when using the model.
 
 ## Documentation
 
-- **[STABLE](https://sebastianbanda1.github.io/OptiPlant/stable/)** — most recently tagged version of the documentation.
-- **[LATEST](https://sebastianbanda1.github.io/OptiPlant/latest/)** — in-development version of the documentation.
+- **[📚 Documentation](https://sebastianbanda1.github.io/OptiPlant/)** — Complete guide including installation, usage, and examples.
+- **[🚀 Quick Start](https://sebastianbanda1.github.io/OptiPlant/installation.html)** — Installation and setup instructions.
+- **[💡 Examples](https://sebastianbanda1.github.io/OptiPlant/Examples.html)** — Practical examples and tutorials.
 
 ## Guide for software installation and test run
 This guide will walk you through setting up the repository locally, configuring your environment, and running the model.
