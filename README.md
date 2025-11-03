@@ -1,19 +1,17 @@
 # OptiPlantPtX
 
-**GitHub Repository:** [https://github.com/SebastianBanda1/OptiPlant](https://github.com/SebastianBanda1/OptiPlant)
+**GitHub Repository:** [https://github.com/njbca/OptiPlant](https://github.com/njbca/OptiPlant)
 
-[![Build Status](https://github.com/SebastianBanda1/OptiPlant/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/SebastianBanda1/OptiPlant/actions/workflows/CI.yml?query=branch%3Amain)
+[![Build Status](https://github.com/njbca/OptiPlant/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/njbca/OptiPlant/actions/workflows/CI.yml?query=branch%3Amain)
 [![Julia Version](https://img.shields.io/badge/julia-1.11+-blue.svg)](https://julialang.org)
-[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://sebastianbanda1.github.io/OptiPlant/)
-[![License](https://img.shields.io/github/license/SebastianBanda1/OptiPlant)](https://github.com/SebastianBanda1/OptiPlant/blob/main/LICENSE)
+[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://njbca.github.io/OptiPlant/)
+[![License](https://img.shields.io/github/license/njbca/OptiPlant)](https://github.com/njbca/OptiPlant/blob/main/LICENSE)
 
 OptiPlant can be used to model and optimize Power-to-X fuel production systems with a high variety of customizable input parameters. The tool is adapted to investigate a large number of scenarios and system configurations in a single run. Please cite https://doi.org/10.1016/j.rser.2022.113057 when using the model.
 
 ## Documentation
 
-- **[📚 Documentation](https://sebastianbanda1.github.io/OptiPlant/)** — Complete guide including installation, usage, and examples.
-- **[🚀 Quick Start](https://sebastianbanda1.github.io/OptiPlant/installation.html)** — Installation and setup instructions.
-- **[💡 Examples](https://sebastianbanda1.github.io/OptiPlant/Examples.html)** — Practical examples and tutorials.
+- **[� DOCUMENTATION](https://njbca.github.io/OptiPlant/)** — Complete documentation with installation guide, usage examples, and API reference.
 
 ## Guide for software installation and test run
 This guide will walk you through setting up the repository locally, configuring your environment, and running the model.
@@ -105,8 +103,8 @@ quick example of running the Streamlit dashboards.
 - **💡 [Usage Examples](docs/src/Examples.md)** - Practical examples and use cases
 - **🔧 [API Reference](docs/src/api.md)** - Detailed function documentation
 - **📊 [Interactive Dashboards](src/PlotGraphs/)** - Streamlit visualization tools
-- **🐛 [Issues & Bug Reports](https://github.com/SebastianBanda1/OptiPlant/issues)** - Report problems or request features
-- **💬 [Discussions](https://github.com/SebastianBanda1/OptiPlant/discussions)** - Community support and questions
+- **🐛 [Issues & Bug Reports](https://github.com/njbca/OptiPlant/issues)** - Report problems or request features
+- **💬 [Discussions](https://github.com/njbca/OptiPlant/discussions)** - Community support and questions
 
 ## Citation
 
