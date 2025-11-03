@@ -2,9 +2,9 @@ name: Documentation
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, Development ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, Development ]
 
 jobs:
   build-docs:
@@ -31,8 +31,10 @@ jobs:
       - name: Build documentation
         run: |
           julia --project=docs docs/make.jl
-      - name: Upload docs
+      - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/Development'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs/build
+          destination_dir: ${{ github.ref == 'refs/heads/main' && 'stable' || 'latest' }}

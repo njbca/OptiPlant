@@ -45,7 +45,7 @@ makedocs(
     modules = modules_list,
     sitename = "OptiPlant.jl",
     authors = "Nicolas Campion, Sebastian Banda",
-    repo = "https://github.com/njbca/OptiPlant.jl",
+    repo = "https://github.com/njbca/OptiPlant",
     pages = [
         "Home" => "index.md",
         "Installation" => "installation.md",
@@ -55,10 +55,18 @@ makedocs(
     ],
     format = Documenter.HTML(
         prettyurls = get(ENV, "CI", nothing) == "true",
-        canonical = "https://njbca.github.io/OptiPlant.jl/stable/",
+        canonical = "https://njbca.github.io/OptiPlant/stable/",
         edit_link = "Development",
         assets = String[],
+        repolink = "https://github.com/njbca/OptiPlant",
     )
 )
 
-# build the documentation
+# Deploy documentation to GitHub Pages
+if get(ENV, "CI", nothing) == "true"
+    deploydocs(
+        repo = "github.com/njbca/OptiPlant",
+        devbranch = "Development",
+        push_preview = true
+    )
+end
