@@ -25,21 +25,8 @@ end
 
 using Documenter
 
-# Make sure the package `src` directory is on LOAD_PATH so `using OptiPlantPtX`
-# works even if CI checks out the repository under a different parent folder
-# (this avoids include/Path errors when Documenter runs on GitHub Actions).
-push!(LOAD_PATH, normpath(joinpath(@__DIR__, "..", "src")))
-
-success_using = false
-try
-    using OptiPlantPtX
-    success_using = true
-catch err
-    @warn "Could not `using OptiPlantPtX` from docs; building docs without the package module" error=err
-end
-
-# make sure `modules` is either a Vector{Module} or an empty Module vector
-modules_list = success_using ? [OptiPlantPtX] : Module[]
+# Build documentation without loading the full module to avoid dependency issues
+modules_list = Module[]
 
 makedocs(
     modules = modules_list,
