@@ -1,61 +1,61 @@
-# Configuración de GitHub Pages para OptiPlant.jl
+# GitHub Pages Setup for OptiPlant.jl
 
-## Para configurar la documentación en GitHub Pages:
+## To configure documentation on GitHub Pages:
 
-### 1. Habilitar GitHub Pages en el repositorio
+### 1. Enable GitHub Pages in the repository
 
-1. Ve a tu repositorio en GitHub: `https://github.com/njbca/OptiPlant`
-2. Ve a **Settings** > **Pages**
-3. En **Source**, selecciona **GitHub Actions**
-4. La documentación se desplegará automáticamente cuando hagas push a las ramas `main` o `Development`
+1. Go to your repository on GitHub: `https://github.com/SebastianBanda1/OptiPlant`
+2. Go to **Settings** > **Pages**
+3. Under **Source**, select **GitHub Actions**
+4. Documentation will deploy automatically when you push to `main` or `Development` branches
 
-### 2. URLs de la documentación
+### 2. Documentation URLs
 
-Una vez configurado GitHub Pages, la documentación estará disponible en:
+Once GitHub Pages is configured, documentation will be available at:
 
-- **Stable**: `https://njbca.github.io/OptiPlant/stable/`
-- **Latest**: `https://njbca.github.io/OptiPlant/latest/`
-- **Root**: `https://njbca.github.io/OptiPlant/` (redirige a stable)
+- **Stable**: `https://sebastianbanda1.github.io/OptiPlant/stable/`
+- **Latest**: `https://sebastianbanda1.github.io/OptiPlant/latest/`
+- **Root**: `https://sebastianbanda1.github.io/OptiPlant/` (redirects to stable)
 
-### 3. Workflow automático
+### 3. Automatic workflow
 
-El archivo `.github/workflows/docs.yml` está configurado para:
-- Construir la documentación automáticamente en push/PR
-- Desplegar a GitHub Pages cuando se actualiza `main` o `Development`
-- Crear versiones `stable` y `latest` de la documentación
+The `.github/workflows/docs.yml` file is configured to:
+- Build documentation automatically on push/PR
+- Deploy to GitHub Pages when `main` or `Development` is updated
+- Create `stable` and `latest` versions of documentation
 
-### 4. Estructura final
+### 4. Final structure
 
 ```
 OptiPlant/
-├── .github/workflows/docs.yml    # Workflow para despliegue automático
+├── .github/workflows/docs.yml    # Workflow for automatic deployment
 ├── docs/
-│   ├── make.jl                   # Script de construcción
-│   ├── Project.toml              # Dependencias de documentación
+│   ├── make.jl                   # Build script
+│   ├── Project.toml              # Documentation dependencies
 │   └── src/
-│       ├── index.md              # Página principal
-│       ├── installation.md       # Guía de instalación
-│       ├── usage.md              # Guía de uso
-│       ├── Examples.md           # Ejemplos prácticos
-│       └── api.md               # Referencia API
-└── README.md                     # Enlaces a documentación
+│       ├── index.md              # Main page
+│       ├── installation.md       # Installation guide
+│       ├── usage.md              # Usage guide
+│       ├── Examples.md           # Practical examples
+│       └── api.md               # API reference
+└── README.md                     # Documentation links
 ```
 
-### 5. Para actualizar la documentación
+### 5. To update documentation
 
-1. Edita los archivos en `docs/src/`
-2. Haz commit y push a `Development` o `main`
-3. GitHub Actions construirá y desplegará automáticamente
-4. La documentación estará disponible en unos minutos
+1. Edit files in `docs/src/`
+2. Commit and push to `Development` or `main`
+3. GitHub Actions will build and deploy automatically
+4. Documentation will be available in a few minutes
 
-### 6. Verificación local
+### 6. Local verification
 
-Para probar localmente antes de hacer push:
+To test locally before pushing:
 
 ```bash
 cd OptiPlant
 julia --project=docs docs/make.jl
 cd docs/build
 python -m http.server 8000
-# Abre http://localhost:8000 en tu navegador
+# Open http://localhost:8000 in your browser
 ```

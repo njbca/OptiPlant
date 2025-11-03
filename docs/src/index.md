@@ -1,6 +1,6 @@
 # OptiPlant.jl Documentation
 
-GitHub Repo: [https://github.com/njbca/OptiPlant](https://github.com/njbca/OptiPlant)
+GitHub Repo: [https://github.com/SebastianBanda1/OptiPlant](https://github.com/SebastianBanda1/OptiPlant)
 
 Welcome to OptiPlant.jl! A Julia package for modeling and optimizing Power-to-X fuel production systems with a high variety of customizable input parameters. The tool is adapted to investigate a large number of scenarios and system configurations in a single run.
 
