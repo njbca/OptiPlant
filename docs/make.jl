@@ -44,13 +44,21 @@ modules_list = success_using ? [OptiPlantPtX] : Module[]
 makedocs(
     modules = modules_list,
     sitename = "OptiPlant.jl",
-    authors = "Sebastian Banda",
-    repo = "https://github.com/SebastianBanda1/OptiPlant.jl",
+    authors = "Nicolas Campion, Sebastian Banda",
+    repo = "https://github.com/njbca/OptiPlant.jl",
     pages = [
-        "Home" => "Intro.md",
+        "Home" => "index.md",
+        "Installation" => "installation.md",
+        "Usage" => "usage.md", 
         "Examples" => "Examples.md",
+        "API Reference" => "api.md",
     ],
-    format = Documenter.HTML()
+    format = Documenter.HTML(
+        prettyurls = get(ENV, "CI", nothing) == "true",
+        canonical = "https://njbca.github.io/OptiPlant.jl/stable/",
+        edit_link = "Development",
+        assets = String[],
+    )
 )
 
 # build the documentation

@@ -1,6 +1,11 @@
 # OptiPlantPtX
 
+**GitHub Repository:** [https://github.com/njbca/OptiPlant](https://github.com/njbca/OptiPlant)
+
 [![Build Status](https://github.com/njbca/OptiPlant.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/njbca/OptiPlant.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![Julia Version](https://img.shields.io/badge/julia-1.11+-blue.svg)](https://julialang.org)
+[![Documentation](https://img.shields.io/badge/docs-stable-blue.svg)](https://njbca.github.io/OptiPlant.jl/stable/)
+[![License](https://img.shields.io/github/license/njbca/OptiPlant)](https://github.com/njbca/OptiPlant/blob/main/LICENSE)
 
 OptiPlant can be used to model and optimize Power-to-X fuel production systems with a high variety of customizable input parameters. The tool is adapted to investigate a large number of scenarios and system configurations in a single run. Please cite https://doi.org/10.1016/j.rser.2022.113057 when using the model.
 
@@ -86,5 +91,31 @@ quick example of running the Streamlit dashboards.
 2. Always make sure that you are working on your fork when making modifications (not on the main branch).
 3. Contact me before contributing to the main branch.
 4. For adding new data: copy one of the existing data folder, rename it, and then change the excel files to your convenience (do not change any of the existing excel files)
+
+## Documentation and Resources
+
+- **📖 [Complete Documentation](docs/build/index.html)** - Comprehensive guides and API reference
+- **🚀 [Quick Start Guide](docs/src/installation.md)** - Get up and running quickly
+- **💡 [Usage Examples](docs/src/Examples.md)** - Practical examples and use cases
+- **🔧 [API Reference](docs/src/api.md)** - Detailed function documentation
+- **📊 [Interactive Dashboards](src/PlotGraphs/)** - Streamlit visualization tools
+- **🐛 [Issues & Bug Reports](https://github.com/njbca/OptiPlant/issues)** - Report problems or request features
+- **💬 [Discussions](https://github.com/njbca/OptiPlant/discussions)** - Community support and questions
+
+## Citation
+
+When using OptiPlant in your research, please cite:
+
+```bibtex
+@article{campion2023optimization,
+  title={Optimization and analysis of large-scale renewable fuel production systems},
+  author={Campion, Nicolas and Barbosa, J and Mohammadi, A and Lund, H},
+  journal={Renewable and Sustainable Energy Reviews},
+  volume={171},
+  pages={113057},
+  year={2023},
+  doi={10.1016/j.rser.2022.113057}
+}
+```
 
 

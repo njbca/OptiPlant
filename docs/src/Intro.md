@@ -49,31 +49,32 @@ OptiPlantPtX is a Julia package for optimizing and analyzing energy plant config
 
 ## Installation
 
-To install the package (once registered or if available locally):
+See the detailed [Installation Guide](installation.md) for complete setup instructions.
 
+Quick setup:
 ```julia
 using Pkg
-Pkg.add(path="/path/to/OptiPlant.jl") # or Pkg.add("OptiPlantPtX") if registered
-```
-
-To build documentation locally (recommended inside a Julia REPL):
-
-```julia
-using Pkg
-Pkg.activate("docs")
+Pkg.activate("path/to/OptiPlant")
 Pkg.instantiate()
-include("docs/make.jl")
+using OptiPlantPtX
 ```
 
 ## Quick start
 
-Below is a minimal usage example — replace with real code for your project:
+Basic usage example:
 
 ```julia
 using OptiPlantPtX
 
-# create a simple model or load an example input
-# result = OptiPlantPtX.run_example()
+# Run a single scenario with example data
+scenarios = [1]
+run_optimization_scenarios(
+    "Full_model",
+    "Input_data_example", 
+    "ScenariosToRun",
+    "HiGHS",
+    scenarios
+)
 ```
 
 ## Where to edit
