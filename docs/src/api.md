@@ -1,364 +1,382 @@
-#- API- Reference- and- Technical- Specifications
+# Technical Specifications and API Reference
 
-This- section- provides- technical- details- about- OptiPlant's- data- structures,- file- formats,- and- specifications.
+This section provides detailed technical specifications for OptiPlant's file formats, solver integration, and performance requirements.
 
-##- Core- Scripts- Reference
+## Model Specifications
 
-###- Main.jl
+### Mathematical Framework
 
-**Purpose**:- Primary- optimization- model- script
+**OptiPlant** implements a linear programming (LP) optimization model with the following characteristics:
 
-**Key- Configuration- Lines**:
--- **Line- 4**:- Solver- selection
-- - ```julia
-- - solver- =- "HiGHS"- - #- or- "Gurobi"
-- - ```
+- **Objective**: Minimize annualized system cost
+- **Constraint**: Meet specified yearly fuel demand  
+- **Approach**: Dynamic power supply and system optimization (DPS-Syst-Opt)
+- **Foresight**: Perfect foresight with hourly resolution
+- **Time horizon**: Annual optimization (8760 hours)
 
--- **Lines- 22-25**:- Directory- configuration
-- - ```julia
-- - OptiPlant_directory- =- "C:/path/to/OptiPlant-master"
-- - input_data_file- =- "Input_data_example"
-- - input_sheet_name- =- "Data_base_case"
-- - results_folder- =- "Results_base_case"
-- - ```
+### Optimization Problem Structure
 
--- **Line- 28**:- Scenario- sheet- reference- (if- creating- new- sheets)
-
-**Dependencies**:- ImportData.jl,- ImportScenarios.jl
-
-###- ImportData.jl
-
-**Purpose**:- Data- import- functionality
-
-**Functionality**:
--- Imports- techno-economic- parameters- from- Excel
--- Loads- renewable- energy- profiles
--- Processes- unit- characteristics- and- constraints
-
-**Input- Requirements**:- 
--- Excel- files- in- BASE/Data/Inputs/
--- Profile- files- in- BASE/Data/Profiles/
-
-###- ImportScenarios.jl
-
-**Purpose**:- Scenario- configuration- management
-
-**Functionality**:
--- Imports- scenario- definitions
--- Processes- operating- strategies
--- Handles- parameter- variations- for- sensitivity- analysis
-
-**Input- Requirements**:- ScenariosToRun- and- Scenarios_definition- sheets
-
-##- Data- Structure- Specifications
-
-###- Excel- File- Structure
-
-####- Input- Data- Workbook- Format
-
-**Required- Sheets**:
-
-1.- **Data_base_case**
-- - - -- **Purpose**:- Master- unit- database
-- - - -- **Columns**:- Unit- parameters,- technical- specifications,- economic- data
-- - - -- **Key- Fields**:- Production- rates,- CapEx,- OpEx,- efficiency- factors
-- - - -- **Special**:- Red- box- indicates- default- yearly- fuel- demands- (model- drivers)
-- - - -- **Units**:- Various- (specified- in- each- column)
-
-2.- **Selected_units**- 
-- - - -- **Format**:- Binary- matrix- (1/0)
-- - - -- **Rows**:- Available- units/technologies
-- - - -- **Columns**:- Fuel- production- processes- (NH₃,- H₂,- MeOH,- etc.)
-- - - -- **Purpose**:- Technology- selection- per- fuel- type
-- - - -- **Default**:- Represents- "standard- case"- configuration
-
-3.- **Scenarios_definition**
-- - - -- **Purpose**:- Operating- strategy- parameters
-- - - -- **Function**:- Intermediate- logic- layer
-- - - -- **Usage**:- Sensitivity- analysis- configuration
-- - - -- **Customization**:- User-defined- parameter- variations
-
-4.- **ScenariosToRun**
-- - - -- **Purpose**:- Scenario- execution- list- - 
-- - - -- **Parameters**:- 
-- - - - - -- Operating- strategy
-- - - - - -- Location- (wind/solar- profiles)
-- - - - - -- Year- (data- vintage)
-- - - - - -- Produced- fuel- type
-- - - - - -- Electrolyzer- technology
-- - - -- **Critical**:- Names- must- match- exactly- across- sheets
-- - - -- **Output**:- Determines- results- folder- naming
-
-5.- **Sources**
-- - - -- **Purpose**:- Data- references- and- citations
-- - - -- **Content**:- Sources- for- Data_base_case- parameters
-- - - -- **Maintenance**:- Update- when- modifying- input- data
-
-####- Profile- Data- Workbook- Format
-
-**File- Naming**:- Year-based- (e.g.,- `2019.xlsx`)
-
-**Required- Sheets**:
-
-1.- **Flux**
-- - - -- **Content**:- Normalized- renewable- energy- profiles- (0-1)
-- - - -- **Granularity**:- Hourly- data- for- full- year- (8760- rows)
-- - - -- **Technologies**:- Multiple- wind- and- solar- technology- types
-- - - -- **Locations**:- Various- geographic- locations
-- - - -- **Sources**:- 
-- - - - - -- Wind:- CorRES- tool
-- - - - - -- Solar:- renewable.ninja- website
-
-2.- **Price**
-- - - -- **Content**:- Hourly- electricity- prices
-- - - -- **Granularity**:- Hourly- data- for- full- year
-- - - -- **Locations**:- Multiple- geographic- regions
-- - - -- **Units**:- Currency- per- MWh
-- - - -- **Coverage**:- Grid- buy- prices- by- location- and- time
-
-###- Output- Data- Structure
-
-####- CSV- File- Organization
-
-**Folder- Structure**:
 ```
-Results_[scenario_name]/
-├──- Data- used/- - - - - - - - - - - #- Input- data- snapshots- (CSV)
-├──- Hourly- results/- - - - - - #- Time-series- optimization- results- (CSV)
-└──- Main- results/- - - - - - - - #- Summary- results- (CSV)
+minimize: Investment_costs + Operational_costs
+
+subject to:
+- Annual fuel demand satisfaction
+- Unit operational constraints  
+- Mass and energy balance equations
+- Storage capacity limitations
+- Renewable resource availability
+- Grid electricity purchase limits
 ```
 
-####- Output- Units- and- Formats
+## File Format Specifications
 
-**Mass- Flows**:
--- **Non-electrical- units**:- t/h- (tonnes- per- hour)
--- **Hourly- results**:- kg/h- (values- ÷- 1000)
--- **Storage**:- t- (tonnes- total)
+### Excel Input File Structure
 
-**Energy- Flows**:
--- **Electrical- units**:- MW- (megawatts)
--- **Hourly- results**:- kW- (values- ÷- 1000)
--- **Storage**:- MWh- (megawatt-hours)
+#### Data_base_case Sheet Format
 
-**CSV- Format- Specifications**:
--- **Delimiter**:- Comma- (,)
--- **Decimal- separator**:- Dot- (.)
--- **Encoding**:- UTF-8
--- **Headers**:- First- row- contains- column- names
+| Column | Parameter | Type | Units | Description |
+|--------|-----------|------|-------|-------------|
+| A | Unit_name | String | - | Technology identifier |
+| B | Unit_type | String | - | "electrical" or "non-electrical" |
+| C | Production_rate | Float | t/h or MW | Nominal output capacity |
+| D | Heat_flow | Float | MW | Heat integration requirements |
+| E | Electrical_flow | Float | MW | Electricity consumption/generation |
+| F | Load_min | Float | % | Minimum operational load |
+| G | Load_max | Float | % | Maximum operational load |
+| H | Ramp_up | Float | %/h | Maximum ramp-up rate |
+| I | Ramp_down | Float | %/h | Maximum ramp-down rate |
+| J | CapEx | Float | €/unit | Capital expenditure |
+| K | OpEx_fixed | Float | €/unit/year | Fixed operational costs |
+| L | OpEx_variable | Float | €/t or €/MWh | Variable operational costs |
+| M | Lifetime | Integer | years | Technology lifetime |
+| N | Yearly_demand | Float | t/year | Default fuel demand (if applicable) |
 
-##- Solver- Integration
+#### Selected_units Sheet Format
 
-###- HiGHS- Solver
+```
+       NH3  H2  MeOH  [Additional_Fuels...]
+Unit1   1   0    1    
+Unit2   1   1    0    
+Unit3   0   1    1    
+[...]
+```
 
-**Type**:- Open-source- linear- programming- solver
+- **Rows**: Available technologies/units
+- **Columns**: Fuel production pathways  
+- **Values**: 1 = included, 0 = excluded
 
-**Installation**:- 
+#### Scenarios_definition Sheet Format
+
+| Column | Parameter | Type | Description |
+|--------|-----------|------|-------------|
+| A | Scenario_name | String | Unique scenario identifier |
+| B | Parameter_1 | Float | First sensitivity parameter |
+| C | Parameter_2 | Float | Second sensitivity parameter |
+| ... | ... | ... | Additional parameters as needed |
+
+#### ScenariosToRun Sheet Format
+
+| Column | Parameter | Type | Example | Description |
+|--------|-----------|------|---------|-------------|
+| A | Scenario | String | "base_case" | Scenario identifier |
+| B | Location | String | "Denmark" | Geographic location |
+| C | Year | Integer | 2019 | Profile data year |
+| D | Fuel | String | "NH3" | Target fuel type |
+| E | Electrolyzer | String | "PEM" | Technology selection |
+| F | Results_folder | String | "Results_base" | Output directory name |
+
+### Profile Data Format
+
+#### Flux Sheet (Renewable Profiles)
+
+```
+Hour | Wind_Tech1_Loc1 | Wind_Tech2_Loc1 | Solar_Tech1_Loc1 | ...
+1    | 0.45           | 0.52           | 0.0              |
+2    | 0.48           | 0.55           | 0.0              |
+...  | ...            | ...            | ...              |
+8760 | 0.42           | 0.49           | 0.0              |
+```
+
+- **Units**: Normalized capacity factors (0-1)
+- **Resolution**: Hourly (8760 rows per year)
+- **Sources**: Wind (CorRES), Solar (renewable.ninja)
+
+#### Price Sheet (Electricity Prices)
+
+```
+Hour | Location1_Price | Location2_Price | ...
+1    | 45.2           | 48.7           |
+2    | 43.8           | 46.3           |
+...  | ...            | ...            |
+8760 | 47.1           | 50.2           |
+```
+
+- **Units**: €/MWh (or local currency per MWh)
+- **Resolution**: Hourly (8760 rows per year)
+
+## Julia Code Structure
+
+### Main.jl Configuration Parameters
+
+#### Required Solver Setting
 ```julia
-add- HiGHS
+solver = "HiGHS"  # or "Gurobi"
 ```
 
-**Usage**:- 
+#### Directory Configuration
 ```julia
-using- HiGHS
-solver- =- "HiGHS"
+OptiPlant_directory = "/path/to/OptiPlant-master"
+input_data_excel_file_name = "Input_data_example"  # without .xlsx
+input_data_excel_sheet_name = "ScenariosToRun"
+results_folder_name = "Results_base_case"
 ```
 
-**Characteristics**:
--- **Performance**:- Typically- <5- minutes- solve- time- on- personal- computer
--- **Reliability**:- Stable,- well-tested
--- **Licensing**:- Open-source,- no- restrictions
--- **Maintenance**:- Automatically- updated- with- Julia- packages
-
-###- Gurobi- Solver
-
-**Type**:- Commercial- linear- programming- solver
-
-**Installation- Requirements**:
-1.- Valid- Gurobi- license
-2.- Gurobi- Optimizer- software- installation
-3.- Julia- package:- `add- Gurobi`
-
-**Performance**:- 
--- **Speed**:- Often- faster- than- HiGHS- for- large- problems
--- **Results**:- Identical- to- HiGHS- (same- optimal- solutions)
--- **Memory**:- Efficient- memory- usage- for- large-scale- problems
-
-**License- Management**:
-```bash
-grbgetkey- <license-key>- - #- Command- Prompt
+#### Optional Advanced Settings
+```julia
+# Solver-specific options
+solver_time_limit = 3600  # seconds
+solver_gap_tolerance = 0.01  # 1% optimality gap
 ```
 
-##- File- Format- Specifications
+### Package Dependencies
 
-###- Excel- (.xlsx)- Requirements
+#### Required Packages
+```julia
+using JuMP          # Optimization modeling framework
+using HiGHS         # Open-source LP solver (recommended)
+using DataFrames    # Structured data manipulation  
+using CSV           # CSV file I/O operations
+using XLSX          # Excel file reading
+```
 
-**Compatibility**:- Microsoft- Excel- 2010+
+#### Optional Packages
+```julia
+using Gurobi        # Commercial LP solver (alternative)
+using Plots         # Results visualization
+using StatsPlots    # Statistical plotting
+using PrettyTables  # Formatted output display
+```
 
-**Sheet- Naming**:- 
--- **Case- sensitive**:- Exact- matches- required
--- **Special- characters**:- Avoid- in- sheet- names
--- **Length- limits**:- Keep- names- reasonable- (<31- characters)
+## Solver Integration
 
-**Data- Types**:
--- **Numeric**:- Use- consistent- decimal- notation
--- **Text**:- UTF-8- encoding- recommended
--- **Dates**:- Excel- date- format- if- applicable
--- **Boolean**:- Use- 1/0- for- Selected_units- sheet
+### HiGHS Solver (Recommended)
 
-###- CSV- Output- Specifications
+**Installation:**
+```julia
+] add HiGHS
+```
 
-**Format- Standards**:
--- **RFC- 4180- compliant**:- Standard- CSV- format
--- **Encoding**:- UTF-8- without- BOM
--- **Line- endings**:- Platform- appropriate- (CRLF/LF)
--- **Quoting**:- Fields- with- commas- automatically- quoted
+**Advantages:**
+- Open-source and free
+- Fast performance for LP problems
+- Active development and support
+- No licensing requirements
 
-**Numeric- Precision**:
--- **Default**:- 6- significant- figures
--- **Large- numbers**:- Scientific- notation- when- appropriate
--- **Consistency**:- Same- precision- across- related- outputs
+**Typical Performance:**
+- Solve time: <5 minutes for standard problems
+- Memory usage: <2GB RAM
+- Scalability: Handles large-scale problems efficiently
 
-##- Model- Parameters
+### Gurobi Solver (Commercial Alternative)
 
-###- Unit- Classification
+**Installation:**
+```julia
+] add Gurobi
+```
 
-**Non-electrical- Units**:
--- **Examples**:- Synthesis- reactors,- storage- tanks,- heat- exchangers
--- **Characteristics**:- Mass-based- flows- and- constraints
--- **Parameters**:- Production- rates- (t/h),- heat- requirements,- material- balances
+**Prerequisites:**
+- Valid Gurobi license (academic/commercial)
+- Gurobi Optimizer software installation
+- License activation via `grbgetkey`
 
-**Electrical- Units**:
--- **Examples**:- Electrolyzers,- renewable- generators,- grid- connections
--- **Characteristics**:- Power-based- flows- and- constraints- - 
--- **Parameters**:- Capacity- (MW),- efficiency- (%),- electrical- consumption/production
+**Advantages:**
+- Potentially faster for very large problems
+- Advanced optimization features
+- Commercial support available
 
-###- Optimization- Constraints
+**Performance Notes:**
+- Identical results to HiGHS for OptiPlant problems
+- May offer speed advantages for complex constraint sets
 
-**System-level**:
--- **Annual- fuel- demand**:- Must- be- satisfied- exactly
--- **Unit- capacity- limits**:- Lower- and- upper- bounds
--- **Ramping- constraints**:- Rate- of- change- limitations
--- **Storage- constraints**:- Inventory- balance- equations
+## Output File Specifications
 
-**Operational**:
--- **Load- factors**:- Minimum/maximum- operating- points
--- **Efficiency- curves**:- Performance- vs.- load- relationships
--- **Maintenance**:- Planned- and- unplanned- availability
--- **Grid- interaction**:- Import/export- limitations
+### CSV Output Structure
 
-##- Performance- Specifications
+#### Main Results Files
 
-###- Computational- Requirements
+**Installed_capacities.csv:**
+```
+Unit_name,Capacity_MW,Capacity_t_h,Investment_cost_EUR
+Electrolyzer_PEM,150.5,0.0,45150000
+H2_storage,0.0,2500.8,12504000
+Wind_turbine,500.2,0.0,75030000
+```
 
-**Minimum- System**:
--- **RAM**:- 4GB- (8GB+- recommended- for- large- problems)
--- **Processor**:- Modern- multi-core- CPU
--- **Storage**:- 1GB- free- space- for- installation- +- results
--- **OS**:- Windows- 10+,- macOS- 10.14+,- Linux- (recent- distributions)
+**Operation_results.csv:**
+```
+Hour,Unit_name,Power_MW,Mass_flow_t_h,Operational_cost_EUR
+1,Electrolyzer_PEM,125.4,0.0,2508
+1,H2_storage,0.0,15.2,0
+2,Electrolyzer_PEM,98.7,0.0,1974
+```
 
-**Julia- Requirements**:
--- **Version**:- Julia- 1.6+- (1.8+- examples- shown- in- guide)
--- **Packages**:- JuMP,- solver- package,- data- handling- packages
--- **Environment**:- Activated- project- environment- recommended
+#### Hourly Results Files
 
-###- Problem- Size- Limits
+**Hourly_flows.csv:**
+- **Columns**: Time, Unit flows, Storage levels, Grid interactions
+- **Resolution**: 8760 hourly time steps
+- **Units**: MW for electrical, t/h for mass flows
 
-**Typical- Performance**:
--- **Solve- time**:- <5- minutes- for- standard- problems
--- **Variables**:- Thousands- to- tens- of- thousands
--- **Constraints**:- Similar- scale- to- variables
--- **Scenarios**:- Multiple- scenarios- in- single- run- supported
+### Results Analysis Integration
 
-**Scaling- Factors**:
--- **Time- horizon**:- 8760- hours- (annual- optimization)
--- **Technologies**:- Dozens- of- unit- types- possible
--- **Locations**:- Multiple- locations- in- single- study
--- **Scenarios**:- Limited- by- available- memory- and- time
+#### Excel Macro Requirements
 
-##- Integration- Points
+The Results.xlsx file uses VBA macros for CSV import:
 
-###- Excel- Integration
+```vba
+' Import macro expects:
+' - Main results folder path (ending with "\")
+' - Hourly results folder path (ending with "\")  
+' - CSV files with standard OptiPlant naming convention
+```
 
-**Import- Process**:
--- **XLSX.jl- package**:- Reads- Excel- files- directly
--- **Data- validation**:- Automatic- checks- for- required- sheets
--- **Error- handling**:- Informative- messages- for- missing/incorrect- data
+#### Pivot Table Configuration
 
-**Export- Process**:
--- **CSV- generation**:- Structured- output- for- Excel- import
--- **Results- workbook**:- Pre-configured- Excel- file- with- macros
--- **Visualization**:- Pivot- Table- templates- for- analysis
+Automated Pivot Tables require:
+- **Data source**: Imported CSV data ranges
+- **Field mappings**: Predefined for OptiPlant output structure  
+- **Chart templates**: Configured for standard analysis types
 
-###- Extensibility
+## Performance Requirements
 
-**Adding- New- Technologies**:
-1.- **Update- Data_base_case**:- Add- unit- parameters
-2.- **Modify- Selected_units**:- Include- in- fuel- production- processes- - 
-3.- **Update- Sources**:- Document- parameter- sources
-4.- **Test- configuration**:- Verify- model- runs- correctly
+### System Specifications
 
-**Adding- New- Locations**:
-1.- **Create- profile- data**:- Wind/solar- profiles- for- location
-2.- **Add- price- data**:- Electricity- costs- for- location
-3.- **Update- scenarios**:- Include- location- in- ScenariosToRun
-4.- **Validate- profiles**:- Ensure- data- quality- and- completeness
+| Component | Minimum | Recommended | Notes |
+|-----------|---------|-------------|-------|
+| **RAM** | 4 GB | 8 GB+ | Large models may require more |
+| **CPU** | Dual-core | Quad-core+ | Multi-threading improves solve time |
+| **Storage** | 2 GB free | 5 GB+ free | For results and temporary files |
+| **OS** | Windows 10, macOS 10.14, Ubuntu 18.04+ | Latest versions | Julia compatibility |
 
-##- Error- Handling
+### Computational Complexity
 
-###- Input- Validation
+**Model Size Scaling:**
+- **Variables**: O(N_units × N_hours) ≈ 50-200 units × 8760 hours
+- **Constraints**: O(N_scenarios × N_hours) ≈ 1-10 scenarios × 8760 hours  
+- **Solve time**: Generally linear with problem size for LP problems
 
-**Data- Consistency- Checks**:
--- **Sheet- existence**:- Required- sheets- in- Excel- files
--- **Data- types**:- Numeric- vs.- text- field- validation
--- **Range- checks**:- Reasonable- parameter- values
--- **Name- matching**:- Consistent- naming- across- sheets
+**Memory Usage Patterns:**
+- **Data loading**: 100-500 MB for input processing
+- **Model building**: 200MB-2GB depending on complexity
+- **Solver execution**: 500MB-4GB peak memory usage
 
-**Profile- Validation**:
--- **Data- completeness**:- 8760- hours- of- data- required
--- **Value- ranges**:- Normalized- profiles- (0-1- for- renewable- resources)
--- **Temporal- consistency**:- Proper- time- series- structure
+## Error Handling and Validation
 
-###- Runtime- Error- Management
+### Input Data Validation
 
-**Solver- Errors**:
--- **Infeasibility**:- Model- constraints- cannot- be- satisfied
--- **Unbounded**:- Objective- function- has- no- optimal- bound
--- **Numerical- issues**:- Scaling- or- precision- problems
+OptiPlant performs automatic validation of:
 
-**File- System- Errors**:
--- **Path- validation**:- Directory- and- file- existence- checks
--- **Permission- issues**:- Read/write- access- verification
--- **Disk- space**:- Adequate- storage- for- results
+1. **Excel file structure**: Required sheets and columns
+2. **Parameter ranges**: Physical constraints and realistic values  
+3. **Data consistency**: Unit matching across sheets
+4. **Profile completeness**: Full 8760-hour datasets
 
-##- Version- Compatibility
+### Common Error Types
 
-###- Julia- Ecosystem
+#### Model Infeasibility
+```
+ERROR: Model infeasible
+Cause: Contradictory constraints or impossible demand targets
+Solution: Review unit capacities and demand requirements
+```
 
-**Core- Dependencies**:
--- **JuMP.jl**:- Optimization- modeling- language
--- **DataFrames.jl**:- Tabular- data- manipulation- - 
--- **CSV.jl**:- CSV- file- input/output
--- **XLSX.jl**:- Excel- file- reading
+#### Data Format Errors  
+```
+ERROR: Expected Float64, got String
+Cause: Non-numeric data in parameter fields
+Solution: Check Excel cells for text in numeric columns
+```
 
-**Version- Stability**:
--- **LTS- Julia**:- Use- Long- Term- Support- versions- when- available
--- **Package- versions**:- Manifest.toml- locks- specific- versions
--- **Compatibility**:- Regular- testing- with- latest- package- versions
+#### File Access Errors
+```
+ERROR: File not found
+Cause: Incorrect paths or missing files
+Solution: Verify all path specifications in Main.jl
+```
 
-###- External- Software
+## Advanced Configuration
 
-**Excel- Compatibility**:
--- **Version- support**:- Excel- 2010- and- later
--- **Feature- requirements**:- Macros- enabled- for- Results- workbook
--- **Alternative- software**:- LibreOffice- Calc- compatibility- (limited)
+### Custom Unit Integration
 
-**Operating- System**:
--- **Cross-platform**:- Julia- runs- on- Windows,- macOS,- Linux
--- **Path- conventions**:- Automatic- handling- of- OS-specific- paths
--- **Performance**:- Similar- across- platforms- for- optimization- tasks
+To add new technologies:
 
-##- Next- Steps
+1. **Define parameters** in Data_base_case sheet
+2. **Set selection logic** in Selected_units sheet  
+3. **Update constraints** in Julia code if needed
+4. **Validate performance** with test scenarios
 
--- **[Examples](Examples.md)**- -- See- practical- applications- of- these- specifications
--- **[Usage- Guide](usage.md)**- -- Learn- how- to- use- the- file- structures
--- **[Installation](installation.md)**- -- Set- up- the- development- environment
+### Multi-objective Optimization
+
+OptiPlant can be extended for multi-objective problems:
+
+```julia
+# Example: Cost + emissions minimization
+@objective(model, Min, 
+    investment_costs + operational_costs + 
+    emission_penalty * total_emissions
+)
+```
+
+### Custom Solver Options
+
+Advanced solver configuration:
+
+```julia
+# HiGHS options
+set_optimizer_attribute(model, "time_limit", 3600.0)
+set_optimizer_attribute(model, "mip_rel_gap", 0.01)
+
+# Gurobi options (if available)
+set_optimizer_attribute(model, "TimeLimit", 3600)
+set_optimizer_attribute(model, "MIPGap", 0.01)
+```
+
+## Integration Guidelines
+
+### External Tool Integration
+
+OptiPlant can interface with:
+
+- **GIS tools**: For location-specific resource assessment
+- **Database systems**: For large-scale parameter management
+- **Visualization software**: For advanced results processing
+- **Economic models**: For market price integration
+
+### Workflow Automation
+
+Batch processing capabilities:
+
+```julia
+# Example: Automated scenario execution
+for scenario in scenario_list
+    update_parameters(scenario)
+    solve_model()
+    export_results(scenario.name)
+end
+```
+
+## Version Compatibility
+
+### Julia Version Requirements
+- **Minimum**: Julia 1.6+
+- **Recommended**: Julia 1.8+
+- **Package compatibility**: Verified with latest LTS releases
+
+### Excel Version Support
+- **Windows**: Excel 2016+ recommended
+- **macOS**: Excel 2016+ or Numbers with CSV import
+- **LibreOffice**: Calc 6.0+ with macro support
+
+---
+
+**Technical Reference Complete!** This specification covers all technical aspects of OptiPlant implementation and usage.

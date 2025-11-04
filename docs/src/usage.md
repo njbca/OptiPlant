@@ -1,240 +1,319 @@
-#- OptiPlant- Tool:- Files- and- Usage
+# File Structure and Usage
 
-This- section- explains- the- file- structure- of- OptiPlant- and- how- to- use- the- tool- effectively.
+This guide explains the OptiPlant file organization and how to use the tool effectively.
 
-##- Getting- OptiPlant
+## OptiPlant File Structure Overview
 
-Download- OptiPlant- from- GitHub:
+After downloading and extracting OptiPlant, you will see the following structure:
 
-1.- Go- to- https://github.com/njbca/OptiPlant
-2.- Click- **"Code- →- Download- ZIP"**
-3.- Extract- the- ZIP- file- to- your- desired- location
-4.- Navigate- to- the- extracted- **OptiPlant-master**- folder
-
-##- File- Structure- Overview
-
-OptiPlant- is- organized- into- two- main- folders:
-
-###- Main- Directories
-
--- **BASE**:- Contains- Data- and- Results- (not- code-related)
--- **RUN- CODE**:- Contains- the- Julia- scripts- to- import- data,- define- scenarios,- and- run- the- optimization- model
+![OptiPlant File Structure](images/Fig.15.png)
 
 ```
 OptiPlant-master/
-├──- BASE/
-│- - - ├──- Data/
-│- - - │- - - ├──- Inputs/- - - - - - - - - - #- Excel- files- with- plant- units,- techno-economic- data,- scenarios
-│- - - │- - - └──- Profiles/- - - - - - - - #- Excel- files- with- wind/solar- profiles- and- electricity- prices
-│- - - └──- Results/- - - - - - - - - - - - - #- Output- folders- created- per- simulation- run
-│- - - - - - - └──- Results.xlsx- - - - - #- Excel- file- for- visualization
-└──- RUN- CODE/
-- - - - ├──- ImportData.jl- - - - - - - - #- Imports- input- data- (units,- techno-economics,- profiles)
-- - - - ├──- ImportScenarios.jl- - - #- Imports- scenario- conditions
-- - - - └──- Main.jl- - - - - - - - - - - - - - #- Main- optimization- model
+├── BASE/
+│   ├── Data/
+│   │   ├── Inputs/           # Excel files with plant units and scenarios
+│   │   └── Profiles/         # Wind/solar profiles and electricity prices
+│   └── Results/              # Output folders (created automatically per run)
+└── RUN CODE/
+    ├── ImportData.jl         # Data import functions
+    ├── ImportScenarios.jl    # Scenario configuration
+    └── Main.jl               # Main optimization model
 ```
 
-##- Run- Code- Folder
+### Main Directories Explained
 
-###- Contents- and- Purpose
+- **BASE**: Contains all data and results (not code-related)
+- **RUN CODE**: Contains the Julia scripts to import data, define scenarios, and run the optimization model
 
-The- **RUN- CODE**- folder- contains- three- essential- Julia- scripts:
+## RUN CODE Folder
 
--- **`ImportData.jl`**:- Imports- into- Julia- the- necessary- input- data- (units,- techno-economics,- power- profiles)
--- **`ImportScenarios.jl`**:- Imports- information- regarding- the- scenario- conditions- of- the- study- - 
--- **`Main.jl`**:- The- optimization- model;- uses- imported- data- and- extracts- outputs
+### Contents and Purpose
 
-###- How- to- Run- the- Model
+The RUN CODE folder contains three main Julia files:
 
-1.- **Open- Main.jl**- in- VS- Code- (from- RUN- CODE- folder)
+![RUN CODE Contents](images/Fig.35.png)
 
-2.- **Configure- the- solver**- (line- 4):
-- - - ```julia
-- - - solver- =- "HiGHS"- - - - #- or- "Gurobi"
-- - - ```
+1. **ImportData.jl**: Imports into Julia the necessary input data (units, techno-economics, power profiles)
+2. **ImportScenarios.jl**: Imports information regarding the scenario conditions of the study
+3. **Main.jl**: The optimization model that uses imported data and extracts outputs
 
-3.- **Set- directories**- (lines- 22-25):
-- - - ```julia
-- - - #- OptiPlant- directory
-- - - OptiPlant_directory- =- "C:/path/to/OptiPlant-master"
-- - - 
-- - - #- Input- data- Excel- file- name- - 
-- - - input_data_file- =- "Input_data_example"
-- - - 
-- - - #- Input- data- Excel- sheet- name
-- - - input_sheet_name- =- "Data_base_case"
-- - - 
-- - - #- Results- folder- name
-- - - results_folder- =- "Results_base_case"
-- - - ```
+### Running OptiPlant
 
-4.- **Run- the- file**- in- VS- Code
+#### Main.jl Configuration
 
-###- Configuration- Options
+Open `Main.jl` in VS Code and configure the following settings:
 
--- **Solver- selection**:- Choose- between- HiGHS- (open-source)- or- Gurobi- (commercial)
--- **Path- configuration**:- Set- correct- paths- to- inputs- and- outputs
--- **Scenario- sheets**:- If- you- create- a- new- scenarios- sheet- in- the- Inputs- Excel,- ensure- Main.jl- references- it- correctly- (e.g.,- line- 28)
+![Main.jl Solver Configuration](images/Fig.36.png)
 
-##- Base- Folder:- Data
+**Line 4 - Solver Selection:**
+```julia
+solver = "HiGHS"    # or "Gurobi"
+```
 
-###- Input- Data- Structure
+![Main.jl Directory Configuration](images/Fig.37.png)
 
-The- **BASE/Data**- folder- contains- two- subfolders:
+**Lines 22-25 - Directory Configuration:**
+```julia
+# Set these paths according to your setup:
+OptiPlant_directory = "C:/path/to/your/OptiPlant-master"
+input_data_excel_file_name = "Input_data_example"
+input_data_excel_sheet_name = "ScenariosToRun"  
+results_folder_name = "Results_base_case"
+```
 
-####- Inputs- Subfolder
+#### Execution Steps
 
-Contains- Excel- workbooks- (example:- `Input_data_example.xlsx`)- with- standard- sheets:
+1. Open `RUN CODE/Main.jl` in VS Code
+2. Set solver preference (line 4)
+3. Configure directory paths (lines 22-25)
+4. If you create a new scenarios sheet, update the reference in Main.jl (e.g., line 28)
+5. Run the file (`Ctrl+Enter` or click Run)
 
-#####- Data_base_case- Sheet
--- **Purpose**:- List- of- possible- units- (non-electrical- and- electrical)- and- characteristics
--- **Contents**:- 
-- - -- Production- rates,- heat/electrical- flows
-- - -- Load- ranges,- ramp- constraints- - 
-- - -- CapEx,- OpEx- parameters
-- - -- **Red- box**:- Default- yearly- demands- of- each- fuel- (main- model- drivers)
--- **Units- and- sources**:- Indicated- for- all- parameters
+**Typical execution time**: Less than 5 minutes
 
-#####- Selected_units- Sheet
--- **Purpose**:- 1/0- matrix- indicating- which- units/technologies- are- included- per- fuel- production- process
--- **Examples**:- NH₃,- H₂,- MeOH- configurations
--- **Usage**:- Set- 1/0- according- to- preference- (default- represents- "standard- case")
--- **Recommendation**:- Work- on- a- copy- or- keep- track- of- changes
+## BASE Folder Structure
 
-#####- Scenarios_definition- Sheet- - 
--- **Purpose**:- Defines- operating- strategy- and- conditions
--- **Function**:- Logic- sits- between- Data_base_case/Selected_units- and- outputs
--- **Usage**:- Useful- for- sensitivity- analysis
+### Data Subfolder
 
-#####- ScenariosToRun- Sheet
--- **Purpose**:- Lists- the- scenarios- to- run
--- **Parameters**:- Operating- strategy,- location- wind/solar,- year,- produced- fuel,- electrolyzer- technology
--- **Important**:- Model- stores- results- as- CSV- in- a- folder- named- per- this- sheet
--- **Critical**:- Carefully- type- names- that- must- match- other- sheets
+The Data folder contains two main subfolders:
 
-#####- Sources- Sheet
--- **Purpose**:- References/sources- for- Data_base_case- entries
--- **Maintenance**:- Should- be- updated- if- you- change/add- input- data
+#### Inputs Subfolder
 
-####- Profiles- Subfolder
+Contains Excel workbooks with all model parameters and scenarios.
 
-Contains- Excel- files- (e.g.,- `2019.xlsx`)- with- renewable- energy- and- price- data:
+![Inputs Folder](images/Fig.16.png)
 
-#####- Flux- Sheet
--- **Content**:- Hourly- solar- and- wind- profiles- (normalized- generator- output)
--- **Coverage**:- Various- technologies- and- locations- for- the- specified- year
--- **Format**:- Normalized- values- (0-1)
+**Standard Excel File Structure** (e.g., "Input_data_example.xlsx"):
 
-#####- Price- Sheet- - 
--- **Content**:- Hourly- grid- buy- price- for- the- specified- year
--- **Coverage**:- Different- locations
--- **Units**:- Currency- per- MWh
+##### 1. Data_base_case Sheet
+Contains the list of possible units and their characteristics:
 
-###- Data- Requirements- and- Specifications
+![Data_base_case Sheet](images/Fig.17.png)
 
-####- Profile- Sources
--- **Wind- profiles**:- From- CorRES- tool
--- **Solar- profiles**:- From- renewable.ninja- website
+- **Non-electrical and electrical units** with production rates
+- **Heat/electrical flows** and load ranges  
+- **Ramp constraints** and operational limits
+- **CapEx and OpEx** economic parameters
+- **Default yearly demands** (red box - main model drivers)
 
-####- Unit- Classification
--- **Non-electrical- units**:- Distinguished- from- electrical- units- in- inputs
--- **Electrical- units**:- Separate- category- with- different- parameters
+![Unit Characteristics Detail](images/Fig.18.png)
 
-###- How- to- Prepare- Input- Data
+##### 2. Selected_units Sheet
+1/0 matrix indicating which units/technologies are included per fuel production process:
 
-1.- **Data_base_case**:- Update- only- if- necessary;- units- and- sources- are- indicated- for- parameters
+![Selected_units Sheet](images/Fig.19.png)
 
-2.- **Selected_units**:- Set- 1/0- according- to- preference;- prefer- working- on- a- copy
+- **Columns**: Different fuel types (NH₃, H₂, MeOH, etc.)
+- **Rows**: Available technologies/units
+- **Values**: 1 = included, 0 = excluded
+- **Use**: Define technology combinations for each fuel type
 
-3.- **Scenarios_definition**:- Adjust- scenario- logic- relative- to- inputs- for- sensitivity- analysis
+##### 3. Scenarios_definition Sheet
+Defines operating strategy and conditions:
 
-4.- **ScenariosToRun**:- Carefully- type- names- that- must- match- other- sheets;- if- creating- new- sheet- per- study- case,- ensure- sheet- name- is- updated- in- Main.jl- (e.g.,- line- 28)
+![Scenarios_definition Sheet](images/Fig.20.png)
 
-5.- **Sources**:- Maintain- if- inputs- are- changed
+- **Intermediate logic** between base case data and outputs
+- **Sensitivity analysis** parameter variations
+- **Operating strategies** for different conditions
 
-##- Base- Folder:- Results
+##### 4. ScenariosToRun Sheet
+Lists the scenarios to execute:
 
-###- Output- File- Structure
+![ScenariosToRun Sheet](images/Fig.21.png)
 
-**BASE/Results**- contains:
--- **Results- Excel- file**:- For- visualization- and- analysis
--- **Subfolders- per- run**:- Named- according- to- ScenariosToRun- sheet- (e.g.,- "Results_base_case")
+Key parameters per scenario:
+- **Operating strategy**
+- **Location** (wind/solar data)
+- **Year** (for profiles)
+- **Produced fuel** type
+- **Electrolyzer technology**
+- **Results folder naming**
 
-Each- run- folder- contains- three- subfolders:
--- **Data- used**- (CSV- files)
--- **Hourly- results**- (CSV- files)- - 
--- **Main- results**- (CSV- files)
+##### 5. Sources Sheet
+References and sources for all data entries:
 
-###- Results- Interpretation
+![Sources Sheet](images/Fig.22.png)
 
-####- Using- the- Results- Excel- File
+- **Parameter sources** and references
+- **Data validation** information  
+- **Update guidance** for parameter modifications
 
-1.- **Setup**:
-- - - -- Use- the- "Results"- Excel- file- 
-- - - -- Make- a- copy- and- place- it- into- the- corresponding- run's- results- folder
+#### Profiles Subfolder
 
-2.- **Import- Process**:
-- - - -- Open- the- "Import"- sheet
-- - - -- Set- correct- directories- for- "Main- results- folder"- and- "Hourly- results- folder"- 
-- - - -- **Important**:- Paths- should- end- with- "\"
-- - - -- Run- macros- to- import- data
+Contains renewable energy and electricity price data organized by year:
 
-3.- **View- Results**:
-- - - -- **Scenario- outputs**:- Sheets- named- after- scenarios- (as- in- Inputs)
-- - - -- **"All_scenarios"**:- Shows- output- values- for- each- unit- and- scenario
-- - - -- **Analysis- sheets**:- "Elec- production",- "Electricity- consumption",- "Production- cost",- "Cost- breakdown",- "Installed- capacities"
-- - - -- **Visualization**:- Use- Pivot- Tables- for- plotting;- refresh- pivots- after- importing- new- results
+![Profiles Folder](images/Fig.23.png)
 
-####- Additional- Result- Sheets
+**Example: 2019.xlsx workbook structure:**
 
-When- hourly- results- are- imported:
--- Each- sheet- corresponds- to- a- run- scenario
--- Contains- hourly- flows- for- different- parameters
--- Time-series- data- for- detailed- analysis
+![Profiles Workbook](images/Fig.24.png)
 
-###- Output- Units
+##### Flux Sheet
+Hourly normalized generator output profiles:
 
--- **Non-electrical- units**:- t/h- (tonnes- per- hour)
--- **Electrical- units**:- MW- - 
--- **Hourly- flow- sheets**:- Values- are- x/1000- (kg/h- and- kW,- respectively)
--- **Mass- storage**:- t- (tonnes)
--- **Electricity- storage**:- MWh
+![Flux Sheet](images/Fig.25.png)
 
-###- File- Formats- Generated
+- **Solar profiles** for various technologies and locations
+- **Wind profiles** for different turbine types and locations  
+- **Normalized values** (0-1 range representing capacity factor)
+- **8760 hours** per year
+- **Data sources**: 
+  - Wind: CorRES tool
+  - Solar: renewable.ninja website
 
-All- outputs- are- in- **CSV- format**- for:
--- Data- used
--- Hourly- results- - 
--- Main- results
+##### Price Sheet
+Hourly electricity grid prices:
 
-###- Post-processing- Options
+![Price Sheet](images/Fig.26.png)
 
--- **Primary- tool**:- Provided- "Results"- Excel- workbook- with- macros
--- **Functionality**:- Import- CSVs- and- create- Pivot- Tables
--- **Purpose**:- Visualize- and- analyze- results
--- **Workflow**:- CSV- →- Excel- →- Analysis- →- Visualization
+- **Hourly electricity buy prices** 
+- **Different locations** and price zones
+- **Currency units** as specified
+- **8760 hours** per year of price data
 
-##- Best- Practices
+### Results Subfolder
 
-###- File- Management
--- Keep- a- copy- of- standard- Inputs- to- revert- changes- (especially- Selected_units)
--- Carefully- maintain- consistent- names- across- Excel- sheets- and- Main.jl- references
--- Organize- results- folders- with- descriptive- names
+Generated automatically when running OptiPlant simulations.
 
-###- Workflow
-1.- **Prepare- data**- in- Excel- (Inputs- and- Profiles)
-2.- **Configure**- Main.jl- with- correct- paths- and- solver
-3.- **Run**- the- optimization- model
-4.- **Import- results**- using- Results- Excel- file
-5.- **Analyze**- using- Pivot- Tables- and- charts
+![Results Folder Structure](images/Fig.27.png)
 
-###- Environment- Management
--- Activate- the- Julia- environment- each- session
--- Use- `status`- to- verify- packages- are- installed
--- Refresh- Excel- Pivot- Tables- after- importing- new- results
+#### Results Organization
 
-##- Next- Steps
+Each simulation creates a separate folder (named per ScenariosToRun sheet):
 
--- **[Examples](Examples.md)**- -- Practical- workflow- examples- and- troubleshooting
--- **[API- Reference](api.md)**- -- Technical- specifications- and- file- formats
--- **[Installation](installation.md)**- -- Return- to- installation- if- needed
+![Individual Results Folder](images/Fig.28.png)
+
+**Each results folder contains:**
+- **Data used** (CSV files with input data actually used)
+- **Hourly results** (CSV files with time-series outputs)  
+- **Main results** (CSV files with summary outputs)
+
+#### Results Excel File
+
+Use the provided "Results.xlsx" file for visualization:
+
+![Results Excel File](images/Fig.29.png)
+
+**Placement**: Copy Results.xlsx into your specific results folder
+
+![Results File Placement](images/Fig.30.png)
+
+#### Import and Analysis Process
+
+##### Import Sheet Configuration
+
+![Import Sheet](images/Fig.31.png)
+
+1. Set **"Main results folder"** path (must end with "\")
+2. Set **"Hourly results folder"** path (must end with "\")  
+3. Click **macro buttons** to import CSV data
+
+##### Results Analysis Sheets
+
+**All_scenarios Sheet:**
+
+![All_scenarios Sheet](images/Fig.32.png)
+
+- **Output values** for each unit and scenario
+- **Comparative analysis** across scenarios
+- **Unit performance** summaries
+
+**Specialized Analysis Sheets:**
+
+![Analysis Charts Example](images/Fig.33.png)
+
+Available analysis sheets:
+- **"Elec production"** - Electricity generation breakdown
+- **"Electricity consumption"** - Power usage analysis  
+- **"Production cost"** - Cost analysis and breakdown
+- **"Cost breakdown"** - Detailed cost components
+- **"Installed capacities"** - System sizing results
+
+**Pivot Table Integration:**
+- Automatic chart generation via Pivot Tables
+- **Refresh pivots** after importing new results
+- Customizable visualizations
+
+##### Hourly Results Analysis
+
+![Hourly Results Example](images/Fig.34.png)
+
+When hourly results are imported:
+- **Additional sheets** created per scenario
+- **Time-series data** for all system flows
+- **Hourly resolution** for detailed analysis
+
+#### Output Units
+
+| Component Type | Units |
+|----------------|-------|
+| **Non-electrical units** | t/h (tonnes per hour) |
+| **Electrical units** | MW (megawatts) |
+| **Hourly flows** | kg/h and kW (values ÷ 1000) |  
+| **Mass storage** | t (tonnes) |
+| **Electricity storage** | MWh (megawatt-hours) |
+
+## Data Requirements and Preparation
+
+### Input Data Guidelines
+
+1. **Data_base_case**: Update only if necessary - units and sources are provided
+2. **Selected_units**: Set 1/0 according to preference (work on copies to track changes)
+3. **Scenarios_definition**: Adjust scenario logic for sensitivity analysis  
+4. **ScenariosToRun**: Carefully type names that must match other sheets
+5. **Sources**: Maintain if inputs are changed
+
+### Profile Data Sources
+
+- **Wind profiles**: Generated using CorRES tool
+- **Solar profiles**: Downloaded from renewable.ninja website  
+- **Electricity prices**: Historical or projected hourly prices by location
+
+### Best Practices
+
+1. **Keep backups** of standard input files to revert changes
+2. **Maintain consistent naming** across Excel sheets and Main.jl references
+3. **Verify file paths** in Main.jl configuration
+4. **Check scenario names** match between sheets
+5. **Update Sources sheet** when modifying input parameters
+
+## Troubleshooting File Operations
+
+### Path Configuration Issues
+
+![Path Configuration Example](images/Fig.40.png)
+
+**Common Problems:**
+- Incorrect directory separators (use `/` or `\\`)
+- Missing trailing slashes for folder paths
+- Spaces or special characters in path names
+
+![Path Routing Example](images/Fig.41.png)
+
+**Solutions:**
+- Use absolute paths when possible
+- Verify all paths in Main.jl lines 22-25
+- Check scenario sheet name if changed (line 28)
+
+### File Access Problems
+
+**Excel File Locked:**
+- Close Excel before running Julia code
+- Check if file is open in another program
+
+**CSV Import Issues:**
+- Verify Results.xlsx is in correct folder
+- Check macro security settings in Excel
+- Ensure CSV files are not corrupted
+
+## Next Steps
+
+1. **[Install Required Software](installation.md)** - Complete setup if not done
+2. **[Try Examples](Examples.md)** - Run sample scenarios and troubleshooting
+3. **[Technical Reference](api.md)** - Detailed specifications and file formats
+
+---
+
+**Ready to optimize!** You now understand the OptiPlant file structure and workflow.
