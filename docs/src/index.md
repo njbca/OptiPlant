@@ -1,64 +1,99 @@
-# OptiPlant.jl Documentation
+# OptiPlant
 
 GitHub Repo: [https://github.com/njbca/OptiPlant](https://github.com/njbca/OptiPlant)
 
-Welcome to OptiPlant.jl! A Julia package for modeling and optimizing Power-to-X fuel production systems with a high variety of customizable input parameters. The tool is adapted to investigate a large number of scenarios and system configurations in a single run.
+**OptiPlant** is a linear optimization model developed by Nicolas Campion (DTU Department of Technology, Management and Economics) that minimizes the investment and operation costs of a power-to-X (PtX) system powered by wind, solar and/or the electricity grid.
 
-## Installation
+## Summary
 
-You can install OptiPlant by cloning the repository and activating the project environment:
+OptiPlant operates under a "dynamic power supply and system optimization" approach (DPS-Syst-Opt) with perfect foresight. The model sizes units and schedules hourly mass/energy flows to meet a yearly fuel demand at minimum cost.
 
-```julia
-# Clone the repository (or use GitHub Desktop)
-# git clone https://github.com/njbca/OptiPlant.git
+**Key characteristics:**
+- **Fast solving**: Typical solving time on a personal computer is usually below 5 minutes using an open-source solver
+- **Linear deterministic programming** with perfect foresight
+- **Modular design**: Input parameters, objective, variables/constraints, and outputs can be modified easily
+- **Simple workflow**: Prepare data in Excel, run Julia code, review results in CSV/Excel
 
-# Navigate to the project directory and activate
-using Pkg
-Pkg.activate("path/to/OptiPlant")
-Pkg.instantiate()
-```
+## Main Purpose and Capabilities
 
-followed by
+### Purpose
+Minimize annualized system cost while meeting a specified yearly fuel demand.
 
-```julia
-using OptiPlantPtX
-```
+### Capabilities
+- **Customize input parameters**: Techno-economic data, electricity prices, renewable profiles, by-product prices
+- **Choose optimization objective**: Variables and constraints structure
+- **Flexible modification**: Modify inputs and extract results in CSV for post-processing in Excel
+- **Multi-scenario analysis**: Run different scenarios defined in Excel with automatic results folder creation per run
 
-to load the package.
+### Supported Systems
+- **PtX fuel production systems** powered by wind, solar, and/or the electricity grid
+- **System components**: Non-electrical and electrical units, storage, power supply, and fuel production units
 
-## Overview
+### Fuel Types
+Examples include:
+- **NH₃** (ammonia)
+- **H₂** (hydrogen) 
+- **MeOH** (methanol)
 
-To start out, let's discuss the high-level functionality provided by the package, which hopefully will help direct you to more specific documentation for your use-case:
+### Technologies Supported
+- **Wind** power (via profiles)
+- **Solar** power (via profiles)
+- **Electricity grid** (hourly buy price)
+- **Storage systems** and other plant units (defined via Excel inputs)
 
-• **Power-to-X System Modeling**: Comprehensive modeling capabilities for various P2X fuel production systems including hydrogen, ammonia, and synthetic fuels production chains.
-
-• **Multi-Scenario Analysis**: Built-in support for running and comparing multiple scenarios with different system configurations, locations, and operational parameters.
-
-• **Optimization Engine**: Integration with commercial (Gurobi) and open-source (HiGHS) solvers for linear programming optimization of system design and operation.
-
-• **Dashboard Integration**: Interactive Streamlit dashboards for visualization and analysis of results, including capacity optimization, investment analysis, and daily operational profiles.
-
-• **Flexible Data Input**: Support for various data sources including CSV profiles for renewable energy resources, techno-economic parameters, and LCIA data.
-
-• **Location-Based Analysis**: Pre-configured profiles for multiple locations including Denmark, Antofagasta, Bornholm, and Faroe Islands with corresponding renewable energy resources.
-
-That's quite a bit! Let's boil down a TL;DR:
-
-• Just want to run a basic P2X optimization? Use the main [`Run.jl`] script with default parameters.
-• Need to analyze multiple scenarios? Configure your scenarios and use [`Run_multi_scenarios.jl`] or the parallel version.
-• Want interactive visualization? Set up the Streamlit dashboards for real-time analysis.
-• Need to add new locations or technologies? Modify the data files in the [`data/`] folders following the existing structure.
+### Optimization Methods
+- **Linear programming (LP)** solved with:
+  - **HiGHS** (recommended open-source solver)
+  - **Gurobi** (commercial solver alternative)
+- Both solvers provide identical results
 • Want to understand the model structure? Check out the detailed documentation in the usage section.
 
-For the rest of the manual, we're going to have sections covering [Installation], [Usage], [Examples], and [API Reference] where we'll walk through the various options and configurations available in OptiPlant.jl.
+## Key Features and Benefits
 
-• [Installation] - Detailed setup instructions for Julia, solvers, and dependencies
-• [Usage] - Basic to advanced usage patterns and configuration options  
-• [Examples] - Practical examples for common use cases and scenarios
-• [API Reference] - Complete documentation of functions, types, and modules
+- ✅ **Linear deterministic programming** with perfect foresight
+- ✅ **Multi-source power supply**: Wind, solar, and grid integration
+- ✅ **High modularity**: Easy modification of inputs, objectives, and outputs
+- ✅ **Fast performance**: Often <5 minutes solve time with open-source solver
+- ✅ **User-friendly workflow**: Excel → Julia → CSV/Excel results
+- ✅ **Complete documentation**: Available via GitHub with comprehensive user guide
+
+## Getting Started
+
+1. **[Installation](installation.md)** - Set up Julia, VS Code, and required packages
+2. **[File Structure](usage.md)** - Understand the OptiPlant tool organization
+3. **[Examples](Examples.md)** - Learn through practical examples and troubleshooting
+4. **[API Reference](api.md)** - Technical details and specifications
+
+## Scientific Background
+
+For detailed model description (plant components/structure, mathematical formulation, data sources, and considerations), refer to:
+
+**Nicolas Campion et al.** "Techno-economic assessment of green ammonia production with different wind and solar potentials." *Renewable Sustainable Energy Reviews* 173 (2023). 
+
+- **DOI**: [10.1016/j.rser.2022.113057](https://doi.org/10.1016/j.rser.2022.113057)
+- **Link**: https://www.sciencedirect.com/science/article/pii/S1364032122009388
 
 ## Citation
 
-Please cite the following paper when using OptiPlant in your research:
+When using OptiPlant in your research, please cite the above publication.
 
-Campion, N., Barbosa, J., Mohammadi, A., & Lund, H. (2023). Optimization and analysis of large-scale renewable fuel production systems. *Renewable and Sustainable Energy Reviews*, 171, 113057. https://doi.org/10.1016/j.rser.2022.113057
+```bibtex
+@article{campion2023optimization,
+  title={Techno-economic assessment of green ammonia production with different wind and solar potentials},
+  author={Campion, Nicolas and Nami, H and Swisher, P R and Vang Hendriksen, P and M{\"u}nster, M},
+  journal={Renewable and Sustainable Energy Reviews},
+  volume={173},
+  pages={113057},
+  year={2023},
+  doi={10.1016/j.rser.2022.113057}
+}
+```
+
+## Additional Resources
+
+- **GitHub Repository**: [https://github.com/njbca/OptiPlant](https://github.com/njbca/OptiPlant)
+- **Julia**: https://julialang.org/
+- **VS Code**: https://code.visualstudio.com/
+- **JuMP**: https://jump.dev/JuMP.jl/stable/
+- **HiGHS**: https://highs.dev/
+- **Gurobi**: https://www.gurobi.com/

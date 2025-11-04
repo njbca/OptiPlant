@@ -1,292 +1,240 @@
-# Usage
+# OptiPlant Tool: Files and Usage
 
-This guide covers how to use OptiPlant.jl for Power-to-X system modeling and optimization, from basic single-scenario runs to advanced multi-scenario analyses.
+This section explains the file structure of OptiPlant and how to use the tool effectively.
 
-## Basic Concepts
+## Getting OptiPlant
 
-### System Architecture
+Download OptiPlant from GitHub:
 
-OptiPlant.jl models Power-to-X fuel production systems using:
-- **Units**: Individual components (electrolyzers, storage, conversion units, etc.)  
-- **Time series**: Hourly profiles for renewable energy and electricity prices
-- **Scenarios**: Different system configurations and operational parameters
-- **Optimization**: Linear programming to minimize total system costs
+1. Go to https://github.com/njbca/OptiPlant
+2. Click **"Code → Download ZIP"**
+3. Extract the ZIP file to your desired location
+4. Navigate to the extracted **OptiPlant-master** folder
 
-### Folder Structure
+## File Structure Overview
 
-OptiPlant follows a specific project structure:
+OptiPlant is organized into two main folders:
+
+### Main Directories
+
+- **BASE**: Contains Data and Results (not code-related)
+- **RUN CODE**: Contains the Julia scripts to import data, define scenarios, and run the optimization model
 
 ```
-Project_Name/
-├── Data/
-│   ├── Inputs/           # Configuration and techno-economic data
-│   └── Profiles/         # Renewable energy and price time series
-├── Results/              # Optimization results and outputs
-└── Code/                 # Julia optimization scripts
+OptiPlant-master/
+├── BASE/
+│   ├── Data/
+│   │   ├── Inputs/          # Excel files with plant units, techno-economic data, scenarios
+│   │   └── Profiles/        # Excel files with wind/solar profiles and electricity prices
+│   └── Results/             # Output folders created per simulation run
+│       └── Results.xlsx     # Excel file for visualization
+└── RUN CODE/
+    ├── ImportData.jl        # Imports input data (units, techno-economics, profiles)
+    ├── ImportScenarios.jl   # Imports scenario conditions
+    └── Main.jl              # Main optimization model
 ```
 
-## Quick Start
+## Run Code Folder
 
-### Running Your First Optimization
+### Contents and Purpose
 
-1. **Select your input data file** in the main run script:
+The **RUN CODE** folder contains three essential Julia scripts:
+
+- **`ImportData.jl`**: Imports into Julia the necessary input data (units, techno-economics, power profiles)
+- **`ImportScenarios.jl`**: Imports information regarding the scenario conditions of the study  
+- **`Main.jl`**: The optimization model; uses imported data and extracts outputs
+
+### How to Run the Model
+
+1. **Open Main.jl** in VS Code (from RUN CODE folder)
+
+2. **Configure the solver** (line 4):
    ```julia
-   # In Run.jl or your main script
-   Inputs_file = "Input_data_example"  # Start with the example
+   solver = "HiGHS"    # or "Gurobi"
    ```
 
-2. **Configure basic settings:**
+3. **Set directories** (lines 22-25):
    ```julia
-   Solver = "HiGHS"          # Use open-source solver
-   Project = "Base"          # Project folder name
-   N_scen_0 = 1             # First scenario to run
-   N_scen_end = 1           # Last scenario to run
+   # OptiPlant directory
+   OptiPlant_directory = "C:/path/to/OptiPlant-master"
+   
+   # Input data Excel file name  
+   input_data_file = "Input_data_example"
+   
+   # Input data Excel sheet name
+   input_sheet_name = "Data_base_case"
+   
+   # Results folder name
+   results_folder = "Results_base_case"
    ```
 
-3. **Run the optimization:**
-   ```julia
-   using OptiPlantPtX
-   include("Run.jl")  # Or execute in VS Code
-   ```
+4. **Run the file** in VS Code
 
-### Understanding Results
+### Configuration Options
 
-Results are automatically saved in `Project/Results/` with:
-- **Main results**: Overall system economics and capacity
-- **Hourly results**: Time series of operation and flows  
-- **Data used**: Input parameters for reproducibility
+- **Solver selection**: Choose between HiGHS (open-source) or Gurobi (commercial)
+- **Path configuration**: Set correct paths to inputs and outputs
+- **Scenario sheets**: If you create a new scenarios sheet in the Inputs Excel, ensure Main.jl references it correctly (e.g., line 28)
 
-## Configuration
+## Base Folder: Data
 
-### Input Data Files
+### Input Data Structure
 
-OptiPlant uses Excel files in `Data/Inputs/` with structured sheets:
+The **BASE/Data** folder contains two subfolders:
 
-#### Core Sheets:
+#### Inputs Subfolder
 
-**Data_base_case**: Techno-economic parameters
-```
-Type of units | Investment (EUR/Capacity) | Fixed O&M | Variable O&M | ...
-Electrolyzer  | 1000000                  | 25000     | 0.01         | ...
-H2_storage    | 500000                   | 10000     | 0.005        | ...
-```
+Contains Excel workbooks (example: `Input_data_example.xlsx`) with standard sheets:
 
-**Selected_units**: Enable/disable units for scenarios
-```
-Unit Type     | Scenario_1 | Scenario_2 | ...
-Electrolyzer  | 1          | 1          | ...
-Ammonia_plant | 1          | 0          | ...
-```
+##### Data_base_case Sheet
+- **Purpose**: List of possible units (non-electrical and electrical) and characteristics
+- **Contents**: 
+  - Production rates, heat/electrical flows
+  - Load ranges, ramp constraints  
+  - CapEx, OpEx parameters
+  - **Red box**: Default yearly demands of each fuel (main model drivers)
+- **Units and sources**: Indicated for all parameters
 
-**ScenariosToRun**: Define scenarios to execute
-```
-Scenario | Location    | Fuel     | Year | Profile  | Electrolyser | ...
-1        | Denmark     | Hydrogen | 2019 | DK1_2019 | AEL          | ...
-2        | Antofagasta | Ammonia  | 2019 | ANF_2019 | PEM          | ...
-```
+##### Selected_units Sheet
+- **Purpose**: 1/0 matrix indicating which units/technologies are included per fuel production process
+- **Examples**: NH₃, H₂, MeOH configurations
+- **Usage**: Set 1/0 according to preference (default represents "standard case")
+- **Recommendation**: Work on a copy or keep track of changes
 
-### Profile Data
+##### Scenarios_definition Sheet  
+- **Purpose**: Defines operating strategy and conditions
+- **Function**: Logic sits between Data_base_case/Selected_units and outputs
+- **Usage**: Useful for sensitivity analysis
 
-Time series data in `Data/Profiles/Location/`:
-- **Renewable energy**: Wind and solar capacity factors (0-1)
-- **Electricity prices**: EUR/MWh for each hour
-- **Format**: CSV with hourly data (8760 hours for full year)
+##### ScenariosToRun Sheet
+- **Purpose**: Lists the scenarios to run
+- **Parameters**: Operating strategy, location wind/solar, year, produced fuel, electrolyzer technology
+- **Important**: Model stores results as CSV in a folder named per this sheet
+- **Critical**: Carefully type names that must match other sheets
 
-Example profile structure:
-```csv
-Hour,Wind_offshore,Solar_PV,Electricity_price
-1,0.45,0.0,45.2
-2,0.52,0.0,43.8
-...
-```
+##### Sources Sheet
+- **Purpose**: References/sources for Data_base_case entries
+- **Maintenance**: Should be updated if you change/add input data
 
-## Advanced Usage
+#### Profiles Subfolder
 
-### Multi-Scenario Analysis
+Contains Excel files (e.g., `2019.xlsx`) with renewable energy and price data:
 
-Run multiple scenarios in sequence:
+##### Flux Sheet
+- **Content**: Hourly solar and wind profiles (normalized generator output)
+- **Coverage**: Various technologies and locations for the specified year
+- **Format**: Normalized values (0-1)
 
-```julia
-N_scen_0 = 1      # Start scenario
-N_scen_end = 10   # End scenario (runs scenarios 1-10)
-```
+##### Price Sheet  
+- **Content**: Hourly grid buy price for the specified year
+- **Coverage**: Different locations
+- **Units**: Currency per MWh
 
-Or use parallel processing:
-```julia
-include("Run_multi_scenarios_para.jl")  # Parallel execution
-```
+### Data Requirements and Specifications
 
-### Scenario Definitions
+#### Profile Sources
+- **Wind profiles**: From CorRES tool
+- **Solar profiles**: From renewable.ninja website
 
-Create advanced scenarios using the `Scenarios_definition` sheet:
+#### Unit Classification
+- **Non-electrical units**: Distinguished from electrical units in inputs
+- **Electrical units**: Separate category with different parameters
 
-```excel
-Reference scenario | Scenario name | Parameter changed | New value
-Base_case         | High_CAPEX    | Investment        | 1200000
-Base_case         | Low_efficiency | Electrical cons.  | 55
-```
+### How to Prepare Input Data
 
-This allows systematic sensitivity analysis by modifying specific parameters.
+1. **Data_base_case**: Update only if necessary; units and sources are indicated for parameters
 
-### Time Period Configuration
+2. **Selected_units**: Set 1/0 according to preference; prefer working on a copy
 
-Control simulation time periods:
+3. **Scenarios_definition**: Adjust scenario logic relative to inputs for sensitivity analysis
 
-```julia
-# Full year simulation
-TMstart = 1; TMend = 8760; Tbegin = 1; Tfinish = 8760
+4. **ScenariosToRun**: Carefully type names that must match other sheets; if creating new sheet per study case, ensure sheet name is updated in Main.jl (e.g., line 28)
 
-# Maintenance periods (exclude summer maintenance)
-TMstart = 4000; TMend = 4876; Tbegin = 72; Tfinish = 8760
+5. **Sources**: Maintain if inputs are changed
 
-# Short test run (first week)
-TMstart = 1; TMend = 168; Tbegin = 1; Tfinish = 168
-```
+## Base Folder: Results
 
-### Solver Configuration
+### Output File Structure
 
-#### HiGHS (Open Source)
-```julia
-Solver = "HiGHS"
-# No additional configuration needed
-```
+**BASE/Results** contains:
+- **Results Excel file**: For visualization and analysis
+- **Subfolders per run**: Named according to ScenariosToRun sheet (e.g., "Results_base_case")
 
-#### Gurobi (Commercial)
-```julia
-Solver = "Gurobi"
-# Requires license activation: grbgetkey YOUR_LICENSE_KEY
-```
+Each run folder contains three subfolders:
+- **Data used** (CSV files)
+- **Hourly results** (CSV files)  
+- **Main results** (CSV files)
 
-### Output Options
+### Results Interpretation
 
-Control result granularity:
+#### Using the Results Excel File
 
-```julia
-# In scenario configuration
-Write_flows = true   # Save detailed hourly flows
-Option_ramping = true # Include ramping constraints
-```
+1. **Setup**:
+   - Use the "Results" Excel file 
+   - Make a copy and place it into the corresponding run's results folder
 
-## System Configuration Options
+2. **Import Process**:
+   - Open the "Import" sheet
+   - Set correct directories for "Main results folder" and "Hourly results folder" 
+   - **Important**: Paths should end with "\"
+   - Run macros to import data
 
-### Available Technologies
+3. **View Results**:
+   - **Scenario outputs**: Sheets named after scenarios (as in Inputs)
+   - **"All_scenarios"**: Shows output values for each unit and scenario
+   - **Analysis sheets**: "Elec production", "Electricity consumption", "Production cost", "Cost breakdown", "Installed capacities"
+   - **Visualization**: Use Pivot Tables for plotting; refresh pivots after importing new results
 
-OptiPlant includes models for:
-- **Electrolyzers**: AEL (Alkaline), PEM (Proton Exchange Membrane)
-- **Storage**: Hydrogen tanks, batteries
-- **Conversion**: Ammonia synthesis, methanol production  
-- **Renewable**: Wind (onshore/offshore), Solar PV, CSP
-- **Grid**: Electricity import/export
+#### Additional Result Sheets
 
-### Operational Constraints
+When hourly results are imported:
+- Each sheet corresponds to a run scenario
+- Contains hourly flows for different parameters
+- Time-series data for detailed analysis
 
-Configure realistic operational limits:
+### Output Units
 
-```julia
-# In techno-economic data
-Max_Capacity = 100      # MW maximum size
-Load_min = 0.1          # 10% minimum load
-Ramp_up = 0.5          # 50% capacity/hour ramp rate  
-Ramp_down = 0.7        # 70% capacity/hour ramp down
-```
+- **Non-electrical units**: t/h (tonnes per hour)
+- **Electrical units**: MW  
+- **Hourly flow sheets**: Values are x/1000 (kg/h and kW, respectively)
+- **Mass storage**: t (tonnes)
+- **Electricity storage**: MWh
 
-### Economic Parameters
+### File Formats Generated
 
-All economic data in EUR 2019:
-- **Investment costs**: EUR/capacity installed
-- **Fixed O&M**: EUR/capacity/year  
-- **Variable O&M**: EUR/output
-- **Fuel prices**: EUR/output
-- **Discount rate**: Built into annuity factors
+All outputs are in **CSV format** for:
+- Data used
+- Hourly results  
+- Main results
 
-## Results Analysis
+### Post-processing Options
 
-### Main Results Structure
+- **Primary tool**: Provided "Results" Excel workbook with macros
+- **Functionality**: Import CSVs and create Pivot Tables
+- **Purpose**: Visualize and analyze results
+- **Workflow**: CSV → Excel → Analysis → Visualization
 
-Key output metrics for each unit:
-- `Installed_capacity`: Optimal capacity (MW or t/h)
-- `Investment`: Total and annualized investment (M€)
-- `Production`: Annual output (kton or GWh)  
-- `Full_load_hours`: Capacity utilization
-- `Production_cost`: EUR/kg fuel or EUR/MWh
+## Best Practices
 
-### Interpreting Results
+### File Management
+- Keep a copy of standard Inputs to revert changes (especially Selected_units)
+- Carefully maintain consistent names across Excel sheets and Main.jl references
+- Organize results folders with descriptive names
 
-**System Levelized Cost**:
-```
-LCOF = (Annualized Investment + O&M + Fuel Costs) / Annual Production
-```
+### Workflow
+1. **Prepare data** in Excel (Inputs and Profiles)
+2. **Configure** Main.jl with correct paths and solver
+3. **Run** the optimization model
+4. **Import results** using Results Excel file
+5. **Analyze** using Pivot Tables and charts
 
-**Capacity Factor**:
-```  
-CF = Full Load Hours / 8760 hours
-```
-
-**Economics**:
-- Compare production costs across scenarios
-- Identify cost drivers (investment vs. operational)
-- Analyze sensitivity to key parameters
-
-## Common Use Cases
-
-### 1. Technology Comparison
-Compare different electrolyzer technologies:
-```julia
-# Scenario 1: AEL electrolyzer
-# Scenario 2: PEM electrolyzer  
-# Compare: investment costs, efficiency, flexibility
-```
-
-### 2. Location Assessment  
-Evaluate different sites:
-```julia
-# Multiple scenarios with different locations
-# Compare: resource quality, electricity prices, LCOF
-```
-
-### 3. Sensitivity Analysis
-Test parameter impacts:
-```julia
-# Vary: CAPEX (-20%, +20%), efficiency (±5%), fuel prices  
-# Analyze: cost sensitivity, optimal design changes
-```
-
-### 4. Optimal Sizing
-Find cost-optimal capacity:
-```julia
-# Enable: Option_max_capacity = true
-# Result: Economically optimal plant size
-```
-
-## Troubleshooting
-
-### Common Issues
-
-**Infeasible Solutions**:
-- Check unit compatibility in `Selected_units`
-- Verify profile data completeness (8760 hours)
-- Ensure renewable resource adequacy
-
-**Slow Performance**:
-- Reduce time resolution for initial studies  
-- Disable ramping constraints for faster solving
-- Use Gurobi for large problems
-
-**File Path Errors**:
-- Use absolute paths in configuration
-- Verify folder structure matches expected layout
-- Check Excel file names and sheet names
-
-### Performance Tips
-
-1. **Start simple**: Use example data, single scenario, HiGHS solver
-2. **Scale up gradually**: Add complexity after verifying basic functionality  
-3. **Profile first**: Test with short time periods before full year
-4. **Parallel processing**: Use for multiple scenarios with sufficient CPU cores
+### Environment Management
+- Activate the Julia environment each session
+- Use `status` to verify packages are installed
+- Refresh Excel Pivot Tables after importing new results
 
 ## Next Steps
 
-- Explore [Examples](Examples.md) for detailed use cases
-- Check [API Reference](api.md) for function documentation  
-- Set up [Streamlit dashboards] for interactive visualization
-- Review the User Guide for additional configuration details
+- **[Examples](Examples.md)** - Practical workflow examples and troubleshooting
+- **[API Reference](api.md)** - Technical specifications and file formats
+- **[Installation](installation.md)** - Return to installation if needed

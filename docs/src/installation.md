@@ -1,162 +1,207 @@
-# Installation
+# Software Installation
 
-This guide will walk you through setting up OptiPlant.jl locally, configuring your environment, and preparing for your first run.
+This guide provides step-by-step instructions for installing all required software to use OptiPlant.
 
-## Prerequisites
+## Julia Installation
 
-### Julia Installation
+### Download Julia
 
-Make sure you have the **latest Julia version** installed (≥ 1.11.6): [Install Julia](https://julialang.org/install/).
+1. Go to https://julialang.org/downloads/
+2. Download the Julia version corresponding to your operating system
+3. Run the Julia installer and install the program
 
-When installing Julia on Windows, make sure to select the "Add to PATH" option.
+### Installation Options
 
-### Git Client
+**Important:** Tick the box "Add Julia to PATH" **only if** you already have Visual Studio Code installed on your PC.
 
-Set up a [GitHub account](https://github.com/signup) and install a Git client:
-- [GitHub Desktop](https://desktop.github.com/) (recommended for beginners)  
-- [Git](https://git-scm.com/downloads) (command line)
+### Verification
 
-### Development Environment (Recommended)
+If the installation is successful, you will see the message: **"You just got Julia on your PC!"**
 
-Download and install [Visual Studio Code](https://code.visualstudio.com/) with the Julia extension for the best development experience.
+*Note: Examples in this guide use Julia v1.8 environment as shown in package manager prompts.*
 
-## Installation Methods
+## VS Code Installation
 
-### Method 1: Clone Repository (Recommended)
+### Download VS Code
 
-#### Using GitHub Desktop:
-1. On the OptiPlant.jl GitHub page, click the green **"<> Code"** button and copy the HTTPS URL
-2. In GitHub Desktop: `File > Clone repository`
-3. Go to the URL tab and paste the OptiPlant.jl repository URL
-4. Choose a local path: **⚠️ Avoid installing on OneDrive/Google Drive as this may cause problems!**
+1. Go to https://code.visualstudio.com/Download
+2. Download the version for your operating system
+3. Run the installer and install the program
 
-#### Using Command Line:
-```bash
-git clone https://github.com/njbca/OptiPlant.git
-cd OptiPlant
+### Installation Configuration
+
+**Critical:** During installation, tick **"Add to PATH (requires shell restart)"**
+
+### Verification
+
+If successful, you will see the message: **"You just got VS Code on your PC! Next step is to add the corresponding extensions and save them in an 'environment'."**
+
+## VS Code Configuration
+
+### Install Julia Extension
+
+1. Open VS Code
+2. Go to **View > Extensions** 
+3. Search **"Julia"**
+4. Install the Julia extension
+
+### Start Julia REPL
+
+Each session, start the Julia REPL via Command Palette:
+1. Press **Ctrl+Shift+P**
+2. Type **"Start Julia"** or **"Julia: Start REPL"**
+
+The Julia extension integrates the REPL (console) inside VS Code, enabling executing Julia code and interacting with the package manager.
+
+## Package Installation
+
+### Required Julia Packages
+
+OptiPlant requires the following packages:
+
+- **JuMP** - Formulate optimization problems
+- **HiGHS** or **Gurobi** - LP solvers (only one required)
+- **DataFrames** - Structured data handling
+- **CSV** - Read CSV files
+- **XLSX** - Read Excel .xlsx files
+
+**Optional packages** for plotting/visualization:
+- Plots
+- StatsPlots  
+- PrettyTables
+
+### Installation Steps
+
+1. **Enter Package Manager**
+   
+   Press `]` in the Julia REPL. The prompt changes from `julia>` to something like `(@v1.8) pkg>`.
+
+2. **Activate Environment**
+   
+   ```julia
+   activate env
+   ```
+   
+   The prompt changes to `(env) pkg>` and creates/switches to folder env.
+
+3. **Install Packages**
+   
+   Install each package using the `add` command:
+   ```julia
+   add JuMP
+   add HiGHS
+   add DataFrames
+   add CSV
+   add XLSX
+   ```
+
+4. **Verify Installation**
+   
+   Check installed packages:
+   ```julia
+   status
+   ```
+   
+   Run this command after activating the env environment.
+
+## Solver Setup
+
+### HiGHS (Recommended - Open Source)
+
+HiGHS is the recommended open-source solver for OptiPlant.
+
+**Installation:**
+```julia
+add HiGHS
 ```
 
-### Method 2: Download ZIP (Alternative)
-1. Go to the OptiPlant.jl GitHub repository
-2. Click **"<> Code" > "Download ZIP"**
-3. Extract to your desired location (avoid cloud storage folders)
+No additional configuration required.
 
-## Environment Setup
+### Gurobi (Optional - Commercial)
 
-### Open Project in VS Code
-1. Open Visual Studio Code
-2. `File > Open Folder` → select your `OptiPlant` folder
-3. Install the Julia extension from the Extensions Marketplace if not already installed
+Gurobi is a faster alternative that provides the same results as HiGHS.
 
-### Julia Environment Configuration
+#### Gurobi Installation Steps
 
-1. **Open Julia REPL in VS Code:**
-   - Press `Alt + J` then `Alt + O` (the first time may take a moment)
+1. **Get License**
+   - Visit https://www.gurobi.com/ (Downloads & Licenses)
+   - Register and obtain the `grbgetkey`
 
-2. **Navigate and activate the project:**
+2. **Install Gurobi Optimizer**
+   - Download the latest optimizer from https://www.gurobi.com/downloads/gurobi-optimizer-eula/
+   - Install the software
+
+3. **Restart System**
+   - Restart if not done automatically
+
+4. **Activate License**
+   - Open Command Prompt
+   - Enter the saved key: `grbgetkey <your-key>`
+   - Save the license in the default location
+
+5. **Install Julia Package**
    ```julia
-   # If needed, navigate to the project directory
-   cd("path/to/OptiPlant")  # adjust path as needed
-   
-   # Enter package manager mode
-   ]
-   
-   # Activate the project environment
-   activate .
-   
-   # Install all dependencies
-   instantiate
-   
-   # Exit package manager mode
-   # Press Backspace key
+   add Gurobi
    ```
 
-3. **Verify installation:**
-   ```julia
-   using OptiPlantPtX
-   # Should load without errors
-   ```
+## Dependency Management
 
-## Solver Installation
+### Using Julia Environments
 
-OptiPlant.jl supports both commercial and open-source optimization solvers:
+OptiPlant uses Julia environments for dependency management:
 
-### HiGHS (Open Source - Default)
-HiGHS is installed automatically with the Julia dependencies. No additional setup required.
+1. **Activate environment**: `activate env`
+2. **Install packages** into the activated environment
+3. **Check status**: `status` to verify packages
+4. **Activate each session**: Remember to activate the environment each time you start Julia
 
-### Gurobi (Commercial - Optional but Recommended)
+### Package Verification
 
-For better performance with large models:
+After installation, verify packages are available:
 
-1. **Install Gurobi software:** 
-   - Download from [Gurobi Downloads](https://www.gurobi.com/downloads/)
-   - Follow the installation wizard
-
-2. **Activate license:**
-   ```bash
-   # Academic users can get a free license
-   grbgetkey YOUR_LICENSE_KEY
-   ```
-
-3. **Verify in Julia:**
-   ```julia
-   using Gurobi
-   # Should load without errors if properly installed
-   ```
-
-**Note:** You may need to update Gurobi periodically and regenerate your license to avoid compatibility issues.
-
-## Verification
-
-### Test Installation
-1. Open `examples/Run.jl` in VS Code
-2. If using HiGHS instead of Gurobi, ensure the solver is set to `"HiGHS"` in the configuration
-3. Run the file by clicking the play button (▶️) at the top of VS Code
-
-If no errors appear, congratulations! Your installation is complete.
-
-### Build Documentation Locally (Optional)
-
-To build and view the documentation locally:
-
-```powershell
-# From PowerShell in the project root
-julia --project=docs -e "using Pkg; Pkg.instantiate(); Pkg.precompile();"
-julia --project=docs docs/make.jl
+```julia
+using JuMP
+using HiGHS  # or using Gurobi
+using DataFrames
+using CSV
+using XLSX
 ```
 
-The documentation will be built in `docs/build/`.
+## Troubleshooting Installation
 
-## Troubleshooting
+### Package Not Found Error
 
-### Common Issues
+**Error:** `Package X not found`
 
-**"Cannot find OptiPlantPtX"**
-- Ensure you've activated the correct project environment with `] activate .`
-- Verify you're in the correct directory with the `Project.toml` file
+**Likely causes:**
+- Environment not activated before running code
+- Package not installed
+- Package not called in code
 
-**"Gurobi license issues"** 
-- Check your license is still valid: `grbgetkey --help`
-- For academic licenses, they typically need renewal annually
+**Solution:**
+1. In Julia REPL, press `]` to enter package manager
+2. Type `activate env`
+3. Check installed packages with `status`
+4. If missing, install with `add PACKAGE_NAME`
+5. Ensure code calls necessary packages at the beginning
 
-**"Package dependencies failed"**
-- Try: `] resolve` followed by `] instantiate`
-- On Windows, ensure Julia has proper permissions
+### Installation Problems
 
-**"Git/GitHub issues"**
-- Avoid spaces in folder paths
-- Don't install in OneDrive, Google Drive, or similar cloud storage
-- Ensure you have proper permissions for the installation directory
+**Julia or VS Code not recognized:**
+- Ensure "Add to PATH" options were selected during installation
+- For VS Code: "Add to PATH (requires shell restart)"
+- For Julia: "Add Julia to PATH" (if VS Code already installed)
 
-### Getting Help
-
-- Check the [GitHub Issues](https://github.com/njbca/OptiPlant/issues) page
-- Contact the maintainers for contribution guidelines
-- Review the [Usage Guide](usage.md) for configuration options
+**Gurobi license issues:**
+- Ensure you ran `grbgetkey <your-key>` in Command Prompt
+- Save license to default location
+- Restart system after Gurobi installation
 
 ## Next Steps
 
 Once installation is complete:
-- Read the [Usage Guide](usage.md) to understand basic operations
-- Explore the [Examples](Examples.md) for practical use cases
-- Review the [API Reference](api.md) for detailed function documentation
+
+1. **[Download OptiPlant](usage.md#getting-optiplant)** - Get the tool files
+2. **[File Structure](usage.md)** - Understand the project organization  
+3. **[Examples](Examples.md)** - Start with practical examples
+4. **[Troubleshooting](Examples.md#troubleshooting)** - Common issues and solutions
