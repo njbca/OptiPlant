@@ -42,9 +42,9 @@ OptiPlant/
 ## Key Parameters
 
 ### Economic Data
-- **Investment costs**: $/kW for each technology
-- **Operating costs**: $/MWh for operation and maintenance
-- **Electricity prices**: $/MWh hourly profiles
+- **Investment costs**: \$/kW for each technology
+- **Operating costs**: \$/MWh for operation and maintenance
+- **Electricity prices**: \$/MWh hourly profiles
 
 ### Technical Data  
 - **Capacity factors**: Wind and solar resource profiles
