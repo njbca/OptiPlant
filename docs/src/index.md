@@ -1,116 +1,228 @@
-# OptiPlant
+# OptiPlant# OptiPlant
 
-GitHub Repo: [https://github.com/njbca/OptiPlant](https://github.com/njbca/OptiPlant)
 
-![OptiPlant GitHub Download](images/Fig.1.png)
-*Figure 1: OptiPlant GitHub repository - download via "Code → Download ZIP"*
 
-**OptiPlant** is a linear optimization model developed by Nicolas Campion (DTU Department of Technology, Management and Economics) that minimizes the investment and operation costs of a power-to-X (PtX) system powered by wind, solar and/or the electricity grid.
+GitHub Repo: [https://github.com/njbca/OptiPlant](https://github.com/njbca/OptiPlant)GitHub Repo: [https://github.com/njbca/OptiPlant](https://github.com/njbca/OptiPlant)
 
-## Using OptiPlant - Summary/Overview
 
-OptiPlant is a linear optimization model that minimizes the investment and operation costs of a power-to-X (PtX) system powered by wind, solar and/or the electricity grid. It assumes perfect foresight and operates under a "dynamic power supply and system optimization" approach (DPS-Syst-Opt).
 
-The model sizes units and schedules hourly mass/energy flows to meet a yearly fuel demand at minimum cost.
+![OptiPlant GitHub Download](images/Fig.1.png)![OptiPlant GitHub Download](images/Fig.1.png)
 
-![System Overview](images/Fig.2.png)
+*Figure 1: OptiPlant GitHub repository - download via "Code → Download ZIP"**Figure 1: OptiPlant GitHub repository - download via "Code → Download ZIP"*
+
+
+
+## Using OptiPlant - Summary/Overview**OptiPlant** is a linear optimization model developed by Nicolas Campion (DTU Department of Technology, Management and Economics) that minimizes the investment and operation costs of a power-to-X (PtX) system powered by wind, solar and/or the electricity grid.
+
+
+
+OptiPlant is a linear optimization model that minimizes the investment and operation costs of a power-to-X (PtX) system powered by wind, solar and/or the electricity grid. It assumes perfect foresight and operates under a "dynamic power supply and system optimization" approach (DPS-Syst-Opt).## Using OptiPlant - Summary/Overview
+
+
+
+The model sizes units and schedules hourly mass/energy flows to meet a yearly fuel demand at minimum cost.OptiPlant is a linear optimization model that minimizes the investment and operation costs of a power-to-X (PtX) system powered by wind, solar and/or the electricity grid. It assumes perfect foresight and operates under a "dynamic power supply and system optimization" approach (DPS-Syst-Opt).
+
+
+
+![System Overview](images/Fig.2.png)The model sizes units and schedules hourly mass/energy flows to meet a yearly fuel demand at minimum cost.
+
 *Figure 2: OptiPlant system specifications and optimization objective*
 
-**Typical solving time**: Usually below 5 minutes using an open-source solver on a personal computer.
+![System Overview](images/Fig.2.png)
 
-### Main Purpose and Capabilities
+**Typical solving time**: Usually below 5 minutes using an open-source solver on a personal computer.*Figure 2: OptiPlant system specifications and optimization objective*
 
-**Purpose**: Minimize annualized system cost while meeting a specified yearly fuel demand.
 
-**Capabilities**:
+
+### Main Purpose and Capabilities**Typical solving time**: Usually below 5 minutes using an open-source solver on a personal computer.
+
+
+
+**Purpose**: Minimize annualized system cost while meeting a specified yearly fuel demand.### Main Purpose and Capabilities
+
+
+
+**Capabilities**:**Purpose**: Minimize annualized system cost while meeting a specified yearly fuel demand.
+
 - Customize input parameters (techno-economic data, electricity prices, renewable profiles, by-product prices)
-- Choose optimization objective, variables, and constraints structure
+
+- Choose optimization objective, variables, and constraints structure**Capabilities**:
+
+- Flexibly modify inputs and extract results in CSV for post-processing in Excel- Customize input parameters (techno-economic data, electricity prices, renewable profiles, by-product prices)
+
+- Run different scenarios defined in Excel and automatically create a results folder per run- Choose optimization objective, variables, and constraints structure
+
 - Flexibly modify inputs and extract results in CSV for post-processing in Excel
-- Run different scenarios defined in Excel and automatically create a results folder per run
 
-### Key Features and Benefits
+### Key Features and Benefits- Run different scenarios defined in Excel and automatically create a results folder per run
 
-- **Linear deterministic programming** with perfect foresight
-- **Power supply support**: Wind, solar, and grid integration
-- **Modularity**: Input parameters, objective, variables/constraints, and outputs can be modified easily
-- **Fast solve times**: Often <5 minutes with open-source solver
+
+
+- Linear deterministic programming with perfect foresight### Key Features and Benefits
+
+- Supports power supply from wind, solar, and the grid
+
+- Modularity: input parameters, objective, variables/constraints, and outputs can be modified in a fairly easy way- **Linear deterministic programming** with perfect foresight
+
+- Fast solve times (often <5 minutes with open-source solver)- **Power supply support**: Wind, solar, and grid integration
+
+- Simple workflow: prepare data in Excel, run Julia code, review results in CSV/Excel- **Modularity**: Input parameters, objective, variables/constraints, and outputs can be modified easily
+
+- Documentation and tool available via GitHub ZIP download- **Fast solve times**: Often <5 minutes with open-source solver
+
 - **Simple workflow**: Prepare data in Excel, run Julia code, review results in CSV/Excel
-- **Documentation and tool**: Available via GitHub ZIP download
 
-## About OptiPlant
+## About OptiPlant- **Documentation and tool**: Available via GitHub ZIP download
 
-### Complete Project Description
 
-OptiPlant is a tool developed by Nicolas Campion (DTU Department of Technology, Management and Economics) to model PtX fuel production systems with many customizable inputs and to optimize them under DPS-Syst-Opt.
 
-The model minimizes the fuel production cost by managing investments and operation of storage, power-supply, and fuel production units under constraints, with perfect foresight. The main driver is the yearly fuel demand, which must be fulfilled.
+### Complete Project Description## About OptiPlant
 
-### What Systems Can Be Modeled
+
+
+OptiPlant is a tool developed by Nicolas Campion (DTU Department of Technology, Management and Economics) to model PtX fuel production systems with many customizable inputs and to optimize them under DPS-Syst-Opt.### Complete Project Description
+
+
+
+The model minimizes the fuel production cost by managing investments and operation of storage, power-supply, and fuel production units under constraints, with perfect foresight. The main driver is the yearly fuel demand, which must be fulfilled.OptiPlant is a tool developed by Nicolas Campion (DTU Department of Technology, Management and Economics) to model PtX fuel production systems with many customizable inputs and to optimize them under DPS-Syst-Opt.
+
+
+
+### What Systems Can Be ModeledThe model minimizes the fuel production cost by managing investments and operation of storage, power-supply, and fuel production units under constraints, with perfect foresight. The main driver is the yearly fuel demand, which must be fulfilled.
+
+
+
+- PtX fuel production systems powered by wind, solar, and/or the electricity grid### What Systems Can Be Modeled
+
+- Systems composed of non-electrical and electrical units, storage, power supply, and fuel production units
 
 - **PtX fuel production systems** powered by wind, solar, and/or the electricity grid
-- **System components**: Non-electrical and electrical units, storage, power supply, and fuel production units
 
-### Technologies Supported
+### Technologies Supported- **System components**: Non-electrical and electrical units, storage, power supply, and fuel production units
 
-- **Wind** (profiles)
+
+
+- **Wind** (profiles)### Technologies Supported
+
 - **Solar** (profiles)  
+
+- **Electricity grid** (hourly buy price)- **Wind** (profiles)
+
+- **Storage and other plant units** are modeled; specific technology names are defined via the Excel inputs- **Solar** (profiles)  
+
 - **Electricity grid** (hourly buy price)
-- **Storage and other plant units**: Specific technology names are defined via the Excel inputs
 
-### Fuel Types That Can Be Produced
+### Fuel Types That Can Be Produced- **Storage and other plant units**: Specific technology names are defined via the Excel inputs
 
-Examples include:
+
+
+Examples mentioned: **NH₃** (ammonia), **H₂** (hydrogen), **MeOH** (methanol). The Selected_units sheet demonstrates how unit selections vary "for each fuel production process - i.e. NH₃, H₂, MeOH, etc."### Fuel Types That Can Be Produced
+
+
+
+### Optimization Methods AvailableExamples include:
+
 - **NH₃** (ammonia)
-- **H₂** (hydrogen)
+
+Linear programming (LP) solved with open-source **HiGHS** or the commercial solver **Gurobi**. Either solver can be used; both provide the same results (HiGHS recommended as open-source).- **H₂** (hydrogen)
+
 - **MeOH** (methanol)
+
+### Scientific Background and References
 
 The Selected_units sheet demonstrates how unit selections vary for each fuel production process.
 
+For detailed model description (plant components/structure, mathematical formulation, data sources, and considerations), refer to:
+
 ### Optimization Methods Available
 
+**Nicolas Campion et al.** "Techno-economic assessment of green ammonia production with different wind and solar potentials." *Renewable Sustainable Energy Reviews* 173 (2023). ISSN: 1364-0321. DOI: 10.1016/j.rser.2022.113057. 
+
 **Linear programming (LP)** solved with:
-- **HiGHS** (open-source, recommended)
+
+**Link**: [https://www.sciencedirect.com/science/article/pii/S1364032122009388](https://www.sciencedirect.com/science/article/pii/S1364032122009388)- **HiGHS** (open-source, recommended)
+
 - **Gurobi** (commercial solver)
-
-Either solver can be used; both provide the same results (HiGHS recommended as open-source).
-
-## Key Features and Benefits
-
-- **Linear deterministic programming** with perfect foresight
-- **Multi-source power supply**: Wind, solar, and grid integration
-- **High modularity**: Easy modification of inputs, objectives, and outputs
-- **Fast performance**: Often <5 minutes solve time with open-source solver
-- **User-friendly workflow**: Excel → Julia → CSV/Excel results
-- **Complete documentation**: Available via GitHub with comprehensive user guide
 
 ## Getting Started
 
+Either solver can be used; both provide the same results (HiGHS recommended as open-source).
+
 1. **[Installation](installation.md)** - Set up Julia, VS Code, and required packages
-2. **[File Structure](usage.md)** - Understand the OptiPlant tool organization
+
+2. **[File Structure](usage.md)** - Understand the OptiPlant tool organization## Key Features and Benefits
+
 3. **[Examples](Examples.md)** - Learn through practical examples and troubleshooting
-4. **[API Reference](api.md)** - Technical details and specifications
 
-## Scientific Background
+4. **[API Reference](api.md)** - Technical details and specifications- **Linear deterministic programming** with perfect foresight
 
-For detailed model description (plant components/structure, mathematical formulation, data sources, and considerations), refer to:
+- **Multi-source power supply**: Wind, solar, and grid integration
+
+## Scientific Background- **High modularity**: Easy modification of inputs, objectives, and outputs
+
+- **Fast performance**: Often <5 minutes solve time with open-source solver
+
+For detailed model description (plant components/structure, mathematical formulation, data sources, and considerations), refer to:- **User-friendly workflow**: Excel → Julia → CSV/Excel results
+
+- **Complete documentation**: Available via GitHub with comprehensive user guide
 
 **Nicolas Campion et al.** "Techno-economic assessment of green ammonia production with different wind and solar potentials." *Renewable Sustainable Energy Reviews* 173 (2023).
 
-- **DOI**: [10.1016/j.rser.2022.113057](https://doi.org/10.1016/j.rser.2022.113057)
-- **Link**: https://www.sciencedirect.com/science/article/pii/S1364032122009388
+## Getting Started
 
-## Citation
+- **DOI**: [10.1016/j.rser.2022.113057](https://doi.org/10.1016/j.rser.2022.113057)
+
+- **Link**: https://www.sciencedirect.com/science/article/pii/S13640321220093881. **[Installation](installation.md)** - Set up Julia, VS Code, and required packages
+
+2. **[File Structure](usage.md)** - Understand the OptiPlant tool organization
+
+## Citation3. **[Examples](Examples.md)** - Learn through practical examples and troubleshooting
+
+4. **[API Reference](api.md)** - Technical details and specifications
 
 When using OptiPlant in your research, please cite the above publication.
 
+## Scientific Background
+
 ```bibtex
-@article{campion2023optimization,
+
+@article{campion2023optimization,For detailed model description (plant components/structure, mathematical formulation, data sources, and considerations), refer to:
+
   title={Techno-economic assessment of green ammonia production with different wind and solar potentials},
-  author={Campion, Nicolas and Nami, H and Swisher, P R and Vang Hendriksen, P and M{\"u}nster, M},
+
+  author={Campion, Nicolas and Nami, H and Swisher, P R and Vang Hendriksen, P and M{\"u}nster, M},**Nicolas Campion et al.** "Techno-economic assessment of green ammonia production with different wind and solar potentials." *Renewable Sustainable Energy Reviews* 173 (2023).
+
   journal={Renewable and Sustainable Energy Reviews},
-  volume={173},
-  pages={113057},
+
+  volume={173},- **DOI**: [10.1016/j.rser.2022.113057](https://doi.org/10.1016/j.rser.2022.113057)
+
+  pages={113057},- **Link**: https://www.sciencedirect.com/science/article/pii/S1364032122009388
+
   year={2023},
+
+  doi={10.1016/j.rser.2022.113057}## Citation
+
+}
+
+```When using OptiPlant in your research, please cite the above publication.
+
+
+
+## Additional Resources```bibtex
+
+@article{campion2023optimization,
+
+- **GitHub Repository**: [https://github.com/njbca/OptiPlant](https://github.com/njbca/OptiPlant)  title={Techno-economic assessment of green ammonia production with different wind and solar potentials},
+
+- **Julia**: https://julialang.org/  author={Campion, Nicolas and Nami, H and Swisher, P R and Vang Hendriksen, P and M{\"u}nster, M},
+
+- **VS Code**: https://code.visualstudio.com/  journal={Renewable and Sustainable Energy Reviews},
+
+- **JuMP**: https://jump.dev/JuMP.jl/stable/  volume={173},
+
+- **HiGHS**: https://highs.dev/  pages={113057},
+
+- **Gurobi**: https://www.gurobi.com/  year={2023},
   doi={10.1016/j.rser.2022.113057}
 }
 ```
