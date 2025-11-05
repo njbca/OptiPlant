@@ -1,72 +1,140 @@
-# Software Installation# Installation Guide#- Software- Installation
+# Installation Guide# Software Installation# Installation Guide#- Software- Installation
 
 
 
-This guide provides step-by-step instructions for installing all required software to use OptiPlant.
+## Julia Installation
 
 
 
-## Julia InstallationThis guide will help you install all the required software and packages to run OptiPlant successfully.This- guide- provides- step-by-step- instructions- for- installing- all- required- software- to- use- OptiPlant.
+Go to https://julialang.org/downloads/ and download Julia for your operating system.This guide provides step-by-step instructions for installing all required software to use OptiPlant.
 
 
 
-### Required Julia Version
+![Julia Download](images/Fig.3.png)
 
 
 
-Package manager prompt in screenshots shows "(@v1.8) pkg>", indicating examples use Julia v1.8 environment.## Overview##- Julia- Installation
+Run the installer:## Julia InstallationThis guide will help you install all the required software and packages to run OptiPlant successfully.This- guide- provides- step-by-step- instructions- for- installing- all- required- software- to- use- OptiPlant.
 
 
 
-### Step-by-Step Julia Installation Process
+![Julia Installer](images/Fig.4.png)
 
 
 
-1. Go to https://julialang.org/downloads/ and download the Julia version corresponding to your operating systemOptiPlant requires:###- Download- Julia
+Tick "Add Julia to PATH" if you have VS Code installed.### Required Julia Version
 
 
 
-![Julia Download Page](images/Fig.3.png)1. **Julia** (programming language and environment)
-
-*Figure 3: Julia download page*
-
-2. **Visual Studio Code** (code editor with Julia extension)1.- Go- to- https://julialang.org/downloads/
-
-2. Run the Julia installer and install the program
-
-3. **Julia packages** (optimization and data handling libraries)2.- Download- the- Julia- version- corresponding- to- your- operating- system
-
-![Julia Installer Steps](images/Fig.4.png)
-
-*Figure 4: Julia installer steps*4. **Microsoft Excel** (for input preparation and results visualization)3.- Run- the- Julia- installer- and- install- the- program
+![Julia Success](images/Fig.5.png)
 
 
 
-3. **Important**: Tick the box "Add Julia to PATH" only if you already have Visual Studio Code already installed on your PC
+## VS Code InstallationPackage manager prompt in screenshots shows "(@v1.8) pkg>", indicating examples use Julia v1.8 environment.## Overview##- Julia- Installation
 
 
 
-4. If the installation is successful, the message will appear: "You just got Julia on your PC!"![OptiPlant Installation Overview](images/Fig.15.png)###- Installation- Options
+Download from https://code.visualstudio.com/Download
 
 
 
-![Julia Installation Success](images/Fig.5.png)
-
-*Figure 5: Successful installation screen*
-
-## 1. Julia Installation**Important:**- Tick- the- box- "Add- Julia- to- PATH"- **only- if**- you- already- have- Visual- Studio- Code- installed- on- your- PC.
-
-### System Requirements
+![VS Code Download](images/Fig.6.png)### Step-by-Step Julia Installation Process
 
 
 
-Not specified in the presentation.
-
-### Download and Install Julia###- Verification
-
-### Verification Steps
+Run installer:
 
 
+
+![VS Code Installer](images/Fig.7.png)1. Go to https://julialang.org/downloads/ and download the Julia version corresponding to your operating systemOptiPlant requires:###- Download- Julia
+
+
+
+Important: Tick "Add to PATH":
+
+
+
+![VS Code PATH](images/Fig.8.png)![Julia Download Page](images/Fig.3.png)1. **Julia** (programming language and environment)
+
+
+
+Success message:*Figure 3: Julia download page*
+
+
+
+![VS Code Success](images/Fig.9.png)2. **Visual Studio Code** (code editor with Julia extension)1.- Go- to- https://julialang.org/downloads/
+
+
+
+## Julia Extension2. Run the Julia installer and install the program
+
+
+
+Install Julia extension:3. **Julia packages** (optimization and data handling libraries)2.- Download- the- Julia- version- corresponding- to- your- operating- system
+
+
+
+![Julia Extension](images/Fig.10.png)![Julia Installer Steps](images/Fig.4.png)
+
+
+
+Search and install:*Figure 4: Julia installer steps*4. **Microsoft Excel** (for input preparation and results visualization)3.- Run- the- Julia- installer- and- install- the- program
+
+
+
+![Extension Install](images/Fig.11.png)
+
+
+
+Start Julia REPL with Ctrl+Shift+P:3. **Important**: Tick the box "Add Julia to PATH" only if you already have Visual Studio Code already installed on your PC
+
+
+
+![Julia REPL](images/Fig.12.png)
+
+
+
+## Package Installation4. If the installation is successful, the message will appear: "You just got Julia on your PC!"![OptiPlant Installation Overview](images/Fig.15.png)###- Installation- Options
+
+
+
+Enter package manager with "]":
+
+
+
+![Package Manager](images/Fig.13.png)![Julia Installation Success](images/Fig.5.png)
+
+
+
+Required packages:*Figure 5: Successful installation screen*
+
+```julia
+
+] activate env## 1. Julia Installation**Important:**- Tick- the- box- "Add- Julia- to- PATH"- **only- if**- you- already- have- Visual- Studio- Code- installed- on- your- PC.
+
+add JuMP HiGHS DataFrames CSV XLSX
+
+```### System Requirements
+
+
+
+## Gurobi Setup (Optional)
+
+
+
+For Gurobi license:Not specified in the presentation.
+
+
+
+![Gurobi Setup](images/Fig.14.png)### Download and Install Julia###- Verification
+
+
+
+```cmd### Verification Steps
+
+grbgetkey [your-key]
+
+```
 
 Successful installation screen: "You just got Julia on your PC!"
 

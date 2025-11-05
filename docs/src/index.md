@@ -1,43 +1,82 @@
-# OptiPlant# OptiPlant
+# OptiPlant Documentation# OptiPlant# OptiPlant
 
 
 
-GitHub Repo: [https://github.com/njbca/OptiPlant](https://github.com/njbca/OptiPlant)GitHub Repo: [https://github.com/njbca/OptiPlant](https://github.com/njbca/OptiPlant)
+OptiPlant is a linear optimization model that minimizes the investment and operation costs of a power-to-X (PtX) system powered by wind, solar and/or the electricity grid.
 
 
 
-![OptiPlant GitHub Download](images/Fig.1.png)![OptiPlant GitHub Download](images/Fig.1.png)
-
-*Figure 1: OptiPlant GitHub repository - download via "Code → Download ZIP"**Figure 1: OptiPlant GitHub repository - download via "Code → Download ZIP"*
+![GitHub Download](images/Fig.1.png)GitHub Repo: [https://github.com/njbca/OptiPlant](https://github.com/njbca/OptiPlant)GitHub Repo: [https://github.com/njbca/OptiPlant](https://github.com/njbca/OptiPlant)
 
 
 
-## Using OptiPlant - Summary/Overview**OptiPlant** is a linear optimization model developed by Nicolas Campion (DTU Department of Technology, Management and Economics) that minimizes the investment and operation costs of a power-to-X (PtX) system powered by wind, solar and/or the electricity grid.
+## Overview
 
 
 
-OptiPlant is a linear optimization model that minimizes the investment and operation costs of a power-to-X (PtX) system powered by wind, solar and/or the electricity grid. It assumes perfect foresight and operates under a "dynamic power supply and system optimization" approach (DPS-Syst-Opt).## Using OptiPlant - Summary/Overview
+The model operates under a "dynamic power supply and system optimization" approach (DPS-Syst-Opt) with perfect foresight. It sizes units and schedules hourly mass/energy flows to meet a yearly fuel demand at minimum cost.![OptiPlant GitHub Download](images/Fig.1.png)![OptiPlant GitHub Download](images/Fig.1.png)
 
 
+
+![System Overview](images/Fig.2.png)*Figure 1: OptiPlant GitHub repository - download via "Code → Download ZIP"**Figure 1: OptiPlant GitHub repository - download via "Code → Download ZIP"*
+
+
+
+Typical solving time on a personal computer is usually below 5 minutes using an open-source solver.
+
+
+
+## Key Features## Using OptiPlant - Summary/Overview**OptiPlant** is a linear optimization model developed by Nicolas Campion (DTU Department of Technology, Management and Economics) that minimizes the investment and operation costs of a power-to-X (PtX) system powered by wind, solar and/or the electricity grid.
+
+
+
+- Linear deterministic programming with perfect foresight
+
+- Supports power supply from wind, solar, and the grid
+
+- Fast solve times (often <5 minutes with open-source solver)OptiPlant is a linear optimization model that minimizes the investment and operation costs of a power-to-X (PtX) system powered by wind, solar and/or the electricity grid. It assumes perfect foresight and operates under a "dynamic power supply and system optimization" approach (DPS-Syst-Opt).## Using OptiPlant - Summary/Overview
+
+- Simple workflow: prepare data in Excel, run Julia code, review results in CSV/Excel
+
+
+
+## About OptiPlant
 
 The model sizes units and schedules hourly mass/energy flows to meet a yearly fuel demand at minimum cost.OptiPlant is a linear optimization model that minimizes the investment and operation costs of a power-to-X (PtX) system powered by wind, solar and/or the electricity grid. It assumes perfect foresight and operates under a "dynamic power supply and system optimization" approach (DPS-Syst-Opt).
 
+OptiPlant is developed by Nicolas Campion (DTU Department of Technology, Management and Economics) to model PtX fuel production systems.
 
 
-![System Overview](images/Fig.2.png)The model sizes units and schedules hourly mass/energy flows to meet a yearly fuel demand at minimum cost.
 
-*Figure 2: OptiPlant system specifications and optimization objective*
+### Supported Technologies
 
-![System Overview](images/Fig.2.png)
+- Wind profiles![System Overview](images/Fig.2.png)The model sizes units and schedules hourly mass/energy flows to meet a yearly fuel demand at minimum cost.
 
-**Typical solving time**: Usually below 5 minutes using an open-source solver on a personal computer.*Figure 2: OptiPlant system specifications and optimization objective*
+- Solar profiles  
+
+- Electricity grid (hourly buy price)*Figure 2: OptiPlant system specifications and optimization objective*
 
 
+
+### Fuel Types![System Overview](images/Fig.2.png)
+
+- NH₃ (ammonia)
+
+- H₂ (hydrogen) **Typical solving time**: Usually below 5 minutes using an open-source solver on a personal computer.*Figure 2: OptiPlant system specifications and optimization objective*
+
+- MeOH (methanol)
+
+
+
+### Scientific Reference
 
 ### Main Purpose and Capabilities**Typical solving time**: Usually below 5 minutes using an open-source solver on a personal computer.
 
+Nicolas Campion et al. "Techno-economic assessment of green ammonia production with different wind and solar potentials." Renewable Sustainable Energy Reviews 173 (2023). DOI: 10.1016/j.rser.2022.113057.
 
 
+
+[Link to paper](https://www.sciencedirect.com/science/article/pii/S1364032122009388)
 **Purpose**: Minimize annualized system cost while meeting a specified yearly fuel demand.### Main Purpose and Capabilities
 
 
