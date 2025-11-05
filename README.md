@@ -8,13 +8,11 @@
 
 **OptiPlant** is a linear optimization model that minimizes the investment and operation costs of a power-to-X (PtX) system powered by wind, solar and/or the electricity grid. Developed by Nicolas Campion (DTU Department of Technology, Management and Economics).
 
-![OptiPlant Overview](docs/src/images/Fig.1.png)
 
 ## Overview
 
 OptiPlant operates under a "dynamic power supply and system optimization" approach (DPS-Syst-Opt) with perfect foresight. The model sizes units and schedules hourly mass/energy flows to meet a yearly fuel demand at minimum cost.
 
-![System Overview](docs/src/images/Fig.2.png)
 
 **Key Features:**
 - **Fast solving**: Typical solving time <5 minutes using open-source solver

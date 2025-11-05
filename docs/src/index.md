@@ -2,55 +2,77 @@
 
 GitHub Repo: [https://github.com/njbca/OptiPlant](https://github.com/njbca/OptiPlant)
 
-![OptiPlant Overview](images/Fig.1.png)
+![OptiPlant GitHub Download](images/Fig.1.png)
+*Figure 1: OptiPlant GitHub repository - download via "Code → Download ZIP"*
 
 **OptiPlant** is a linear optimization model developed by Nicolas Campion (DTU Department of Technology, Management and Economics) that minimizes the investment and operation costs of a power-to-X (PtX) system powered by wind, solar and/or the electricity grid.
 
-## Summary
+## Using OptiPlant - Summary/Overview
 
-OptiPlant operates under a "dynamic power supply and system optimization" approach (DPS-Syst-Opt) with perfect foresight. The model sizes units and schedules hourly mass/energy flows to meet a yearly fuel demand at minimum cost.
+OptiPlant is a linear optimization model that minimizes the investment and operation costs of a power-to-X (PtX) system powered by wind, solar and/or the electricity grid. It assumes perfect foresight and operates under a "dynamic power supply and system optimization" approach (DPS-Syst-Opt).
+
+The model sizes units and schedules hourly mass/energy flows to meet a yearly fuel demand at minimum cost.
 
 ![System Overview](images/Fig.2.png)
+*Figure 2: OptiPlant system specifications and optimization objective*
 
-**Key characteristics:**
-- **Fast solving**: Typical solving time on a personal computer is usually below 5 minutes using an open-source solver
+**Typical solving time**: Usually below 5 minutes using an open-source solver on a personal computer.
+
+### Main Purpose and Capabilities
+
+**Purpose**: Minimize annualized system cost while meeting a specified yearly fuel demand.
+
+**Capabilities**:
+- Customize input parameters (techno-economic data, electricity prices, renewable profiles, by-product prices)
+- Choose optimization objective, variables, and constraints structure
+- Flexibly modify inputs and extract results in CSV for post-processing in Excel
+- Run different scenarios defined in Excel and automatically create a results folder per run
+
+### Key Features and Benefits
+
 - **Linear deterministic programming** with perfect foresight
-- **Modular design**: Input parameters, objective, variables/constraints, and outputs can be modified easily
+- **Power supply support**: Wind, solar, and grid integration
+- **Modularity**: Input parameters, objective, variables/constraints, and outputs can be modified easily
+- **Fast solve times**: Often <5 minutes with open-source solver
 - **Simple workflow**: Prepare data in Excel, run Julia code, review results in CSV/Excel
+- **Documentation and tool**: Available via GitHub ZIP download
 
-## Main Purpose and Capabilities
+## About OptiPlant
 
-### Purpose
-Minimize annualized system cost while meeting a specified yearly fuel demand.
+### Complete Project Description
 
-### Capabilities
-- **Customize input parameters**: Techno-economic data, electricity prices, renewable profiles, by-product prices
-- **Choose optimization objective**: Variables and constraints structure
-- **Flexible modification**: Modify inputs and extract results in CSV for post-processing in Excel
-- **Multi-scenario analysis**: Run different scenarios defined in Excel with automatic results folder creation per run
+OptiPlant is a tool developed by Nicolas Campion (DTU Department of Technology, Management and Economics) to model PtX fuel production systems with many customizable inputs and to optimize them under DPS-Syst-Opt.
 
-### Supported Systems
+The model minimizes the fuel production cost by managing investments and operation of storage, power-supply, and fuel production units under constraints, with perfect foresight. The main driver is the yearly fuel demand, which must be fulfilled.
+
+### What Systems Can Be Modeled
+
 - **PtX fuel production systems** powered by wind, solar, and/or the electricity grid
 - **System components**: Non-electrical and electrical units, storage, power supply, and fuel production units
 
-### Fuel Types
+### Technologies Supported
+
+- **Wind** (profiles)
+- **Solar** (profiles)  
+- **Electricity grid** (hourly buy price)
+- **Storage and other plant units**: Specific technology names are defined via the Excel inputs
+
+### Fuel Types That Can Be Produced
+
 Examples include:
 - **NH₃** (ammonia)
 - **H₂** (hydrogen)
 - **MeOH** (methanol)
 
-### Technologies Supported
-- **Wind** power (via profiles)
-- **Solar** power (via profiles)
-- **Electricity grid** (hourly buy price)
-- **Storage systems** and other plant units (defined via Excel inputs)
+The Selected_units sheet demonstrates how unit selections vary for each fuel production process.
 
-### Optimization Methods
-- **Linear programming (LP)** solved with:
-  - **HiGHS** (recommended open-source solver)
-  - **Gurobi** (commercial solver alternative)
-- Both solvers provide identical results
-Want to understand the model structure? Check out the detailed documentation in the usage section.
+### Optimization Methods Available
+
+**Linear programming (LP)** solved with:
+- **HiGHS** (open-source, recommended)
+- **Gurobi** (commercial solver)
+
+Either solver can be used; both provide the same results (HiGHS recommended as open-source).
 
 ## Key Features and Benefits
 

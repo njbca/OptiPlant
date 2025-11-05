@@ -1,294 +1,149 @@
-# Software Installation# Installation Guide#- Software- Installation
+# Installation Guide#- Software- Installation
 
 
 
-This guide provides step-by-step instructions for installing all required software to use OptiPlant.
+This guide will help you install all the required software and packages to run OptiPlant successfully.This- guide- provides- step-by-step- instructions- for- installing- all- required- software- to- use- OptiPlant.
 
 
 
-## Julia InstallationThis guide will help you install all the required software and packages to run OptiPlant successfully.This- guide- provides- step-by-step- instructions- for- installing- all- required- software- to- use- OptiPlant.
+## Overview##- Julia- Installation
 
 
 
-### Required Julia Version
+OptiPlant requires:###- Download- Julia
 
-
-
-Package manager prompt in screenshots shows "(@v1.8) pkg>", indicating examples use Julia v1.8 environment.## Overview##- Julia- Installation
-
-
-
-### Step-by-Step Julia Installation Process
-
-
-
-1. Go to https://julialang.org/downloads/ and download the Julia version corresponding to your operating systemOptiPlant requires:###- Download- Julia
-
-
-
-![Julia Download Page](images/Fig.3.png)1. **Julia** (programming language and environment)
-
-*Figure 3: Julia download page*
+1. **Julia** (programming language and environment)
 
 2. **Visual Studio Code** (code editor with Julia extension)1.- Go- to- https://julialang.org/downloads/
 
-2. Run the Julia installer and install the program
-
 3. **Julia packages** (optimization and data handling libraries)2.- Download- the- Julia- version- corresponding- to- your- operating- system
 
-![Julia Installer Steps](images/Fig.4.png)
-
-*Figure 4: Julia installer steps*4. **Microsoft Excel** (for input preparation and results visualization)3.- Run- the- Julia- installer- and- install- the- program
+4. **Microsoft Excel** (for input preparation and results visualization)3.- Run- the- Julia- installer- and- install- the- program
 
 
 
-3. **Important**: Tick the box "Add Julia to PATH" only if you already have Visual Studio Code already installed on your PC
+![OptiPlant Installation Overview](images/Fig.15.png)###- Installation- Options
 
 
-
-4. If the installation is successful, the message will appear: "You just got Julia on your PC!"![OptiPlant Installation Overview](images/Fig.15.png)###- Installation- Options
-
-
-
-![Julia Installation Success](images/Fig.5.png)
-
-*Figure 5: Successful installation screen*
 
 ## 1. Julia Installation**Important:**- Tick- the- box- "Add- Julia- to- PATH"- **only- if**- you- already- have- Visual- Studio- Code- installed- on- your- PC.
 
-### System Requirements
 
-
-
-Not specified in the presentation.
 
 ### Download and Install Julia###- Verification
 
-### Verification Steps
 
-
-
-Successful installation screen: "You just got Julia on your PC!"
 
 1. Go to [https://julialang.org/downloads/](https://julialang.org/downloads/)If- the- installation- is- successful,- you- will- see- the- message:- **"You- just- got- Julia- on- your- PC!"**
 
-## VS Code Installation
-
 2. Download the Julia version corresponding to your operating system
-
-### VS Code Setup Instructions
 
 *Note:- Examples- in- this- guide- use- Julia- v1.8- environment- as- shown- in- package- manager- prompts.*
 
-1. Go to https://code.visualstudio.com/Download and download the version for your operating system
-
 ![Julia Download Page](images/Fig.3.png)
 
-![VS Code Download Page](images/Fig.6.png)
+##- VS- Code- Installation
 
-*Figure 6: VS Code download page*##- VS- Code- Installation
+3. Run the Julia installer and install the program
 
-
-
-2. Run the installer and install the program3. Run the Julia installer and install the program
+4. **Important**: Tick the box "Add Julia to PATH" only if you already have Visual Studio Code installed on your PC###- Download- VS- Code
 
 
-
-![VS Code Installer](images/Fig.7.png)4. **Important**: Tick the box "Add Julia to PATH" only if you already have Visual Studio Code installed on your PC###- Download- VS- Code
-
-*Figure 7: VS Code installer*
-
-
-
-3. **Important**: During installation, tick "Add to PATH (requires shell restart)"
 
 ![Julia Installation](images/Fig.4.png)1.- Go- to- https://code.visualstudio.com/Download
 
-![VS Code PATH Option](images/Fig.8.png)
+2.- Download- the- version- for- your- operating- system
 
-*Figure 8: VS Code "Add to PATH" option*2.- Download- the- version- for- your- operating- system
-
-
-
-4. If successful, message shown: "You just got VS Code on your PC! Next step is to add the corresponding extensions and save them in an 'environment'."5. If the installation is successful, you will see: "You just got Julia on your PC!"3.- Run- the- installer- and- install- the- program
+5. If the installation is successful, you will see: "You just got Julia on your PC!"3.- Run- the- installer- and- install- the- program
 
 
-
-![VS Code Installation Success](images/Fig.9.png)
-
-*Figure 9: VS Code installation success message*
 
 ![Julia Installation Success](images/Fig.5.png)###- Installation- Configuration
 
-### Required Extensions
 
-
-
-"Julia" extension in VS Code (provides Julia language support and a Julia REPL).
 
 ### System Requirements**Critical:**- During- installation,- tick- **"Add- to- PATH- (requires- shell- restart)"**
 
-### Configuration Steps
 
-
-
-1. Open VS Code → View > Extensions → search "Julia" → Install
 
 Julia works on:###- Verification
 
-![Julia Extension Installation](images/Fig.10.png)
+- **Windows**: Windows 10 or later
 
-*Figure 10: VS Code Extensions view for "Julia"*- **Windows**: Windows 10 or later
+- **macOS**: macOS 10.14 or later  If- successful,- you- will- see- the- message:- **"You- just- got- VS- Code- on- your- PC!- Next- step- is- to- add- the- corresponding- extensions- and- save- them- in- an- 'environment'."**
 
-
-
-2. Start Julia REPL each session via Command Palette: press "Ctrl+Shift+P", type "Start Julia" or "Julia: Start REPL"- **macOS**: macOS 10.14 or later  If- successful,- you- will- see- the- message:- **"You- just- got- VS- Code- on- your- PC!- Next- step- is- to- add- the- corresponding- extensions- and- save- them- in- an- 'environment'."**
-
-
-
-![Command Palette Julia REPL](images/Fig.11.png)- **Linux**: Recent distributions with glibc 2.17 or later
-
-*Figure 11: Command Palette showing "Julia: Start REPL"*
+- **Linux**: Recent distributions with glibc 2.17 or later
 
 ##- VS- Code- Configuration
 
-### Integration with Julia
-
 ## 2. Visual Studio Code Installation
-
-The Julia extension integrates the REPL (console) inside VS Code, enabling executing Julia code and interacting with the package manager.
 
 ###- Install- Julia- Extension
 
-## Packages Installation
-
 ### Download and Install VS Code
-
-### Required Julia Packages List
 
 1.- Open- VS- Code
 
-- **JuMP** (formulate optimization problems)
+1. Go to [https://code.visualstudio.com/Download](https://code.visualstudio.com/Download)2.- Go- to- **View- >- Extensions**- 
 
-- **HiGHS or Gurobi** (LP solvers; only one is required)1. Go to [https://code.visualstudio.com/Download](https://code.visualstudio.com/Download)2.- Go- to- **View- >- Extensions**- 
+2. Download the version for your operating system3.- Search- **"Julia"**
 
-- **DataFrames** (structured data)
+4.- Install- the- Julia- extension
 
-- **CSV** (read CSV files)2. Download the version for your operating system3.- Search- **"Julia"**
+![VS Code Download Page](images/Fig.6.png)
 
-- **XLSX** (read Excel .xlsx files)
+###- Start- Julia- REPL
 
-- **Optional for plotting/visualization**: Plots, StatsPlots, PrettyTables4.- Install- the- Julia- extension
-
-
-
-### Installation Commands![VS Code Download Page](images/Fig.6.png)
-
-
-
-1. Enter package manager by pressing "]" in the Julia REPL (prompt changes from "julia>" to something like "(@v1.8) pkg>")###- Start- Julia- REPL
-
-
-
-![Package Manager Prompt](images/Fig.12.png)3. Run the installer and install the program
-
-*Figure 12: Package manager prompts illustrating activation*
+3. Run the installer and install the program
 
 4. **Important**: During installation, tick "Add to PATH (requires shell restart)"Each- session,- start- the- Julia- REPL- via- Command- Palette:
 
-2. Activate environment: type "activate env" (prompt changes to "(env) pkg>" and creates/switches to folder env)
-
 1.- Press- **Ctrl+Shift+P**
 
-![Environment Activation](images/Fig.13.png)
-
-*Figure 13: Adding packages in activated environment*![VS Code Installation Options](images/Fig.7.png)2.- Type- **"Start- Julia"**- or- **"Julia:- Start- REPL"**
+![VS Code Installation Options](images/Fig.7.png)2.- Type- **"Start- Julia"**- or- **"Julia:- Start- REPL"**
 
 
 
-3. Install packages: type "add PACKAGE_NAME" (e.g., "add JuMP", "add HiGHS", "add DataFrames", "add CSV", "add XLSX")
+5. If successful, you will see: "You just got VS Code on your PC! Next step is to add the corresponding extensions and save them in an 'environment'."The- Julia- extension- integrates- the- REPL- (console)- inside- VS- Code,- enabling- executing- Julia- code- and- interacting- with- the- package- manager.
 
 
 
-4. Check installed packages: type "status" (run after activating env)5. If successful, you will see: "You just got VS Code on your PC! Next step is to add the corresponding extensions and save them in an 'environment'."The- Julia- extension- integrates- the- REPL- (console)- inside- VS- Code,- enabling- executing- Julia- code- and- interacting- with- the- package- manager.
+![VS Code Installation Success](images/Fig.8.png)##- Package- Installation
 
 
 
-### Solver Setup (Gurobi, HiGHS, etc.)
+### Install Julia Extension###- Required- Julia- Packages
 
 
 
-#### HiGHS (Recommended)![VS Code Installation Success](images/Fig.8.png)##- Package- Installation
-
-**HiGHS**: Recommended open-source solver for OptiPlant. Install via "add HiGHS".
-
-
-
-#### Gurobi (Optional, Commercial)
-
-**Gurobi** (optional, commercial; faster alternative; same results as HiGHS):### Install Julia Extension###- Required- Julia- Packages
-
-
-
-1. Get a license via https://www.gurobi.com/ (Downloads & Licenses). After registration, obtain the grbgetkey
-
-2. Install the latest optimizer from https://www.gurobi.com/downloads/gurobi-optimizer-eula/
-
-3. Restart system if not done automatically1. Open Visual Studio CodeOptiPlant- requires- the- following- packages:
-
-4. Open Command Prompt and enter the saved key: "grbgetkey" and save the license in the default location
+1. Open Visual Studio CodeOptiPlant- requires- the- following- packages:
 
 2. Go to **View → Extensions** (or press `Ctrl+Shift+X`)
 
-![Gurobi License Setup](images/Fig.14.png)
+3. Search for "Julia"-- **JuMP**- -- Formulate- optimization- problems
 
-*Figure 14: Command Prompt example with "grbgetkey ..." usage*3. Search for "Julia"-- **JuMP**- -- Formulate- optimization- problems
+4. Install the Julia extension (provides Julia language support and REPL)-- **HiGHS**- or- **Gurobi**- -- LP- solvers- (only- one- required)
 
+-- **DataFrames**- -- Structured- data- handling
 
+![Julia Extension Installation](images/Fig.9.png)-- **CSV**- -- Read- CSV- files
 
-5. In Julia package manager, "add Gurobi"4. Install the Julia extension (provides Julia language support and REPL)-- **HiGHS**- or- **Gurobi**- -- LP- solvers- (only- one- required)
+-- **XLSX**- -- Read- Excel- .xlsx- files
 
+### Configure Julia in VS Code
 
+**Optional- packages**- for- plotting/visualization:
 
-### Dependency Management-- **DataFrames**- -- Structured- data- handling
-
-
-
-Use Julia environments. Activate an "env" environment and install required packages into it. Use "status" to verify.![Julia Extension Installation](images/Fig.9.png)-- **CSV**- -- Read- CSV- files
-
-
-
-### Troubleshooting Package Issues-- **XLSX**- -- Read- Excel- .xlsx- files
-
-
-
-If "Package X not found": ensure the environment is activated ("activate env"), verify with "status", install missing package with "add PACKAGE_NAME", and ensure the code calls the package at the top (see Troubleshooting section for details and figure references).### Configure Julia in VS Code
-
-
-
-## Installation Problems**Optional- packages**- for- plotting/visualization:
-
-
-
-- **Julia or VS Code not recognized**: Ensure "Add to PATH" options were ticked during installation (Julia PATH guidance and VS Code's "Add to PATH (requires shell restart)")Each time you start working with Julia:-- Plots
-
-- **Gurobi license issues**: Ensure you ran "grbgetkey" in Command Prompt and saved license to default location
+Each time you start working with Julia:-- Plots
 
 -- StatsPlots- - 
 
-## Next Steps
-
 1. Press `Ctrl+Shift+P` to open Command Palette-- PrettyTables
-
-Once installation is complete:
 
 2. Type "Start Julia" or "Julia: Start REPL"
 
-1. **[Understand File Structure](usage.md)** - Learn the OptiPlant organization
+3. This will start the Julia REPL (console) inside VS Code###- Installation- Steps
 
-2. **[Try Examples](Examples.md)** - Run sample scenarios and troubleshooting3. This will start the Julia REPL (console) inside VS Code###- Installation- Steps
-
-3. **[Technical Reference](api.md)** - Detailed specifications and file formats
 
 
 ![Julia REPL in VS Code](images/Fig.10.png)1.- **Enter- Package- Manager**

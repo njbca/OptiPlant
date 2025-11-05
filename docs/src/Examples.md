@@ -1,299 +1,126 @@
-# Examples and Troubleshooting
-
-This section provides practical examples for using OptiPlant and comprehensive troubleshooting for common issues.
+# Troubleshooting
 
 ## Common Errors and Solutions
 
 ### ERROR: Package X not found
 
-![Package Environment Example](images/Fig.38.png)
+**Likely cause**: Environment not activated before running code, or package not installed, or package not called in code.
 
-**Likely Cause:**
-- Environment not activated before running code
-- Package not installed in current environment  
-- Package not called properly in code
+**Solution:**
 
-**Solution Steps:**
+1. In Julia REPL, enter package manager with "]", then type "activate env"
 
-1. **Activate Environment:**
-   ```julia
-   ] activate env
-   ```
+![Package Manager Access](images/Fig.38.png)
+*Figure 38: Example of calling packages at the beginning of the code and env/package manager usage*
 
-2. **Check Installed Packages:**
-   ```julia
-   (env) pkg> status
-   ```
+2. Check installed packages with "status" (inside the activated env)
 
-![Package Manager Status](images/Fig.39.png)
+![Environment Status](images/Fig.39.png)
+*Figure 39: Package manager usage and environment status*
 
-3. **Install Missing Package:**
-   ```julia
-   (env) pkg> add PACKAGE_NAME
-   ```
+3. If missing, install with "add PACKAGE_NAME"
 
-4. **Ensure Proper Package Calls:**
-   Make sure your code includes the necessary `using` statements at the beginning:
-   ```julia
-   using JuMP, HiGHS, DataFrames, CSV, XLSX
-   ```
-
-**Prevention:**
-- Always activate the `env` environment before running OptiPlant
-- Verify package installation with `status` command
-- Include all required packages in your Julia script header
+4. Ensure the code calls the necessary packages at the beginning (the slide shows an example in figures above)
 
 ### ERROR: File not found "no such file or directory"
 
-**Likely Cause:**
-- Incorrect paths/routing between Julia scripts and Excel files in Main.jl
-- Missing files or moved directories
-- Incorrect file naming or extensions
+**Likely cause**: Incorrect paths/routing between Julia scripts and Excel sheets to Main.jl.
 
-**Solution Steps:**
+**Solution:**
+
+Verify all file and folder paths in Main.jl are correctly set (solver line, directories lines 22–25, scenario sheet name if changed).
 
 ![Path Configuration](images/Fig.40.png)
+*Figure 40: Path/routing examples for files and directories in Main.jl*
 
-1. **Verify File Paths in Main.jl:**
-   Check lines 22-25 for correct paths:
-   ```julia
-   OptiPlant_directory = "C:/correct/path/to/OptiPlant-master"
-   input_data_excel_file_name = "Input_data_example"  # No .xlsx extension
-   input_data_excel_sheet_name = "ScenariosToRun"
-   results_folder_name = "Results_base_case"
-   ```
+Pay extra attention when you have many folders/subfolders:
 
-2. **Check File Existence:**
-   - Verify Excel files exist in `BASE/Data/Inputs/`
-   - Confirm profile files exist in `BASE/Data/Profiles/`
-   - Ensure correct file names (case-sensitive)
+![Folder Routing](images/Fig.41.png)
+*Figure 41: Path/routing examples for directories and Excel*
 
-![Routing Example](images/Fig.41.png)
+### ERROR: Format error when displaying the simulation results in Excel
 
-3. **Path Format Guidelines:**
-   - Use forward slashes `/` or double backslashes `\\\\`
-   - Avoid spaces in folder/file names when possible
-   - Use absolute paths for reliability
+**Symptom**: After importing "main results" CSV, results appear unrealistic/too large due to CSV parsing.
 
-4. **Scenario Sheet References:**
-   If you created a new scenario sheet, update Main.jl line 28:
-   ```julia
-   scenario_sheet_name = "YourNewSheetName"  # Update this line
-   ```
-
-**Prevention:**
-- Keep consistent file naming across all components
-- Use the provided folder structure without modifications
-- Document any custom path changes
-
-### ERROR: Format error when displaying simulation results in Excel
-
-![Incorrect Results Display](images/Fig.42.png)
-
-**Symptom:**
-After importing "main results" CSV files, results appear unrealistic or extremely large numbers due to CSV parsing issues.
+![Unrealistic Results](images/Fig.42.png)
+*Figure 42: Example of unrealistic imported results due to CSV parsing settings*
 
 **Diagnosis:**
-Open a CSV file from "Main results" in a text editor - you'll see the CSV uses commas to separate cells and dots for decimals:
 
-![CSV Format Example](images/Fig.43.png)
+Open a CSV from "Main results" in a text editor/notebook: the CSV uses commas to separate cells and dots for decimals:
 
-**Solution (Excel Settings):**
+![CSV Format](images/Fig.43.png)
+*Figure 43: CSV content showing comma-separated cells and dot decimals*
 
-#### Method 1: Excel Advanced Options
+**Solution (Excel settings):**
+
+1. **File → Options → Advanced** → Set "Decimal separator" to dot (.) and, if possible, set thousands separator to none or a symbol other than dot (e.g., apostrophe ')
 
 ![Excel Advanced Options](images/Fig.44.png)
+*Figure 44: Excel Advanced options (decimal/thousands separators)*
 
-1. **File → Options → Advanced**
-2. Set **"Decimal separator"** to dot (.)
-3. Set **"Thousands separator"** to none or different symbol (e.g., apostrophe ')
-4. Click OK and restart Excel
-
-#### Method 2: Number Format Settings
+2. **Home → Number** (open the Number format dialog; bottom-right of the Number group) → untick "Use 1000 separator"
 
 ![Number Format Dialog](images/Fig.45.png)
+*Figure 45: Excel Number format settings ("Use 1000 separator")*
 
-1. **Home → Number** (click small arrow in Number group)
-2. **Untick "Use 1000 separator"**
+![Number Format Settings](images/Fig.46.png)
+*Figure 46: Additional Number format options*
 
-![Number Format Options](images/Fig.46.png)
-
-3. Apply changes and restart Excel
-4. Re-import the CSV data
-
-**Result After Fix:**
+3. Restart Excel and re-import data. Results should now be correct:
 
 ![Corrected Results](images/Fig.47.png)
+*Figure 47: Corrected results after fixing Excel settings*
 
-Results should now display correctly with realistic values.
+## Installation Problems
 
-**Prevention:**
-- Set correct Excel regional settings before first use
-- Always verify a few result values make sense after import
-- Keep Excel settings consistent across team members
+- **Julia or VS Code not recognized**: Ensure "Add to PATH" options were ticked during installation (Julia PATH guidance and VS Code's "Add to PATH (requires shell restart)")
+- **Gurobi license issues**: Ensure you ran "grbgetkey" in Command Prompt and saved license to default location
 
-## Installation Troubleshooting
+## Runtime Issues
 
-### Julia Installation Issues
-
-**Problem**: Julia not recognized in command line or VS Code
-
-**Solutions:**
-- Ensure "Add Julia to PATH" was checked during installation
-- Restart computer after installation
-- Reinstall Julia with administrator privileges
-- Manually add Julia to system PATH if needed
-
-### VS Code Integration Problems
-
-**Problem**: Julia extension not working properly
-
-**Solutions:**
-- Install official Julia extension from VS Code marketplace
-- Restart VS Code after Julia installation
-- Use `Ctrl+Shift+P` → "Julia: Start REPL" to initialize
-- Check Julia path in VS Code settings if issues persist
-
-### Gurobi License Issues
-
-**Problem**: Gurobi license not recognized
-
-**Solutions:**
-- Ensure license key was entered correctly in command prompt
-- Verify license file location (should be in default directory)  
-- Check license validity and expiration
-- Contact Gurobi support for license-specific issues
+- **Packages not found**: Activate env, verify with status, add missing packages, and ensure "using ..." statements are present in code
+- **File path errors**: Double-check absolute/relative paths in Main.jl for OptiPlant directory, input Excel file/sheet names, and results folder name
 
 ## Performance Tips
 
-### Optimization Speed
+- **HiGHS is recommended** (open-source) and typical solve time is below 5 minutes on a personal computer (as stated)
+- Keep scenario scope and data consistent to avoid unnecessary reruns due to path/name mismatches
 
-1. **Use HiGHS Solver:**
-   - Recommended open-source solver
-   - Typically solves problems in <5 minutes
-   - Same results as commercial alternatives
+## FAQ Items
 
-2. **Model Size Management:**
-   - Remove unused units in Selected_units sheet (set to 0)
-   - Limit time resolution if hourly detail not needed
-   - Focus scenarios on essential parameter variations
+Common questions presented:
+- Package not found
+- File not found/no such file or directory
+- Format error when displaying results in Excel
 
-3. **Hardware Recommendations:**
-   - **RAM**: 8GB+ for large models
-   - **CPU**: Multi-core processors improve solving speed
-   - **Storage**: SSD for faster file I/O operations
+## Final Notes
 
-### Data Management Best Practices
+### Important Warnings or Considerations
 
-1. **Scenario Organization:**
-   - Group related scenarios in same Excel sheet
-   - Use descriptive scenario names for result identification
-   - Keep scenario count reasonable for analysis purposes
+- For installation errors, check official installation guides of each program
+- For OptiPlant tool issues, refer to this Troubleshooting section
+- If encountering errors not mentioned, use internet forums or other tools (such as AI) to tackle them
+- In last resort, you may contact one of the authors of the model
 
-2. **Input Data Validation:**
-   - Verify units are consistent across all parameters
-   - Check for missing data or unrealistic values  
-   - Validate profile data covers full 8760 hours
+### Best Practices
 
-3. **Results Handling:**
-   - Regular cleanup of old results folders
-   - Use clear naming conventions for result folders
-   - Export key results to separate files for archiving
+- Keep a copy of standard Inputs to revert changes (especially Selected_units)
+- Carefully maintain consistent names across Excel sheets (ScenariosToRun, etc.) and Main.jl references  
+- Activate the Julia environment each session; use "status" to verify packages
+- Refresh Excel Pivot Tables after importing new results
 
-## FAQ - Frequently Asked Questions
+### Limitations
 
-### General Usage
+- Linear deterministic model with perfect foresight
+- Documentation indicates the model aims at minimizing fuel production cost, constrained by annual fuel demand and unit operational limits
 
-**Q: How long should OptiPlant take to solve?**
-A: Typical solve times are below 5 minutes on personal computers using HiGHS solver. Larger models or older hardware may take longer.
+### Additional Resources
 
-**Q: Can I use commercial solvers other than Gurobi?**
-A: OptiPlant is configured for HiGHS (open-source) and Gurobi (commercial). Both provide identical results.
-
-**Q: What fuel types can OptiPlant model?**
-A: NH₃ (ammonia), H₂ (hydrogen), and MeOH (methanol) are demonstrated examples. The model can be adapted for other Power-to-X fuels.
-
-### Technical Questions
-
-**Q: Can I modify the optimization objective?**
-A: Yes, OptiPlant's modular design allows modification of objectives, constraints, and variables through the Julia code.
-
-**Q: How do I add new technologies or units?**
-A: Add new units in the Data_base_case sheet with appropriate parameters, then include them in Selected_units configurations.
-
-**Q: Can I use my own renewable energy profiles?**
-A: Yes, replace profile data in the Profiles Excel files with your data, maintaining the same format and structure.
-
-### Troubleshooting Workflow
-
-1. **Check Environment:** Ensure `env` is activated and packages installed
-2. **Verify Paths:** Confirm all file paths in Main.jl are correct  
-3. **Validate Data:** Check Excel files are accessible and not corrupted
-4. **Test Installation:** Run simple Julia commands to verify setup
-5. **Review Logs:** Check error messages for specific failure points
-
-## Example Workflows
-
-### Basic First Run
-
-1. **Setup:** Complete installation and download OptiPlant
-2. **Configuration:** Set paths in Main.jl for your system
-3. **Execution:** Run with default scenario to verify operation
-4. **Validation:** Import results and verify reasonable outputs
-5. **Analysis:** Use Excel tools to examine results
-
-### Custom Scenario Development
-
-1. **Planning:** Define research questions and parameter variations
-2. **Data Preparation:** Modify Scenarios_definition with new parameters  
-3. **Scenario Definition:** Add scenarios to ScenariosToRun sheet
-4. **Execution:** Run multiple scenarios with batch processing
-5. **Analysis:** Compare results across scenarios using Pivot Tables
-
-### Advanced Modifications
-
-1. **Literature Review:** Research parameter values and validate sources
-2. **Model Extension:** Add new technologies in Data_base_case  
-3. **Testing:** Validate new components with simple test cases
-4. **Documentation:** Update Sources sheet with new data references
-5. **Version Control:** Keep backups of working configurations
-
-## Getting Additional Help
-
-### Documentation Resources
-- **[Installation Guide](installation.md)** - Complete setup instructions
-- **[File Structure Guide](usage.md)** - Detailed file organization  
-- **[Technical Reference](api.md)** - Specifications and formats
-
-### External Resources
-- **Julia Community**: [https://discourse.julialang.org/](https://discourse.julialang.org/)
-- **JuMP Documentation**: [https://jump.dev/JuMP.jl/stable/](https://jump.dev/JuMP.jl/stable/)
-- **HiGHS Solver**: [https://highs.dev/](https://highs.dev/)
-
-### Support Guidelines
-
-1. **Check this troubleshooting section first**
-2. **Search Julia and JuMP forums for similar issues**
-3. **Use internet resources and AI tools for programming problems**
-4. **Contact model authors as last resort** - provide detailed error descriptions
-
-### Best Practices for Problem Solving
-
-1. **Document the Problem:**
-   - Note exact error messages
-   - Record steps that led to the issue
-   - Save relevant file states before changes
-
-2. **Systematic Debugging:**
-   - Test components individually
-   - Use minimal examples to isolate issues  
-   - Verify each fix before proceeding
-
-3. **Preventive Measures:**
-   - Keep backup copies of working configurations
-   - Test changes incrementally
-   - Maintain consistent naming conventions
-
----
-
-**Problem Resolved?** You should now be able to successfully run OptiPlant and handle most common issues that arise.
+- **GitHub repo** (tool and documentation, including this guide): https://github.com/njbca/OptiPlant (download via "Code → Download ZIP")
+- **Julia**: https://julialang.org/
+- **VS Code**: https://code.visualstudio.com/
+- **JuMP**: https://jump.dev/JuMP.jl/stable/
+- **HiGHS**: https://highs.dev/
+- **Gurobi**: https://www.gurobi.com/
+- **Scientific article**: https://www.sciencedirect.com/science/article/pii/S1364032122009388
