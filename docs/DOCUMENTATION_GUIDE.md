@@ -88,6 +88,30 @@ Technical- reference- documentation:
 -- Module- documentation
 -- Parameter- descriptions
 
+###- Interactive- Dashboard- Documentation
+
+The- OptiPlant- project- includes- comprehensive- dashboard- documentation- outside- the- main- Documenter.jl- system- due- to- its- Python-based- nature:
+
+####- `docs/DASHBOARDS.md`- -- Dashboard- Setup- Guide
+Standalone- Markdown- documentation- covering:
+-- Installation- and- setup- instructions- for- Streamlit- dashboards
+-- Usage- guide- for- each- dashboard- type- (CO2,- Daily,- Scenarios)
+-- Configuration- options- and- customization
+-- Troubleshooting- common- issues
+-- File- format- requirements- and- best- practices
+
+**Why- separate?**- The- dashboard- documentation- is- maintained- as- a- standalone- Markdown- file- because:
+1.- **Technology- stack- difference**:- Dashboards- use- Python/Streamlit,- not- Julia
+2.- **Installation- requirements**:- Different- dependency- management- (pip- vs.- Julia- packages)
+3.- **Usage- patterns**:- Interactive- web- tools- vs.- command-line- optimization
+4.- **Maintenance- workflow**:- Dashboard- updates- may- be- independent- of- core- model- changes
+
+**Integration- approach**:
+-- Main- README.md- includes- dashboard- overview- and- quick- start
+-- docs/DASHBOARDS.md- provides- comprehensive- setup- and- usage- guide
+-- Cross-references- between- main- documentation- and- dashboard- guide
+-- Consistent- formatting- and- terminology- across- both- systems
+
 ##- Documentation- Workflow
 
 ###- 1.- Local- Development

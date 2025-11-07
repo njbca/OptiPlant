@@ -74,12 +74,72 @@ add JuMP HiGHS DataFrames CSV XLSX
 - **Technology comparison** across different system configurations
 - **Sensitivity analysis** with automated scenario processing
 - **Results visualization** through Excel dashboards with Pivot Tables
+- **Interactive web dashboards** with Streamlit for advanced data exploration
 
 ### Optimization Features
 - **Linear programming** solved with HiGHS (open-source) or Gurobi (commercial)
 - **Perfect foresight** optimization with hourly resolution
 - **Annual fuel demand** constraint satisfaction
 - **Investment and operational** cost minimization
+
+## Interactive Dashboards
+
+OptiPlant includes **Streamlit-based interactive dashboards** for advanced results visualization and analysis. These web-based tools provide dynamic, interactive exploration of optimization results beyond traditional Excel outputs.
+
+### Available Dashboards
+
+#### 1. **CO2 Dashboard** (`Dashboard_CO2.py`)
+- **Primary visualization tool** for scenario comparison by location
+- **Stacked bar charts** grouped by technology type
+- **Multi-level grouping**: Electrolyser → Fuel → Location
+- **Interactive filtering** and data exploration
+- **Matplotlib and Plotly integration** for high-quality charts
+
+#### 2. **Daily Series Dashboard** (`Dashboard_Daily.py`)
+- **Hourly time series visualization** from flow results
+- **Customizable time range selection** (start/end hour)
+- **Multi-series plotting** with clean formatting
+- **Legend positioning** and auto-scaled axes
+- **Ideal for operational analysis** and load profile examination
+
+#### 3. **Scenario Comparison Dashboard** (`Dashboard_Scenarios.py`)
+- **Multi-scenario comparative analysis** across key metrics
+- **Technology-specific comparisons** (CAPEX, installed capacity, etc.)
+- **Stacked bar visualizations** with selective technology filtering
+- **Batch scenario processing** from CSV results
+
+### Dashboard Features
+- **Web-based interface**: No additional software installation required
+- **Real-time interactivity**: Dynamic filtering, zooming, and data selection
+- **Professional visualizations**: Publication-ready charts and graphs
+- **Flexible data input**: Compatible with OptiPlant CSV outputs
+- **Responsive design**: Works on desktop and tablet devices
+
+### Quick Dashboard Setup
+
+```powershell
+# Create Python environment and install dependencies
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+
+# Launch CO2 Dashboard
+streamlit run src/PlotGraphs/Dashboard_CO2.py
+
+# Launch Daily Series Dashboard  
+streamlit run src/PlotGraphs/Dashboard_Daily.py
+
+# Launch Scenario Comparison Dashboard
+streamlit run src/PlotGraphs/Dashboard_Scenarios.py
+```
+
+### Dashboard Requirements
+- **Python 3.7+** with pip
+- **Dependencies**: Streamlit, Pandas, Matplotlib, NumPy, Plotly
+- **Input files**: OptiPlant CSV results and Excel scenario metadata
+- **Browser**: Modern web browser for dashboard interface
+
+For detailed dashboard setup and troubleshooting, see [`docs/DASHBOARDS.md`](docs/DASHBOARDS.md).
 
 ## File Structure
 
@@ -90,6 +150,14 @@ OptiPlant-master/
 │   │   ├── Inputs/           # Excel files: units, economics, scenarios
 │   │   └── Profiles/         # Wind/solar profiles, electricity prices
 │   └── Results/              # Output folders (auto-created per run)
+├── src/
+│   └── PlotGraphs/           # Interactive Streamlit dashboards
+│       ├── Dashboard_CO2.py         # Primary scenario comparison tool
+│       ├── Dashboard_Daily.py       # Hourly time series visualization
+│       └── Dashboard_Scenarios.py   # Multi-scenario analysis
+├── docs/
+│   └── DASHBOARDS.md         # Dashboard setup and troubleshooting guide
+├── requirements.txt          # Python dependencies for dashboards
 └── RUN CODE/
     ├── ImportData.jl         # Data import functions
     ├── ImportScenarios.jl    # Scenario configuration
@@ -111,11 +179,19 @@ OptiPlant is based on peer-reviewed research. For detailed model description, ma
 - **Julia 1.6+** (examples use v1.8+)
 - **VS Code** with Julia extension
 - **Microsoft Excel** (for input preparation and results visualization)
+- **Python 3.7+** (optional, for interactive dashboards)
 
 ### Julia Packages
 - **JuMP**: Optimization modeling
 - **HiGHS** or **Gurobi**: Linear programming solvers
 - **DataFrames**, **CSV**, **XLSX**: Data handling
+
+### Python Packages (for Dashboards)
+- **Streamlit**: Web dashboard framework
+- **Pandas**: Data manipulation and analysis
+- **Matplotlib**: Static plotting and visualization
+- **Plotly**: Interactive plotting (optional)
+- **NumPy**: Numerical computing
 
 ### System Requirements
 - **RAM**: 4GB minimum (8GB+ recommended)
@@ -170,6 +246,7 @@ For major changes, please open an issue first to discuss proposed modifications.
 **Quick Links:**
 - [Documentation](https://njbca.github.io/OptiPlant/)
 - [Installation](https://njbca.github.io/OptiPlant/installation.html)
+- [Dashboard Setup Guide](docs/DASHBOARDS.md)
 - [Download ZIP](https://github.com/njbca/OptiPlant/archive/refs/heads/main.zip)
 - [Issues](https://github.com/njbca/OptiPlant/issues)
 - [Contact Authors](mailto:ncampion@protonmail.com)
