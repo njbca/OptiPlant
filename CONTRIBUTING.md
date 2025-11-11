@@ -1,44 +1,18 @@
-#- Contributing- to- OptiPlant.jl
+# Contributing to OptiPlantPtX.jl
 
-Thank- you- for- contributing!- This- file- contains- a- minimal- checklist- and- steps- to
-prepare- a- branch- and- pull- request- that- will- pass- Continuous- Integration- (CI).
+Thanks for contributing!
 
-Checklist- before- opening- a- PR
+When doing modifications, always make sure that you are working on your fork.
+For more advanced collaborations, tool usage or specific inquiries please contact [njbca@dtu.dk](mailto:njbca@dtu.dk) 
 
--- [- ]- Pull- the- latest- `main`- into- your- feature- branch- and- resolve- conflicts- locally.
--- [- ]- Run- the- unit- tests- (if- any)- and- ensure- they- pass.
--- [- ]- Build- the- documentation- locally- (see- below)- and- ensure- `docs/make.jl`- runs.
--- [- ]- Add- or- update- documentation- for- any- user-facing- changes.
--- [- ]- Update- `README.md`- or- `docs/src`- as- appropriate.
+## Build the documentation locally
 
-How- to- run- checks- locally- (Windows- PowerShell)
+This repository uses Documenter.jl to build the docs in `docs/`.
 
-1.- Activate- the- Julia- project- and- install- dependencies:
+From the repository root (PowerShell):
 
 ```powershell
-julia- --project- -e- "using- Pkg;- Pkg.instantiate();- Pkg.precompile();"
+# Build the documentation locally
+julia --project=docs -e "using Pkg; Pkg.instantiate(); Pkg.precompile();"
+julia --project=docs docs/make.jl
 ```
-
-2.- Build- the- documentation- (this- uses- the- `docs/`- Project.toml):
-
-```powershell
-julia- --project=docs- -e- "using- Pkg;- Pkg.instantiate();- Pkg.precompile();"
-julia- --project=docs- docs/make.jl
-```
-
-3.- Install- Python- dependencies- for- dashboards- and- run- Streamlit- if- needed:
-
-```powershell
-python- -m- venv- .venv
-.\.venv\Scripts\Activate.ps1
-pip- install- -r- requirements.txt
-streamlit- run- src/PlotGraphs/Dashboard_CO2.py
-```
-
-PR- acceptance- notes- for- maintainers
-
--- Check- CI- logs- for- the- `Documentation`- job- (build-docs).- If- it- fails- with- a
-- - missing- `docs/make.jl`,- ensure- the- PR- branch- contains- the- `docs/`- folder- and
-- - the- workflow- checkout- path- is- correct.
--- If- Documenter- fails- to- `using- OptiPlantPtX`,- check- that- `src/`- contains
-- - `OptiPlantPtX.jl`- and- that- `docs/make.jl`- adds- `src`- to- `LOAD_PATH`.

@@ -1,69 +1,61 @@
 # Installation Guide
 
-## Julia Installation
+## Fork the repository
 
-Go to https://julialang.org/downloads/ and download Julia for your operating system.
+Set up a [GitHub account](https://github.com/signup) and sign-in.
+On the online repository, click on **Fork >  Create a new fork** and name it as you wish i.e. `OptiPlantPtX`.
 
-![Julia Download](images/Fig.3.png)
+## Clone the repository to your local machine
 
-Run the installer:
+Install a Git client (choose one you’re comfortable with):  
+- [GitHub Desktop](https://desktop.github.com/) (recommended for beginners)  
+- [Git](https://git-scm.com/downloads)  
 
-![Julia Installer](images/Fig.4.png)
+### Steps (with GitHub Desktop):
+1. On the OptiPlant repository that you forked, click on the green "<> Code" button, go to HTTPS and copy the URL
+2. In GitHub desktop, go to `File > Clone repository` 
+3. Go in the URL tab and paste the OptiPlant repository URL
+4. Choose the path to clone the repository locally: **installing on a Drive may cause problems!**  
 
-Tick "Add Julia to PATH" if you have VS Code installed.
+## Open in VS Code
 
-![Julia Success](images/Fig.5.png)
+Download and install [Visual Studio Code](https://code.visualstudio.com/). 
+Make sure to select the "Add to PATH" option when installing. 
 
-## VS Code Installation
+![Add_to_PATH](images/VSCode_addtopath.png)
 
-Download from https://code.visualstudio.com/Download
+1. Open VS Code  
+2. Go to `File > Open Folder` → select your `OptiPlantPtX` folder  
 
-![VS Code Download](images/Fig.6.png)
+## Setup Julia Environment
 
-Run installer:
+Make sure you have the **latest Julia version** installed: [Install Julia](https://julialang.org/install/).
 
-![VS Code Installer](images/Fig.7.png)
+1. Add the *Julia* extension in VS Code using the "Extensions: Marketplace" (access on the square icon on left sidebar of VS Code)
 
-Important: Tick "Add to PATH":
+![Julia_extension](images/Julia_extension.png)
 
-![VS Code PATH](images/Fig.8.png)
+2. Open the Julia REPL inside VS Code (the first time opening can take a bit of time):  
+   - Option 1, keyboard shortcut: Press `Alt + J` then `Alt + O` 
+   - Option 2, open the command palette (`Ctrl+Shift+P`) and run: `Julia: Start REPL`
 
-Success message:
+This is now a condensed version of the [Julia documentation](https://pkgdocs.julialang.org/v1/environments/) to use someone else's project.
 
-![VS Code Success](images/Fig.9.png)
+3. In the REPL, run this comand to move one directory up (where the folder where `OptiPlantPtX` is located):  
+   ```julia
+   cd("..")
+   ```
+4. Press `]` to enter the package manager
 
-## Julia Extension
+5. To set up the environment write
+    ```julia
+    activate OptiPlantPtX
+    ```
+    followed by
+    ```julia
+    instantiate
+    ```
 
-Install Julia extension:
+6. To use Gurobi as a solver, you need to [install the software](https://www.gurobi.com/downloads/) and activate your license using the grbgetkey. Overtime, you may need to update Gurobi to the latest version and re-generate your license to avoid license compatibility issues.
 
-![Julia Extension](images/Fig.10.png)
-
-Search and install:
-
-![Extension Install](images/Fig.11.png)
-
-Start Julia REPL with Ctrl+Shift+P:
-
-![Julia REPL](images/Fig.12.png)
-
-## Package Installation
-
-Enter package manager with "]":
-
-![Package Manager](images/Fig.13.png)
-
-Required packages:
-```julia
-] activate env
-add JuMP HiGHS DataFrames CSV XLSX
-```
-
-## Gurobi Setup (Optional)
-
-For Gurobi license:
-
-![Gurobi Setup](images/Fig.14.png)
-
-```cmd
-grbgetkey [your-key]
-```
+7. Done! You can exit the package manager pressing the `Backspace key` and start running the examples.

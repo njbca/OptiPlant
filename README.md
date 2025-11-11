@@ -7,17 +7,22 @@ OptiPlant can be used to model and optimize Power-to-X fuel production systems w
 ## Guide for software installation and test run
 This guide will walk you through setting up the repository locally, configuring your environment, and running the model.
 
-## Clone the Repository
+## Fork the repository
 
-Set up a [GitHub account](https://github.com/signup), sign-in and install a Git client (choose one you’re comfortable with):  
+Set up a [GitHub account](https://github.com/signup) and sign-in.
+On the online repository, click on **Fork >  Create a new fork** and name it as you wish i.e. `OptiPlant`.
+
+## Clone the repository to your local machine
+
+Install a Git client (choose one you’re comfortable with):  
 - [GitHub Desktop](https://desktop.github.com/) (recommended for beginners)  
 - [Git](https://git-scm.com/downloads)  
 
 ### Steps (with GitHub Desktop):
-1. On the (current) OptiPlant page, click on the green "<> Code" button, go to HTTPS and copy the URL
+1. On the OptiPlant repository that you forked, click on the green "<> Code" button, go to HTTPS and copy the URL
 2. In GitHub desktop, go to `File > Clone repository` 
 3. Go in the URL tab and paste the OptiPlant repository URL
-4. Choose the path to clone the repository locally: **installing on Drive may cause problems!**  
+4. Choose the path to clone the repository locally: **installing on a Drive may cause problems!**  
 
 ## Open in VS Code
 
@@ -34,9 +39,12 @@ Make sure you have the **latest Julia version** installed: [Install Julia](https
 1. Add the *Julia* extension in VS Code using the "Extensions: Marketplace" (access on the square icon on left sidebar of VS Code)
 
 2. Open the Julia REPL inside VS Code (the first time opening can take a bit of time):  
-   - Press `Alt + J` then `Alt + O`  
+   - Option 1, keyboard shortcut: Press `Alt + J` then `Alt + O` 
+   - Option 2, open the command palette (`Ctrl+Shift+P`) and run: `Julia: Start REPL`
 
-3. Move one directory up:  
+This is now a condensed version of the [Julia documentation](https://pkgdocs.julialang.org/v1/environments/) to use someone else's project.
+
+3. In the REPL, run this comand to move one directory up (where the folder where `OptiPlant` is located):  
    ```julia
    cd("..")
    ```
@@ -44,51 +52,44 @@ Make sure you have the **latest Julia version** installed: [Install Julia](https
 
 5. To set up the environment write
     ```julia
-    activate OptiPlantPtX.jl
+    activate OptiPlantPtX
     ```
     followed by
     ```julia
     instantiate
     ```
-    For more detailed explanations, refer to the Julia documentation: [Using someone else's project](https://pkgdocs.julialang.org/v1/environments/).
 
 6. To use Gurobi as a solver, you need to [install the software](https://www.gurobi.com/downloads/) and activate your license using the grbgetkey. Overtime, you may need to update Gurobi to the latest version and re-generate your license to avoid license compatibility issues.
 
 7. Done! You can exit the package manager pressing the `Backspace key`
 
 
-## Running the Project
+## Running one of the examples
 
-1. In VSCode, open the `Run.jl` file.
+1. In VSCode, in the open the `Run.jl` file from the `examples` folder.
 2. If Gurobi is not installed, make sure that the selected solver is `"HiGHS"`
 2. Click the little arrow on top of VS Code to execute it.
 
-No errors? Great! You can now start using the tool.
+No errors? Great! A result folder should have appeared.
+You can now start using the tool for more interesting stuff.
 
-## Documentation (building locally)
+## How to use the tool
 
-This repository uses Documenter.jl to build the docs in `docs/`.
+Most of the tool parameter setting, scenario selection, etc... happens in the excel files in the `data` folder.
 
-From the repository root (PowerShell):
+To start your own project copy one of the existing data folder, rename it, and then change the excel files to your convenience (avoid changing the existing excel files).
+
+In the `Run.jl`file change the `datafoldername` and `techno_eco_filename` to yours.
+
+More detailed explanations are given in the documentation: https://njbca.github.io/OptiPlant/index.html 
+
+## Use the data analysis dashboards
+
+To use the data analysis dashboards and  analyze the results write in the powershell terminal:
 
 ```powershell
-# Build the documentation locally
-julia --project=docs -e "using Pkg; Pkg.instantiate(); Pkg.precompile();"
-julia --project=docs docs/make.jl
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+streamlit run src/PlotGraphs/Dashboard_Scenarios.py
 ```
-
-If you want to build the dashboards locally, see `docs/src/Examples.md` for a
-quick example of running the Streamlit dashboards.
-
-## Making Modifications (Mandatory!)
-
-1. On the online repository, click on **Fork >  Create a new fork**.
-2. Always make sure that you are working on your fork when making modifications (not on the main branch).
-3. For adding new data: copy one of the existing data folder, rename it, and then change the excel files to your convenience (do not change any of the existing excel files)
-
-
-### Documentation
-- **[Installation Guide](https://njbca.github.io/OptiPlant/installation.html)** - Step-by-step setup
-- **[Usage Guide](https://njbca.github.io/OptiPlant/usage.html)** - File organization and workflow
-- **[Troubleshooting](https://njbca.github.io/OptiPlant/Examples.html#troubleshooting)** - Common issues and solutions
-

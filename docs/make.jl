@@ -1,21 +1,10 @@
-"""
-Minimal Documenter build script for OptiPlant.jl.
-
-This script is intentionally defensive:
-- it ensures the package `src` directory is on LOAD_PATH so `using OptiPlantPtX`
-  works regardless of the working directory layout on CI (avoids missing-file
-  errors when the repo is checked out under a different folder name).
-- it provides a minimal set of pages under `docs/src` so the docs job can run.
-
-Adjust `modules`, `pages`, and `repo` below as the documentation grows.
-"""
-
 import Pkg
 
 # Ensure the docs project is activated and dependencies are available.
 # This makes it easier to run `docs/make.jl` directly (it will try to
 # instantiate the `docs/` environment if needed). If you prefer to run
 # manually, use: julia --project=docs -e "using Pkg; Pkg.instantiate()"
+
 try
     Pkg.activate(@__DIR__)
     Pkg.instantiate()
@@ -30,14 +19,15 @@ modules_list = Module[]
 
 makedocs(
     modules = modules_list,
-    sitename = "OptiPlant.jl",
+    sitename = "OptiPlantPtX.jl",
     authors = "Nicolas Campion, Sebastian Banda",
     repo = "https://github.com/njbca/OptiPlant",
     pages = [
         "Home" => "index.md",
+        "Introduction" => "introduction.md",
         "Installation" => "installation.md",
-        "Usage" => "usage.md", 
-        "Examples" => "Examples.md",
+        "User-guide" => "usage.md", 
+        "Data dashboard" => "dashboards.md",
         "API Reference" => "api.md",
     ],
     format = Documenter.HTML(

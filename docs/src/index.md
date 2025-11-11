@@ -1,40 +1,19 @@
-# OptiPlant Documentation
+# OptiPlantPtX documentation
 
-OptiPlant is a linear optimization model that minimizes the investment and operation costs of a power-to-X (PtX) system powered by wind, solar and/or the electricity grid.
+Welcome to the OptiPlantPtX documentation!
 
-![GitHub Download](images/Fig.1.png)
+OptiPlant is a tool that enables the user to model Power-to-X fuel production systems with a high variety of customizable input parameters and to optimize them according to different criteria. The tool is adapted to investigate a large number of scenarios and system configurations in a single run.
 
-## Overview
+The current model optimize the operation and investment of an e-ammonia, DME, e-methanol or upgraded pyrolysis oil plant. The plant can be powered by solar, wind and/or the grid.
 
-The model operates under a "dynamic power supply and system optimization" approach (DPS-Syst-Opt) with perfect foresight. It sizes units and schedules hourly mass/energy flows to meet a yearly fuel demand at minimum cost.
+The model is designed in a way that the input parameters, the optimization objective, variables or constrains, and the outcoming results can be modified in a fairly easy way. The solving time on a personal computer is usually below 5 minutes using an open-source solver. 
 
-![System Overview](images/Fig.2.png)
+For a more detailed description of the OptiPlant model such as the components and structure of the simulated plant, the mathematical description of the optimization model, the sources of the data inputs or other considerations, one can check the following articles:
 
-Typical solving time on a personal computer is usually below 5 minutes using an open-source solver.
+- Model description and ammonia production: https://doi.org/10.1016/j.rser.2022.113057
+- Inclusion of CSP (concentrated solar power) technologies: https://doi.org/10.1016/j.renene.2024.121410 
+- Inclusion of upgraded pyrolysis bio-oils: https://doi.org/10.1016/j.enconman.2024.118225 
+- Inclusion of dimethyl ether (DME): https://doi.org/10.1021/acs.energyfuels.4c00311
+- Comparison between measured and simulated PV data: https://doi.org/10.1016/j.rser.2024.115044
+- Other related works: https://orbit.dtu.dk/en/persons/nicolas-jean-bernard-campion/publications/ 
 
-## Key Features
-
-- Linear deterministic programming with perfect foresight
-- Supports power supply from wind, solar, and the grid
-- Fast solve times (often <5 minutes with open-source solver)
-- Simple workflow: prepare data in Excel, run Julia code, review results in CSV/Excel
-
-## About OptiPlant
-
-OptiPlant is developed by Nicolas Campion (DTU Department of Technology, Management and Economics) to model PtX fuel production systems.
-
-### Supported Technologies
-- Wind profiles
-- Solar profiles  
-- Electricity grid (hourly buy price)
-
-### Fuel Types
-- NH₃ (ammonia)
-- H₂ (hydrogen) 
-- MeOH (methanol)
-
-### Scientific Reference
-
-Nicolas Campion et al. "Techno-economic assessment of green ammonia production with different wind and solar potentials." Renewable Sustainable Energy Reviews 173 (2023). DOI: 10.1016/j.rser.2022.113057.
-
-[Link to paper](https://www.sciencedirect.com/science/article/pii/S1364032122009388)

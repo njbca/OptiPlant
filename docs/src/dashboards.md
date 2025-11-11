@@ -1,14 +1,14 @@
 # Interactive Dashboards - Setup and Usage Guide
 
-This document provides comprehensive instructions for setting up and using the Streamlit-based interactive dashboards included with OptiPlant. These web-based visualization tools offer advanced data exploration capabilities beyond traditional Excel outputs.
+This document provides comprehensive instructions for setting up and using the Streamlit-based interactive dashboards included with OptiPlantPtX. These web-based visualization tools offer advanced data exploration capabilities beyond traditional Excel outputs.
 
 ## Overview
 
-OptiPlant includes three specialized dashboards for different types of analysis:
+OptiPlantPtX includes three specialized dashboards for different types of analysis:
 
-- **Dashboard_CO2.py**: Primary scenario comparison tool with location-based grouping
 - **Dashboard_Daily.py**: Hourly time series visualization for operational analysis  
 - **Dashboard_Scenarios.py**: Multi-scenario comparative analysis across key metrics
+- **Dashboard_CO2.py**: Primary scenario comparison tool with location-based grouping
 
 ## Prerequisites
 
