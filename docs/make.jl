@@ -25,32 +25,35 @@ end
 
 using Documenter
 
-# Make sure the package `src` directory is on LOAD_PATH so `using OptiPlantPtX`
-# works even if CI checks out the repository under a different parent folder
-# (this avoids include/Path errors when Documenter runs on GitHub Actions).
-push!(LOAD_PATH, normpath(joinpath(@__DIR__, "..", "src")))
-
-success_using = false
-try
-    using OptiPlantPtX
-    success_using = true
-catch err
-    @warn "Could not `using OptiPlantPtX` from docs; building docs without the package module" error=err
-end
-
-# make sure `modules` is either a Vector{Module} or an empty Module vector
-modules_list = success_using ? [OptiPlantPtX] : Module[]
+# Build documentation without loading the full module to avoid dependency issues
+modules_list = Module[]
 
 makedocs(
     modules = modules_list,
     sitename = "OptiPlant.jl",
-    authors = "Sebastian Banda",
-    repo = "https://github.com/SebastianBanda1/OptiPlant.jl",
+    authors = "Nicolas Campion, Sebastian Banda",
+    repo = "https://github.com/njbca/OptiPlant",
     pages = [
-        "Home" => "Intro.md",
+        "Home" => "index.md",
+        "Installation" => "installation.md",
+        "Usage" => "usage.md", 
         "Examples" => "Examples.md",
+        "API Reference" => "api.md",
     ],
-    format = Documenter.HTML()
+    format = Documenter.HTML(
+        prettyurls = get(ENV, "CI", nothing) == "true",
+        canonical = "https://njbca.github.io/OptiPlant/",
+        edit_link = "Development",
+        assets = String[],
+        repolink = "https://github.com/njbca/OptiPlant",
+    )
 )
 
-# build the documentation
+# Deploy documentation to GitHub Pages
+if get(ENV, "CI", nothing) == "true"
+    deploydocs(
+        repo = "github.com/njbca/OptiPlant",
+        devbranch = "Development",
+        push_preview = true
+    )
+end

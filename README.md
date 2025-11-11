@@ -87,3 +87,8 @@ quick example of running the Streamlit dashboards.
 3. For adding new data: copy one of the existing data folder, rename it, and then change the excel files to your convenience (do not change any of the existing excel files)
 
 
+### Documentation
+- **[Installation Guide](https://njbca.github.io/OptiPlant/installation.html)** - Step-by-step setup
+- **[Usage Guide](https://njbca.github.io/OptiPlant/usage.html)** - File organization and workflow
+- **[Troubleshooting](https://njbca.github.io/OptiPlant/Examples.html#troubleshooting)** - Common issues and solutions
+

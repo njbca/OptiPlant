@@ -10,9 +10,23 @@ __pycache__/
 # OS files
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Jupyter checkpoints
 .ipynb_checkpoints/
+
+# Documentation build artifacts (generated files)
+temp_build/
+
+# Backup files
+*.backup
+*.backup[0-9]
+*.bak
+*.tmp
+*.temp
+*.old
+*.orig
+*~
 
 # Optional: exclude local streamlit config
 .streamlit/

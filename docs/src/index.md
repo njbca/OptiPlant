@@ -1,20 +1,40 @@
-# OptiPlant.jl documentation (landing page)
+# OptiPlant Documentation
 
-This is the landing page for the minimal documentation site. It is intentionally
-small — the goal is to make the `docs/` folder visible in the repository and to
-provide a stable place for contributors to add documentation pages.
+OptiPlant is a linear optimization model that minimizes the investment and operation costs of a power-to-X (PtX) system powered by wind, solar and/or the electricity grid.
 
-What this file does:
-- Provides a simple index so Documenter generates a landing page (avoids the
-  "src/index.md missing" warning).
-- Links to the `Intro` and `Examples` pages that were added as minimal content.
+![GitHub Download](images/Fig.1.png)
 
-You can edit this file to add a project overview, quick start, and links to
-other pages.
+## Overview
 
----
+The model operates under a "dynamic power supply and system optimization" approach (DPS-Syst-Opt) with perfect foresight. It sizes units and schedules hourly mass/energy flows to meet a yearly fuel demand at minimum cost.
 
-See also:
+![System Overview](images/Fig.2.png)
 
-- `docs/make.jl` — the script that Documenter runs to build the site.
-- `docs/Project.toml` — the Project used to instantiate docs-only dependencies.
+Typical solving time on a personal computer is usually below 5 minutes using an open-source solver.
+
+## Key Features
+
+- Linear deterministic programming with perfect foresight
+- Supports power supply from wind, solar, and the grid
+- Fast solve times (often <5 minutes with open-source solver)
+- Simple workflow: prepare data in Excel, run Julia code, review results in CSV/Excel
+
+## About OptiPlant
+
+OptiPlant is developed by Nicolas Campion (DTU Department of Technology, Management and Economics) to model PtX fuel production systems.
+
+### Supported Technologies
+- Wind profiles
+- Solar profiles  
+- Electricity grid (hourly buy price)
+
+### Fuel Types
+- NH₃ (ammonia)
+- H₂ (hydrogen) 
+- MeOH (methanol)
+
+### Scientific Reference
+
+Nicolas Campion et al. "Techno-economic assessment of green ammonia production with different wind and solar potentials." Renewable Sustainable Energy Reviews 173 (2023). DOI: 10.1016/j.rser.2022.113057.
+
+[Link to paper](https://www.sciencedirect.com/science/article/pii/S1364032122009388)
