@@ -17,6 +17,7 @@ desktop.ini
 
 # Documentation build artifacts (generated files)
 temp_build/
+docs/build/
 
 # Backup files
 *.backup
@@ -30,6 +31,7 @@ temp_build/
 
 # Optional: exclude local streamlit config
 .streamlit/
+/docs/Manifest*.toml
 /Manifest*.toml
 /results/
 /src/SolveModel/Solve_LP_stochastic.jl
