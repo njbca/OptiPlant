@@ -14,9 +14,9 @@ Set up a [GitHub account](https://github.com/signup), sign-in and install a Git 
 - [Git](https://git-scm.com/downloads)  
 
 ### Steps (with GitHub Desktop):
-1. On the (current) OptiPlantPtX.jl page, click on the green "<> Code" button, go to HTTPS and copy the URL
+1. On the (current) OptiPlant page, click on the green "<> Code" button, go to HTTPS and copy the URL
 2. In GitHub desktop, go to `File > Clone repository` 
-3. Go in the URL tab and paste the OptiPlant.jl repository URL
+3. Go in the URL tab and paste the OptiPlant repository URL
 4. Choose the path to clone the repository locally: **installing on Drive may cause problems!**  
 
 ## Open in VS Code
@@ -25,7 +25,7 @@ Download and install [Visual Studio Code](https://code.visualstudio.com/).
 Make sure to select the "Add to PATH" option when installing. 
 
 1. Open VS Code  
-2. Go to `File > Open Folder` → select your `OptiPlantPtX.jl` folder  
+2. Go to `File > Open Folder` → select your `OptiPlant` folder  
 
 ## Setup Julia Environment
 
@@ -84,7 +84,6 @@ quick example of running the Streamlit dashboards.
 
 1. On the online repository, click on **Fork >  Create a new fork**.
 2. Always make sure that you are working on your fork when making modifications (not on the main branch).
-3. Contact me before contributing to the main branch.
-4. For adding new data: copy one of the existing data folder, rename it, and then change the excel files to your convenience (do not change any of the existing excel files)
+3. For adding new data: copy one of the existing data folder, rename it, and then change the excel files to your convenience (do not change any of the existing excel files)
 
 
