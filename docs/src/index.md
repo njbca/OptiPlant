@@ -10,10 +10,10 @@ The model is designed in a way that the input parameters, the optimization objec
 
 For a more detailed description of the OptiPlant model such as the components and structure of the simulated plant, the mathematical description of the optimization model, the sources of the data inputs or other considerations, one can check the following articles:
 
-- Model description and ammonia production: https://doi.org/10.1016/j.rser.2022.113057
-- Inclusion of CSP (concentrated solar power) technologies: https://doi.org/10.1016/j.renene.2024.121410 
-- Inclusion of upgraded pyrolysis bio-oils: https://doi.org/10.1016/j.enconman.2024.118225 
-- Inclusion of dimethyl ether (DME): https://doi.org/10.1021/acs.energyfuels.4c00311
-- Comparison between measured and simulated PV data: https://doi.org/10.1016/j.rser.2024.115044
-- Other related works: https://orbit.dtu.dk/en/persons/nicolas-jean-bernard-campion/publications/ 
+- Model description and ammonia production:[https://doi.org/10.1016/j.rser.2022.113057](https://doi.org/10.1016/j.rser.2022.113057)
+- Inclusion of CSP (concentrated solar power) technologies: [https://doi.org/10.1016/j.renene.2024.121410](https://doi.org/10.1016/j.renene.2024.121410) 
+- Inclusion of upgraded pyrolysis bio-oils: [https://doi.org/10.1016/j.enconman.2024.118225](https://doi.org/10.1016/j.enconman.2024.118225) 
+- Inclusion of dimethyl ether (DME): [https://doi.org/10.1021/acs.energyfuels.4c00311](https://doi.org/10.1021/acs.energyfuels.4c00311)
+- Comparison between measured and simulated PV data:[https://doi.org/10.1016/j.rser.2024.115044](https://doi.org/10.1016/j.rser.2024.115044)
+- Other related works: [(https://orbit.dtu.dk/en/persons/nicolas-jean-bernard-campion/publications/)](https://orbit.dtu.dk/en/persons/nicolas-jean-bernard-campion/publications/)
 

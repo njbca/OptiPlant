@@ -7,19 +7,21 @@ import Pkg
 
 try
     Pkg.activate(@__DIR__)
+    Pkg.develop(path = joinpath(@__DIR__, ".."))
     Pkg.instantiate()
 catch err
     @warn "Could not activate/instantiate docs environment; you may need to run 'julia --project=docs -e \"using Pkg; Pkg.instantiate()\"' manually" error=err
 end
 
 using Documenter
+using OptiPlantPtX
 
 # Build documentation without loading the full module to avoid dependency issues
 modules_list = Module[]
 
 makedocs(
+    sitename = "OptiPlantPtX.jl",    
     modules = modules_list,
-    sitename = "OptiPlantPtX.jl",
     authors = "Nicolas Campion, Sebastian Banda",
     repo = "https://github.com/njbca/OptiPlant",
     pages = [
