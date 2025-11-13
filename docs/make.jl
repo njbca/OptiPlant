@@ -7,7 +7,7 @@ import Pkg
 
 try
     Pkg.activate(@__DIR__)
-    Pkg.develop(path = joinpath(@__DIR__, ".."))
+    #Pkg.develop(path = joinpath(@__DIR__, ".."))
     Pkg.instantiate()
 catch err
     @warn "Could not activate/instantiate docs environment; you may need to run 'julia --project=docs -e \"using Pkg; Pkg.instantiate()\"' manually" error=err
