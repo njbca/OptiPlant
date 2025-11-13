@@ -28,8 +28,7 @@ makedocs(
         "Introduction" => "introduction.md",
         "Installation" => "installation.md",
         "User-guide" => "usage.md", 
-        "Data dashboard" => "dashboards.md",
-        "API Reference" => "api.md",
+        "Data dashboard" => "dashboards.md"
     ],
     format = Documenter.HTML(
         prettyurls = get(ENV, "CI", nothing) == "true",
