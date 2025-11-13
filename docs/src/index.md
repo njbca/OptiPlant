@@ -15,5 +15,5 @@ For a more detailed description of the OptiPlant model such as the components an
 - Inclusion of upgraded pyrolysis bio-oils: [https://doi.org/10.1016/j.enconman.2024.118225](https://doi.org/10.1016/j.enconman.2024.118225) 
 - Inclusion of dimethyl ether (DME): [https://doi.org/10.1021/acs.energyfuels.4c00311](https://doi.org/10.1021/acs.energyfuels.4c00311)
 - Comparison between measured and simulated PV data:[https://doi.org/10.1016/j.rser.2024.115044](https://doi.org/10.1016/j.rser.2024.115044)
-- Other related works: [(https://orbit.dtu.dk/en/persons/nicolas-jean-bernard-campion/publications/)](https://orbit.dtu.dk/en/persons/nicolas-jean-bernard-campion/publications/)
+- Other related works: [https://orbit.dtu.dk/en/persons/nicolas-jean-bernard-campion/publications/](https://orbit.dtu.dk/en/persons/nicolas-jean-bernard-campion/publications/)
 
