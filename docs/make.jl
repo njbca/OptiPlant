@@ -14,7 +14,6 @@ catch err
 end
 
 using Documenter
-using OptiPlantPtX
 
 # Build documentation without loading the full module to avoid dependency issues
 modules_list = Module[]
