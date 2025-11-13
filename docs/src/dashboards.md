@@ -10,18 +10,6 @@ OptiPlantPtX includes three specialized dashboards for different types of analys
 - **Dashboard_Scenarios.py**: Multi-scenario comparative analysis across key metrics
 - **Dashboard_CO2.py**: Primary scenario comparison tool with location-based grouping
 
-## Prerequisites
-
-### Software Requirements
-- **Python 3.7+** installed on your system
-- **pip** package manager (included with Python)
-- **Web browser** (Chrome, Firefox, Safari, or Edge)
-
-### OptiPlant Requirements
-- **Completed OptiPlant runs** with CSV results generated
-- **Excel scenario metadata files** (for CO2 Dashboard)
-- **Proper file structure** as outlined in OptiPlant documentation
-
 ## Installation and Setup
 
 ### 1. Create Python Virtual Environment
@@ -55,21 +43,6 @@ source .venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 ```
-
-### 2. Verify Installation
-
-Check that all required packages are installed:
-```bash
-pip list
-```
-
-Expected packages:
-- streamlit
-- pandas
-- matplotlib
-- numpy
-- openpyxl
-- xlrd
 
 ## Dashboard Usage
 
