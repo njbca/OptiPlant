@@ -40,10 +40,9 @@ makedocs(
 )
 
 # Deploy documentation to GitHub Pages
-if get(ENV, "CI", nothing) == "true"
-    deploydocs(
-        repo = "github.com/njbca/OptiPlant",
-        devbranch = "Development",
-        push_preview = true
-    )
-end
+
+deploydocs(
+    repo = "github.com/njbca/OptiPlant",
+    devbranch = "Development",
+    push_preview = true
+)
