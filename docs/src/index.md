@@ -4,7 +4,7 @@ Welcome to the OptiPlantPtX documentation!
 
 OptiPlant is a tool that enables the user to model Power-to-X fuel production systems with a high variety of customizable input parameters and to optimize them according to different criteria. The tool is adapted to investigate a large number of scenarios and system configurations in a single run.
 
-![Multiple scenarios](images/Multiple_scen.png)
+![Multiple scenarios](images/Multiple_scen.jpg)
 
 The current model optimize the operation and investment of an e-ammonia, DME, e-methanol or upgraded pyrolysis oil plant. The plant can be powered by solar, wind and/or the grid.
 
