@@ -1,5 +1,10 @@
 # Ignore build artifacts and virtual environments
 
+# Other
+
+examples/Run.jl
+examples/Run gl.jl
+
 # Python virtual env
 .venv/
 

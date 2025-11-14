@@ -418,7 +418,7 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
       remove_lcia_columns!(df_results, opt_data.dat_lcia, remove_lcia_phases)
   end
 
-  println("remove lcia phase: $remove_lcia_phases")
+  #println("remove lcia phase: $remove_lcia_phases")
 
   if model == "LP_2obj"
 

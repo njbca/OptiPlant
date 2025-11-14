@@ -143,7 +143,7 @@ function run_optimization_scenarios(
         if scen_data.Write_flows || scen_data.Write_sold_products || scen_data.Write_fuel_cost
           write_hourly_results_LP(opt_data, opt_results, N_scen, resultsfolder, results_currency_multiplier,)
         end
-        # Only write LCIA/LCA results if LCIA data is available
+        # Write all results and LCIA/LCA results only if LCIA data is available
         write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder, results_currency, results_currency_multiplier, 
           default_results_cost_scale, default_results_capacity_units, default_results_production_units; write_lca_results = !isnothing(opt_data.dat_lcia))
       
