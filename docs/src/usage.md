@@ -35,7 +35,7 @@ Adding a new technology can be done by inserting a line and fill up all the para
 New technologies associated with a profile also requires to be added in the profile folder.
 
 !!! warning 
-        Avoid changing the cells in red. The julia code identify the position of some column based on the names in red. These can be changed but the `src/ReadData/user_defined` files shouls also be modified accordingly.
+    Avoid changing the cells in red. The julia code identify the position of some column based on the names in red. These can be changed but the `src/ReadData/user_defined` files shouls also be modified accordingly.
 
 ### Selected units
 
@@ -46,7 +46,7 @@ This sheet contains a list of the different units and technologies that can cons
 The number of lines and names should be exactly the same as in the *Data\_base\_case* sheet (so remember to also update this file when adding a new technology).
 
 !!! note
-        It is also possible to use an automatic unit filter based on the unit names, and exclude some specific units manually if needed (see the file in `Full_model` for an example).
+    It is also possible to use an automatic unit filter based on the unit names, and exclude some specific units manually if needed (see the file in `Full_model` for an example).
 
 ### Scenario definition
 
@@ -89,8 +89,8 @@ This sheet contains the normalized output power of solar and wind technologies f
 In this example, the solar/wind power profiles included in the Flux excel sheet are extracted from the [CorRES tool](https://corres.windenergy.dtu.dk/) (for wind profiles), and from [renewables.ninja website](https://www.renewables.ninja/) (for solar profiles).
 
 !!! warning
-        It is important that the **Subsets** of the profile technologies matches with the ones from the *Data\_base\_case* data sheet. So each profile will be associated to the correct power generation technologies.
-        Having technologies in the *Data\_base\_case* data sheet not associated to a specific profile will lead to an error.
+    It is important that the **Subsets** of the profile technologies matches with the ones from the *Data\_base\_case* data sheet. So each profile will be associated to the correct power generation technologies.
+    Having technologies in the *Data\_base\_case* data sheet not associated to a specific profile will lead to an error.
 
 ### Price
 
