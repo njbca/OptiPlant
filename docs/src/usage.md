@@ -61,7 +61,7 @@ The reference scenario can be used to include the changes from a previously defi
 For example, in the image, *Is\_nonflex* scenario uses the *Islanded* scenario as reference scenario, meaning that that the *electricity from the grid - used (1 or 0)* parameters will be set at 0 instead of 1 PLUS the *NH3 plant - Load min* will be set at 1 instead of 0.4 in the original *Data\_base\_case* sheet.
 
 !!! note
-        "Chains" of references does not work, meaning that *Is\_nonflex* can not be used as a reference scenario (because it's already using a the *Islanded* reference scenario). 
+    "Chains" of references does not work, meaning that *Is\_nonflex* can not be used as a reference scenario (because it's already using a the *Islanded* reference scenario). 
 
 ### Scenarios to run
 
@@ -106,14 +106,14 @@ It is recommended to remove negative electricity prices using the option "No neg
 
 ## Running the model
 
-Running the model can be done running one of the scripts in the `examples` folder (for example *Run ammonia.jl*) using the function `run_optimization_scenarios` with the following arguments as minimum:
+Running the model can be done running one of the scripts in the `examples` folder (for example *Run example.jl*) using the function `run_optimization_scenarios` with the following arguments as minimum:
 
 ```julia
 using OptiPlanPtX
 
 run_optimization_scenarios(
-        datafoldername = "Ammonia_paper", #Name of the folder with all the data
-        techno_eco_filename = "Data_ammonia_paper", #Techno-economic and scenario file name
+        datafoldername = "Example", #Name of the folder with all the data
+        techno_eco_filename = "Input_data_example", #Techno-economic and scenario file name
         scenario_set = "ScenariosToRun", #Sheet name with the scenarios list
         solver = "HiGHS", # Solver name (HiGHS or Gurobi)
         scenarios_to_run = 1:18; #Specific numbers of scenarios to run one after the other
