@@ -18,14 +18,14 @@ The excel file inside the `model_input` is the main "workplace" to run the tool.
 
 In general be especially cautious on writing the name for the different cell’s inputs correctly to avoid errors.
 
-In the `Ammonia_paper` folder, the current file is called *Data_ammonia_paper.xlsx*.
+In the `Ammonia_paper` folder, the current file is called *Data\_ammonia\_paper.xlsx*.
 The excel document has the following sheets:
 
 ![Excel sheets input](images/Excel_sheets_inputs.png)
 
 The purpose of each sheet is described below:
 
-### Data_base_case
+### Data\_base\_case
 
 This sheet includes a list of the different units that can constitute the PtX plant and their characteristics: production rates, heat and electrical flows, load ranges, ramp up/down times, CapEx and OpEx, etc… These are user defined and can be completely changed if needed (but everything works also without changing anything)
 
@@ -34,21 +34,23 @@ This sheet includes a list of the different units that can constitute the PtX pl
 Adding a new technology can be done by inserting a line and fill up all the parameters.
 New technologies associated with a profile also requires to be added in the profile folder.
 
-Warning: Avoid changing the cells in red! The julia code identify the position of some column based on the names in red. These can be changed but the `src/ReadData/user_defined` files shouls also be modified accordingly.
+!!! warning 
+        Avoid changing the cells in red. The julia code identify the position of some column based on the names in red. These can be changed but the `src/ReadData/user_defined` files shouls also be modified accordingly.
 
 ### Selected units
 
-This sheet contains a list of the different units and technologies that can constitute the PtX plant and the ones that are ..used for each fuel production process -i.e. NH3, H2, MeOH, etc.- For each case, a 1 implies that the unit is considered in the PtX plant and ..a 0 implies that it is not.
+This sheet contains a list of the different units and technologies that can constitute the PtX plant and the ones that are used for each fuel production process (i.e. NH3, H2, MeOH, etc.) For each case, a 1 implies that the unit is considered in the PtX plant and a 0 implies that it is not.
 
 ![Selected units](images/Selected_units.png)
 
-The number of lines and names should be exactly the same as in the Data_base_case sheet (so remember to also update this file when adding a new technology).
+The number of lines and names should be exactly the same as in the *Data\_base\_case* sheet (so remember to also update this file when adding a new technology).
 
-It is also possible to use an automatic unit filter based on the unit names, and exclude some specific units manually if needed (see the file in `Full_model` for an example).
+!!! note
+        It is also possible to use an automatic unit filter based on the unit names, and exclude some specific units manually if needed (see the file in `Full_model` for an example).
 
 ### Scenario definition
 
-This sheet is used to define different scenarios or sensitivities by modifying specific values in the *Data_base_case sheet* before running the optimization.
+This sheet is used to define different scenarios or sensitivities by modifying specific values in the *Data\_base\_case* sheet before running the optimization.
 
 Each modification has to be associated with a name (Scenario name definition), that can be called when running a chain of scenarios.
 
@@ -56,19 +58,18 @@ The reference scenario can be used to include the changes from a previously defi
 
 ![Scenario definition](images/Scenario_def.png)
 
-For example, in the image, *Is_nonflex* scenario uses the *Islanded* scenario as reference scenario, meaning that that the *electricity from the grid - used (1 or 0)* parameters will be set at 0 instead of 1 PLUS the *NH3 plant - Load min* will be set at 1 instead of 0.4 in the original *Data_base_case* sheet.
+For example, in the image, *Is\_nonflex* scenario uses the *Islanded* scenario as reference scenario, meaning that that the *electricity from the grid - used (1 or 0)* parameters will be set at 0 instead of 1 PLUS the *NH3 plant - Load min* will be set at 1 instead of 0.4 in the original *Data\_base\_case* sheet.
 
-"Chains" of references does not work, meaning that *Is_nonflex* can not be used as a reference scenario (because it's already using a the *Islanded* reference scenario). 
+!!! note
+        "Chains" of references does not work, meaning that *Is\_nonflex* can not be used as a reference scenario (because it's already using a the *Islanded* reference scenario). 
 
 ### Scenarios to run
 
-This sheet is used to list the different scenarios to be run through the optimization model. The conditions and characteristics of each of the listed scenarios make reference to the other sheets in the same excel document or to the profile folder. One can set the scenario parameters such as: operating strategy, location wind/solar data, year data, produced fuel, electrolyzer technology, etc. The output results of the model are going to be stored as CSV files in a ``results`` folder (the folder is automatically created).
+This sheet is used to list the different scenarios to be run through the optimization model. The conditions and characteristics of each of the listed scenarios make reference to the other sheets in the same excel document or to the profile folder. One can set the scenario parameters such as: operating strategy, location wind/solar data, year data, produced fuel, electrolyzer technology, etc. The output results of the model are going to be stored as CSV files in a `results` folder (the folder is automatically created).
 
 ![Scenarios list](images/Scenarios_list.png)
 
-For more advanced analysis, more scenario columns can be added (see ``Full_model`` for complete features).
-
-The *Scenario* columns refers to the scenarios defined in the *Scenarios_definition* sheet. Scenario name, is the name of scenario that will appear in the result file after running OptiPlantPtX.
+The *Scenario* columns refers to the scenarios defined in the *Scenarios\_definition* sheet. Scenario name, is the name of scenario that will appear in the result file after running OptiPlantPtX.
 
 ## Profiles
 
@@ -87,13 +88,13 @@ This sheet contains the normalized output power of solar and wind technologies f
 
 In this example, the solar/wind power profiles included in the Flux excel sheet are extracted from the [CorRES tool](https://corres.windenergy.dtu.dk/) (for wind profiles), and from [renewables.ninja website](https://www.renewables.ninja/) (for solar profiles).
 
-It is important that the **Subsets** of the profile technologies matches with the ones from the *Data_base_case* data sheet. So each profile will be associated to the correct power generation technologies.
-
-Having technologies in the *Data_base_case* data sheet not associated to a specific profile will lead to an error.
+!!! warning
+        It is important that the **Subsets** of the profile technologies matches with the ones from the *Data\_base\_case* data sheet. So each profile will be associated to the correct power generation technologies.
+        Having technologies in the *Data\_base\_case* data sheet not associated to a specific profile will lead to an error.
 
 ### Price
 
-This sheet contains the hourly electricity spot price for the year 2019 at different locations. Similarly, the subset *grid_buy* should match with the in the *Data_base_case* sheet (for the grid electricity).
+This sheet contains the hourly electricity spot price for the year 2019 at different locations. Similarly, the subset *grid\_buy* should match with the in the *Data\_base\_case* sheet (for the grid electricity).
 
 ![Price profiles](images/Price_profiles.png)
 
@@ -105,7 +106,7 @@ It is recommended to remove negative electricity prices using the option "No neg
 
 ## Running the model
 
-Running the model can be done running one of the scripts in the `examples` folder (for example *Run ammonia.jl*) using the function ``run_optimization_scenarios`` with the following arguments as minimum:
+Running the model can be done running one of the scripts in the `examples` folder (for example *Run ammonia.jl*) using the function `run_optimization_scenarios` with the following arguments as minimum:
 
 ```julia
 using OptiPlanPtX
@@ -122,7 +123,7 @@ run_optimization_scenarios(
 ```
 ## Checking the results
 
-All results are saved in a folder that has the same name as the data folder (i.e. ``Ammonia_paper``). Results subfolders have been user-defined the *Techno-economic and scenarios* excel file (`Data_ammonia_paper.xlsx`) in the *ScenariosToRun* sheet.
+All results are saved in a folder that has the same name as the data folder (i.e. `Ammonia_paper`). Results subfolders have been user-defined the *Techno-economic and scenarios* excel file (`Data_ammonia_paper.xlsx`) in the *ScenariosToRun* sheet.
 
 These folders always contains subfolders named ’Data used’, ’Hourly results’, and ’Main results’, that include the inputs and results of the simulation in CSV files.
 
