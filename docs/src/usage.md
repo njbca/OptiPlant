@@ -9,14 +9,12 @@ Let's use the `data/Ammonia_paper` folder as an example.
 ## Data folder content
 
 The data folder has two main folders:
-- **model_inputs**: Contains or one more excel files with techno-economic data and study-case scenarios information
+- **model_inputs**: Contains one or more excel files with techno-economic data and study-case scenarios information
 - **profiles**: Contains every time dynamic inputs (typically electricity prices, renewable power supply or grid CO2e emissions). Some subfolders can be used to organize the profiles folder and be called accordingly in the input excel file (see the `data/Full_model` for example). 
 
 ## Model inputs
 
 The excel file inside the `model_input` is the main "workplace" to run the tool.
-
-In general be especially cautious on writing the name for the different cell’s inputs correctly to avoid errors.
 
 In the `Ammonia_paper` folder, the current file is called *Data\_ammonia\_paper.xlsx*.
 The excel document has the following sheets:
@@ -35,7 +33,7 @@ Adding a new technology can be done by inserting a line and fill up all the para
 New technologies associated with a profile also requires to be added in the profile folder.
 
 !!! warning 
-    Avoid changing the cells in red. The julia code identify the position of some column based on the names in red. These can be changed but the `src/ReadData/user_defined` files shouls also be modified accordingly.
+    Avoid changing the cells in red. The julia code identifies the position of some column based on the names in red. These can be changed but the `src/ReadData/user_defined` files should also be modified accordingly.
 
 ### Selected units
 
@@ -61,7 +59,7 @@ The reference scenario can be used to include the changes from a previously defi
 For example, in the image, *Is\_nonflex* scenario uses the *Islanded* scenario as reference scenario, meaning that that the *electricity from the grid - used (1 or 0)* parameters will be set at 0 instead of 1 PLUS the *NH3 plant - Load min* will be set at 1 instead of 0.4 in the original *Data\_base\_case* sheet.
 
 !!! note
-    "Chains" of references does not work, meaning that *Is\_nonflex* can not be used as a reference scenario (because it's already using a the *Islanded* reference scenario). 
+    "Chains" of references do not work, meaning that *Is\_nonflex* can not be used as a reference scenario (because it's already using a the *Islanded* reference scenario). 
 
 ### Scenarios to run
 
@@ -94,11 +92,11 @@ In this example, the solar/wind power profiles included in the Flux excel sheet 
 
 ### Price
 
-This sheet contains the hourly electricity spot price for the year 2019 at different locations. Similarly, the subset *grid\_buy* should match with the in the *Data\_base\_case* sheet (for the grid electricity).
+This sheet contains the hourly electricity spot price for the year 2019 at different locations. Similarly, the subset *grid\_buy* should match with the one in the *Data\_base\_case* sheet (for the grid electricity).
 
 ![Price profiles](images/Price_profiles.png)
 
-It is also possible to add timeseries for electricity sale and/or hourly heat bying or selling.
+It is also possible to add timeseries for electricity sale and/or hourly heat buying or selling.
 
 Adding a selling option is possible only if the maximum amount of electricity that can be sold is fixed. It is recommended to avoid selling electricity in the model and include electricity sale of curtailed electricity in post-calculation.
 
@@ -106,7 +104,7 @@ It is recommended to remove negative electricity prices using the option "No neg
 
 ## Running the model
 
-Running the model can be done running one of the scripts in the `examples` folder (for example *Run example.jl*) using the function `run_optimization_scenarios` with the following arguments as minimum:
+The model can be run by executing one of the scripts in the `examples` folder (for example *Run example.jl*) using the function `run_optimization_scenarios` with the following arguments as minimum:
 
 ```julia
 using OptiPlanPtX
@@ -123,7 +121,7 @@ run_optimization_scenarios(
 ```
 ## Checking the results
 
-All results are saved in a folder that has the same name as the data folder (i.e. `Ammonia_paper`). Results subfolders have been user-defined the *Techno-economic and scenarios* excel file (`Data_ammonia_paper.xlsx`) in the *ScenariosToRun* sheet.
+All results are saved in a folder that has the same name as the data folder (i.e. `Ammonia_paper`). Results subfolders are user-defined in the *Techno-economic and scenarios* excel file (`Data_ammonia_paper.xlsx`) in the *ScenariosToRun* sheet.
 
 These folders always contains subfolders named ’Data used’, ’Hourly results’, and ’Main results’, that include the inputs and results of the simulation in CSV files.
 
