@@ -1,7 +1,7 @@
-using OptiPlant
+using OptiPlantPtX
 
-datafoldername = "Greenlab"
-techno_eco_filename = "greenlab_data"
+datafoldername = "Bakkafuel"
+techno_eco_filename = "Data_bakkafuel"
 scenario_set = "ScenariosToRun"
 solver = "Gurobi"
 
