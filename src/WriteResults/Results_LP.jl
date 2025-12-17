@@ -415,8 +415,6 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
 
   #Drop unwanted phase columns
   if write_lca_results && !isempty(remove_lcia_phases)
-      #remove_lcia_columns!(df_results, opt_data.dat_lcia, remove_lcia_phases)
-      println("Helloooo")
       remove_lcia_columns!(df_results, opt_data.dat_lcia, remove_lcia_phases)
   end
 
@@ -508,7 +506,7 @@ Remove selected LCIA phase columns (e.g. `[:inf, :use]`) from `df`.
 If `remove_phases` is empty, nothing is removed.
 """
 function remove_lcia_columns!(df::DataFrame, lcia_data, remove_phases::Vector{Symbol})
-    println("Running remove lcia columns function")
+
     isempty(remove_phases) && return df  # nothing to remove
 
     # Map phase symbols to their text labels
@@ -520,7 +518,6 @@ function remove_lcia_columns!(df::DataFrame, lcia_data, remove_phases::Vector{Sy
     )
 
     existing_cols = Set(names(df))
-    println("Existing columns: $existing_cols ")
     to_remove = String[]
 
     for cat_sym in lcia_data.impact_categories_symbol
@@ -528,10 +525,8 @@ function remove_lcia_columns!(df::DataFrame, lcia_data, remove_phases::Vector{Sy
         for phase in remove_phases
             if haskey(phase_labels, phase)
                 col_name = cat_name * phase_labels[phase]
-                println("col_name: $col_name")
                 if col_name in existing_cols
                     push!(to_remove, col_name)
-                    println("to_remove_1: $to_remove")
                 end
             end
         end
@@ -541,7 +536,6 @@ function remove_lcia_columns!(df::DataFrame, lcia_data, remove_phases::Vector{Sy
     if !isempty(to_remove)
         select!(df, Not(to_remove))
     end
-    println("to_remove: $to_remove")
 
     return df
 end

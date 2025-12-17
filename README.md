@@ -47,3 +47,10 @@ streamlit run src/PlotGraphs/Dashboard_Scenarios.py
 ```
 
 Otherwise you can also use the result excel file coming with the package (`Results_general.xlsm`) or use your own analysis method.
+
+
+#Test lines
+using Pkg
+Pkg.add("OptiPlantPtX")
+julia --project=. setup_python.jl  # install Python packages
+using OptiPlantPtX

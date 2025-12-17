@@ -4,6 +4,7 @@
 
 examples/Run.jl
 examples/Run gl.jl
+RenNinjaToken.txt
 
 # Python virtual env
 .venv/

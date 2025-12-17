@@ -53,7 +53,7 @@ end
 # ************** Filter the lcia data ******************
 
 function filter_lcia_data(
-    Data_units, # Usually, use the filtered Data_units as input (instead of the "original" Data_units contained in techno_scen_data)
+    Data_units, # Use the filtered Data_units as input instead of the "original" Data_units contained in techno_scen_data
     techno_scen_data,
     lcia_data
 )
