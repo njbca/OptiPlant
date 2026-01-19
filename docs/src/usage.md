@@ -4,19 +4,20 @@ All of the important files to run the model are in the `data` folder.
 
 To create your own analysis **copy one of the existing folder and rename it to your convenience**.
 
-Let's use the `data/Ammonia_paper` folder as an example.
+Let's use the `data/Example` folder as an example.
 
 ## Data folder content
 
 The data folder has two main folders:
 - **model_inputs**: Contains one or more excel files with techno-economic data and study-case scenarios information
-- **profiles**: Contains every time dynamic inputs (typically electricity prices, renewable power supply or grid CO2e emissions). Some subfolders can be used to organize the profiles folder and be called accordingly in the input excel file (see the `data/Full_model` for example). 
+- **profiles**: Contains every time dynamic inputs (typically electricity prices, renewable power supply or grid CO2e emissions). Some subfolders can be used to organize the profiles folder and be called in the "model_inputs" excel file (see the `data/Full_model` for example). 
 
 ## Model inputs
 
-The excel file inside the `model_input` is the main "workplace" to run the tool.
+The excel file inside the `model_inputs` folder is the main "workplace" to run the tool.
 
-In the `Ammonia_paper` folder, the current file is called *Data\_ammonia\_paper.xlsx*.
+In the `Example` folder, one file is called *Data\_ammonia\_paper.xlsx* and one is called *Input_data_example.xlsx*. Let's open the *Input_data_example.xlsx* file.
+
 The excel document has the following sheets:
 
 ![Excel sheets input](images/Excel_sheets_inputs.png)
@@ -33,15 +34,18 @@ Adding a new technology can be done by inserting a line and fill up all the para
 New technologies associated with a profile also requires to be added in the profile folder.
 
 !!! warning 
-    Avoid changing the cells in red. The julia code identifies the position of some column based on the names in red. These can be changed but the `src/ReadData/user_defined` files should also be modified accordingly.
+    Avoid changing the cells in red. The julia code identifies the position of some column based on the names in red. These can be changed but the `src/ReadData/user_defined` files inside the OptiPlantPtX package folder should also be modified accordingly.
 
 ### Selected units
 
-This sheet contains a list of the different units and technologies that can constitute the PtX plant and the ones that are used for each fuel production process (i.e. NH3, H2, MeOH, etc.) For each case, a 1 implies that the unit is considered in the PtX plant and a 0 implies that it is not.
+This sheet contains a list of the different units and technologies that can constitute the PtX plant and the ones that are used for each fuel production process (i.e. NH3, H2, MeOH, etc.) For each case, a 1 implies that the unit is considered in the PtX plant and a 0 implies that it is not and will therefore be excluded of the optimization.
 
 ![Selected units](images/Selected_units.png)
 
 The number of lines and names should be exactly the same as in the *Data\_base\_case* sheet (so remember to also update this file when adding a new technology).
+
+!!! warning 
+    Make sure that the system is still physically/technically feasible before removing units. For example removing all power supply units or both curtailment and storage options will lead to infeasibilities.
 
 !!! note
     It is also possible to use an automatic unit filter based on the unit names, and exclude some specific units manually if needed (see the file in `Full_model` for an example).

@@ -39,38 +39,35 @@ Make sure to select the "Add to PATH" option when installing.
 
 ## 4. Setup Julia Environment
 
-Make sure you have the **latest Julia version** installed: [Install Julia](https://julialang.org/install/).
+1. Make sure you have the **latest Julia version** installed: [Install Julia](https://julialang.org/install/).
 
-1. Add the *Julia* extension in VS Code using the "Extensions: Marketplace" (access on the square icon on left sidebar of VS Code)
+2. Add the *Julia* extension in VS Code using the "Extensions: Marketplace" (access on the square icon on left sidebar of VS Code)
+   ![Julia_extension](images/Julia_extension.png)
 
-![Julia_extension](images/Julia_extension.png)
-
-2. Open the Julia REPL inside VS Code (the first time opening can take a bit of time):  
+3. Open the Julia REPL inside VS Code (the first time opening can take a bit of time):  
    - Option 1, keyboard shortcut: Press `Alt + J` then `Alt + O` 
    - Option 2, open the command palette (`Ctrl+Shift+P`) and run: `Julia: Start REPL`
 
-This is now a condensed version of the [Julia documentation](https://pkgdocs.julialang.org/v1/environments/) to use someone else's project.
+4. This is now a condensed version of the [Julia documentation](https://pkgdocs.julialang.org/v1/environments/) to use someone else's project.
+   - In the REPL, run this comand to move one directory up (where the folder where `OptiPlantPtX` is located):  
+      ```julia
+      cd("..")
+      ```
+   - Press `]` to enter the package manager
 
-3. In the REPL, run this comand to move one directory up (where the folder where `OptiPlantPtX` is located):  
-   ```julia
-   cd("..")
-   ```
+   - To set up the environment write:
 
-4. Press `]` to enter the package manager
+      ```julia
+      activate OptiPlantPtX 
+      ```
+      If your folder is called differently i.e. "MyOptiPlant" write `activate MyOptiPlant`
 
-5. To set up the environment write:
+      Then write: 
 
-   ```julia
-   activate OptiPlantPtX 
-   ```
-   If your folder is called differently i.e. "MyOptiPlant" write `activate MyOptiPlant`
+      ```julia
+      instantiate
+      ```
 
-   Then write: 
+5. To use Gurobi as a solver, you need to [install the software](https://www.gurobi.com/downloads/) and activate your license using the grbgetkey. Overtime, you may need to update Gurobi to the latest version and re-generate your license to avoid license compatibility issues.
 
-   ```julia
-   instantiate
-   ```
-
-6. To use Gurobi as a solver, you need to [install the software](https://www.gurobi.com/downloads/) and activate your license using the grbgetkey. Overtime, you may need to update Gurobi to the latest version and re-generate your license to avoid license compatibility issues.
-
-7. Done! You can exit the package manager pressing the `Backspace key` and start running the examples.
+6. Done! You can exit the package manager pressing the `Backspace key` and start running the examples.

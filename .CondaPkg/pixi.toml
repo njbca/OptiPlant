@@ -1,11 +1,12 @@
 [dependencies]
 streamlit = "*"
+openssl = ">=3, <3.6"
 uv = ">=0.4"
 
     [dependencies.python]
     channel = "conda-forge"
     build = "*cp*"
-    version = ">=3.10,<3.14"
+    version = ">=3.10,!=3.14.0,!=3.14.1,<4"
 
 [project]
 name = ".CondaPkg"

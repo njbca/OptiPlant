@@ -1,4 +1,4 @@
-#***************** Fuel energy contents based on the fuel names in the excel sheet ************************
+#***************** Fuel energy contents based on the fuel names in the "model-inputs" excel sheet ************************
 
 Fuel_energy_content_list = Dict(
     "H2" => 120,
