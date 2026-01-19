@@ -4,7 +4,7 @@ using OptiPlantPtX
 datafoldername = "Example"
 techno_eco_filename = "Input_data_example" #or "Data_ammonia_paper"
 scenario_set = "ScenariosToRun"
-solver = "Gurobi"  # Change to "Gurobi" if you have the license
+solver = "HiGHS"  # Change to "Gurobi" if you have the license
 
 # Run all scenarios 1:18 (adjust the upper bound if your excel has fewer scenarios)
 # To run only one scenario: scenarios_to_run = 1:1 or scenarios_to_run = 4:4

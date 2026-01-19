@@ -2,6 +2,8 @@
 
 All of the important files to run the model are in the `data` folder.
 
+![Data folder](images/Data_folder.png)
+
 To create your own analysis **copy one of the existing folder and rename it to your convenience**.
 
 Let's use the `data/Example` folder as an example.
@@ -10,13 +12,13 @@ Let's use the `data/Example` folder as an example.
 
 The data folder has two main folders:
 - **model_inputs**: Contains one or more excel files with techno-economic data and study-case scenarios information
-- **profiles**: Contains every time dynamic inputs (typically electricity prices, renewable power supply or grid CO2e emissions). Some subfolders can be used to organize the profiles folder and be called in the "model_inputs" excel file (see the `data/Full_model` for example). 
+- **profiles**: Contains every time dynamic inputs (typically electricity prices, renewable power supply or grid CO2e emissions). Some subfolders can be used to organize the profiles folder and be called in the "model\_inputs" excel file (see the `data/Full_model` for example). 
 
 ## Model inputs
 
 The excel file inside the `model_inputs` folder is the main "workplace" to run the tool.
 
-In the `Example` folder, one file is called *Data\_ammonia\_paper.xlsx* and one is called *Input_data_example.xlsx*. Let's open the *Input_data_example.xlsx* file.
+In the `Example` folder, one file is called *Data\_ammonia\_paper.xlsx* and one is called *Input\_data\_example.xlsx*. Let's open the *Input\_data\_example.xlsx* file.
 
 The excel document has the following sheets:
 
@@ -75,7 +77,7 @@ The *Scenario* columns refers to the scenarios defined in the *Scenarios\_defini
 
 ## Profiles
 
-In the `Ammonia_paper` folder, the current profile file is called *2019.xlsx*.
+In the `Example` folder, the current profile file is called *2019.xlsx*.
 The excel document has the following sheets:
 
 ![Excel sheets profiles](images/Excel_sheets_profiles.png)
@@ -108,7 +110,11 @@ It is recommended to remove negative electricity prices using the option "No neg
 
 ## Running the model
 
-The model can be run by executing one of the scripts in the `examples` folder (for example *Run example.jl*) using the function `run_optimization_scenarios` with the following arguments as minimum:
+The model can be run by executing one of the scripts in the `examples` folder (for example *Run example.jl*) pressing the small arrow on the top right corner of the screen.
+
+![Example folder](images/Example_folder.png)
+
+In general, using the function `run_optimization_scenarios` with the following arguments is sufficient to conduct basic analyses:
 
 ```julia
 using OptiPlanPtX
@@ -125,7 +131,7 @@ run_optimization_scenarios(
 ```
 ## Checking the results
 
-All results are saved in a folder that has the same name as the data folder (i.e. `Ammonia_paper`). Results subfolders are user-defined in the *Techno-economic and scenarios* excel file (`Data_ammonia_paper.xlsx`) in the *ScenariosToRun* sheet.
+All results are saved in a folder that has the same name as the data folder (i.e. `Example` or `Ammonia_paper`). Results subfolders are user-defined in the *Techno-economic and scenarios* excel file (i.e. `Input_data_example.xlsx`) in the *ScenariosToRun* sheet.
 
 These folders always contains subfolders named ’Data used’, ’Hourly results’, and ’Main results’, that include the inputs and results of the simulation in CSV files.
 
@@ -135,3 +141,31 @@ The method to process the results is quite free.
 
 This can be done with the excel file and pivot charts provided on the GitHub or using the interactive data dashboard coming with OptiPlantPtX.
 
+## Trouble shooting for common errors
+
+If you are a new user and are facing one of the errors not mentioned here, feel free to contact one of the authors of the package.
+
+### Format error when displaying simulation results in excel
+
+Once the model has run successfully and some results have been generated, one can encounter some problems when reading the CSV ’results’ file. For instance, when importing the ’main results’ CSV, one can get ’weird/unrealistic’ results if the importing method is not defined correctly:
+
+![Excel comma error 1](images/Excel_comma_error1.png)
+
+It can be clearly seen that the obtained results for the installed capacities are too large. There might be an error on the CSV reading process. To check that the error is in the file lecture and not actually in the results, we open any of the CSV files on ’Main results’ with the notebook. One should see the following:
+
+![Excel comma error 2](images/Excel_comma_error2.png)
+
+The numbers here are realistic and a priori seem correct. Observe that the CSV file separates cells with commas and decimals with dots. To use the separators correctly, do the following:
+
+1. Inside excel, go to File > Options > Advanced and look for this lines here:
+    ![Excel comma error 3](images/Excel_comma_error3.png)
+
+2. Go to HOME and click in the ‘Number’ tab -bottom corner right of the image-:
+    ![Excel comma error 4](images/Excel_comma_error4.png)
+
+3. Untick the ‘Use 1000 separator’ box:
+    ![Excel comma error 5](images/Excel_comma_error5.png)
+
+After completing the previous steps, reset Excel and import the data again. Now, it should look like this:
+
+![Excel comma error 6](images/Excel_comma_error6.png)
