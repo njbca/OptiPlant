@@ -27,7 +27,7 @@ makedocs(
         "Home" => "index.md",
         "Introduction" => "introduction.md",
         "Installation" => "installation.md",
-        "User-guide" => "usage.md", 
+        "User-guide" => "userguide.md", 
         "Data dashboard" => "dashboards.md"
     ],
     format = Documenter.HTML(

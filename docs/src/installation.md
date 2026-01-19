@@ -8,7 +8,7 @@ In short:
 3. Open in VS Code
 4. Setup Julia Environment
 
-Done! Try to run some of the examples
+Done! Try to run some of the examples following the user-guide
 
 ## 1. Fork the repository
 
@@ -48,26 +48,26 @@ Make sure to select the "Add to PATH" option when installing.
    - Option 1, keyboard shortcut: Press `Alt + J` then `Alt + O` 
    - Option 2, open the command palette (`Ctrl+Shift+P`) and run: `Julia: Start REPL`
 
-4. This is now a condensed version of the [Julia documentation](https://pkgdocs.julialang.org/v1/environments/) to use someone else's project.
+
+4. This is now a condensed version of the [Julia documentation](https://pkgdocs.julialang.org/v1/environments/) to use someone else's project:
    - In the REPL, run this comand to move one directory up (where the folder where `OptiPlantPtX` is located):  
-      ```julia
-      cd("..")
-      ```
+   ```julia
+   cd("..")
+   ```
    - Press `]` to enter the package manager
 
    - To set up the environment write:
+   ```julia
+   activate OptiPlantPtX 
+   ```
+   !!! warning
+       If your folder is called differently i.e. "MyOptiPlant" write `activate MyOptiPlant` instead
 
-      ```julia
-      activate OptiPlantPtX 
-      ```
-      If your folder is called differently i.e. "MyOptiPlant" write `activate MyOptiPlant`
-
-      Then write: 
-
-      ```julia
-      instantiate
-      ```
+   Then write: 
+   ```julia
+   instantiate
+   ```
 
 5. To use Gurobi as a solver, you need to [install the software](https://www.gurobi.com/downloads/) and activate your license using the grbgetkey. Overtime, you may need to update Gurobi to the latest version and re-generate your license to avoid license compatibility issues.
 
-6. Done! You can exit the package manager pressing the `Backspace key` and start running the examples.
+6. Done! You can exit the package manager pressing the `Backspace key` and start running the examples from the user-guide.
