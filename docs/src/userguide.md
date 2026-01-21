@@ -2,7 +2,10 @@
 
 All of the important files to run the model are in the `data` folder.
 
-<img src="images/Data_folder.png" width="20%">  
+
+<p align="center">
+  images/Data_folder.png
+</p>
 
 To create your own analysis **copy one of the existing folder and rename it to your convenience**.
 
