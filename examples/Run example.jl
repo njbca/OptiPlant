@@ -13,7 +13,7 @@ scenarios_to_run = 1:2
 
 # Run and time the execution. Wrap in try/catch so a single scenario error doesn't stop the batch.
 try
-    result = run_optimization_scenarios(
+    run_optimization_scenarios(
         datafoldername,
         techno_eco_filename,
         scenario_set,
@@ -25,3 +25,5 @@ catch e
     println("Error running scenarios: ", e)
     @show(stacktrace(catch_backtrace()))
 end
+
+launch_hourly_profiles_dashboard()

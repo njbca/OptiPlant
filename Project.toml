@@ -1,21 +1,27 @@
 name = "OptiPlantPtX"
 uuid = "036e4454-802e-43b1-820d-78f38b913b71"
-authors = ["Nicolas Campion"]
 version = "1.0.0-DEV"
+authors = ["Nicolas Campion"]
 
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+Conda = "8f4d0f93-b110-5947-807f-2305c1781a2d"
 CondaPkg = "992eb4ea-22a4-4c89-a5bb-47a3300528ab"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 Gurobi = "2e9cd046-0924-5485-92f1-d5272153d98b"
 HiGHS = "87dc4568-4c63-4d18-b0c0-bb2238e4078b"
 JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
+MicroMamba = "0b3b1443-0f03-428d-bdfb-f27f9c1191ea"
+PreferenceTools = "ba661fbb-e901-4445-b070-854aec6bfbc5"
 PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
 XLSX = "fdbf4ff8-1666-58a4-91e7-1b58723a45e0"
 
 [compat]
+Conda = "1.10.3"
 CondaPkg = "0.2.33"
+MicroMamba = "0.1.14"
+PreferenceTools = "0.1.2"
 PythonCall = "0.9.30"
 julia = "1.11.6"
 
