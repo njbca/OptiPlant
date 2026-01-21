@@ -139,7 +139,7 @@ These folders always contains subfolders named ’Data used’, ’Hourly result
 
 The method to process the results is quite free.
 
-This can be done with the excel file and pivot charts provided on the GitHub or using the interactive data dashboard coming with OptiPlantPtX.
+For example, this can be done with the excel file and pivot charts provided on the GitHub or using streamlit
 
 ## Trouble shooting for common errors
 
