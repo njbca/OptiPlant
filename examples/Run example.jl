@@ -25,5 +25,3 @@ catch e
     println("Error running scenarios: ", e)
     @show(stacktrace(catch_backtrace()))
 end
-
-launch_hourly_profiles_dashboard()
