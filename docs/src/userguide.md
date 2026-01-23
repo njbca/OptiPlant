@@ -3,9 +3,7 @@
 All of the important files to run the model are in the `data` folder.
 
 ```@raw html
-<p align="center">
-  images/Data_folder.png
-</p>
+<iframe src="images/Data_folder.png" style="width:25%;"></iframe>
 ```
 
 To create your own analysis **copy one of the existing folder and rename it to your convenience**.
@@ -116,8 +114,6 @@ It is recommended to remove negative electricity prices using the option "No neg
 
 The model can be run by executing one of the scripts in the `examples` folder (for example *Run example.jl*) pressing the small arrow on the top right corner of the screen.
 
-![Example folder](images/Example_folder.png)
-
 In general, using the function `run_optimization_scenarios` with the following arguments is sufficient to conduct basic analyses:
 
 ```julia
@@ -151,25 +147,11 @@ If you are a new user and are facing one of the errors not mentioned here, feel 
 
 ### Format error when displaying simulation results in excel
 
-Once the model has run successfully and some results have been generated, one can encounter some problems when reading the CSV ’results’ file. For instance, when importing the ’main results’ CSV, one can get ’weird/unrealistic’ results if the importing method is not defined correctly:
+If the opened csv results file looks like this, then you probably have a problem with the excel separators. 
 
 ![Excel comma error 1](images/Excel_comma_error1.png)
 
-It can be clearly seen that the obtained results for the installed capacities are too large. There might be an error on the CSV reading process. To check that the error is in the file lecture and not actually in the results, we open any of the CSV files on ’Main results’ with the notebook. One should see the following:
 
-![Excel comma error 2](images/Excel_comma_error2.png)
+To solve this, it possible to change the separators for your Windows system (explanations on this website)[https://www.supportyourtech.com/tech/how-to-change-the-windows-11-list-separator-a-step-by-step-guide/] 
 
-The numbers here are realistic and a priori seem correct. Observe that the CSV file separates cells with commas and decimals with dots. To use the separators correctly, do the following:
-
-1. Inside excel, go to File > Options > Advanced and look for this lines here:
-    ![Excel comma error 3](images/Excel_comma_error3.png)
-
-2. Go to HOME and click in the ‘Number’ tab -bottom corner right of the image-:
-    ![Excel comma error 4](images/Excel_comma_error4.png)
-
-3. Untick the ‘Use 1000 separator’ box:
-    ![Excel comma error 5](images/Excel_comma_error5.png)
-
-After completing the previous steps, reset Excel and import the data again. Now, it should look like this:
-
-![Excel comma error 6](images/Excel_comma_error6.png)
+In excel, it is also possible to you can separators settings in `File > Options > Advanced` and make some changes in some of the excel tabs:  `Home , Number and 1000 sperator box`.

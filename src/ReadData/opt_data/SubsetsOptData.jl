@@ -55,7 +55,7 @@ struct subsets_opt_data
     Grid_CO2_emitted_p; nGCO2em
     Grid_CO2_regulated_p; nGCO2reg
 
-    # Number of subsets (length) per Type
+    # Number of subsets per profile type
     nSubf #Flux
     nSubp #Price
     nSubC_em #CO2 emitted

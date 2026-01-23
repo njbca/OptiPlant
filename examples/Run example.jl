@@ -9,7 +9,7 @@ solver = "HiGHS"  # Change to "Gurobi" if you have the license
 # Run all scenarios 1:18 (adjust the upper bound if your excel has fewer scenarios)
 # To run only one scenario: scenarios_to_run = 1:1 or scenarios_to_run = 4:4
 # Or any personalized vector of scenarios
-scenarios_to_run = 1:2
+scenarios_to_run = 1:1
 
 # Run and time the execution. Wrap in try/catch so a single scenario error doesn't stop the batch.
 try

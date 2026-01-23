@@ -101,10 +101,9 @@ function run_optimization_scenarios(
       # Initialize LCIA-related variables to safe defaults in case no LCIA is provided
       lcia_data = nothing
       Data_lcia_filtered = nothing
-      if scen_data.Lcia_filename != "None"
+      if scen_data.Lcia_filename != "None"  #If the file exists, load and filter lcia data
         lcia_data = load_and_locate_lcia_data(wb_lcia, Available_sheets_lcia, key_terms_lcia)
         Data_lcia_filtered = filter_lcia_data(Data_units_filtered, techno_scen_data, lcia_data)
-        #dat_lcia = build_lcia_opt_data(Data_lcia_filtered, lcia_data)
       end
 
       # Build optimization input data

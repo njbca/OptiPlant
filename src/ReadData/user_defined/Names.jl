@@ -9,6 +9,7 @@ SheetTags = (
     co2_regulated = "CO2_regulated",
     co2_emitted = "CO2_emitted",
     rencrit = "Renewable_criterion",
+    lcia_hourly = "Lcia_hourly",
     lciadata = "LCIA_Results"
 )
 
