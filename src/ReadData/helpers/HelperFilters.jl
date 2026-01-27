@@ -82,19 +82,17 @@ function filter_matrix_by_mapping(
     matrix::AbstractMatrix,
     selected_key::String,
     mapping::Dict{String, Vector{String}},
-    indexes,
-    corners
+    column_index,
+    data_start_row
 )
-    unit_col = indexes.idx_t.units[2]           # Column index where unit names are stored
-    data_start_row = corners.L1                 # First data row (after header)
 
-    unit_names = matrix[data_start_row:end, unit_col]  # Extract unit names from matrix
+    column_values = matrix[data_start_row:end, column_index]  # Extract unit names from matrix
 
-    allowed_units = get(mapping, selected_key, String[])
-    mapped_units = vcat(values(mapping)...)
+    allowed_values = get(mapping, selected_key, String[])
+    mapped_values = vcat(values(mapping)...)
 
     # Flag rows to keep (true = keep row)
-    keep_flags = [!(u in mapped_units) || (u in allowed_units) for u in unit_names]
+    keep_flags = [!(u in mapped_values) || (u in allowed_values) for u in column_values]
 
     # Calculate full list of row indices to keep
     keep_rows = vcat(1:(data_start_row - 1), findall(keep_flags) .+ (data_start_row - 1))
@@ -106,43 +104,18 @@ end
 function filter_matrix_by_pattern(
     matrix::AbstractMatrix,
     pattern::String,
-    indexes,
-    corners;
+    column_index,
+    data_start_row;
     allowed_exceptions::Vector{String}=String[]
 )
-    unit_col = indexes.idx_t.units[2]        # Column containing unit names
-    data_start_row = corners.L1           # Start row of actual data
 
-    unit_names = matrix[data_start_row:end, unit_col]
+    column_values = matrix[data_start_row:end, column_index]
     allowed_set = Set(allowed_exceptions)
 
     # Flag rows to keep
-    keep_flags = [!occursin(pattern, u) || (u in allowed_set) for u in unit_names]
+    keep_flags = [!occursin(pattern, u) || (u in allowed_set) for u in column_values]
 
     # Keep headers + filtered data rows
-    keep_rows = vcat(1:(data_start_row - 1), findall(keep_flags) .+ (data_start_row - 1))
-
-    return matrix[keep_rows, :]
-end
-
-
-"Exclude units that contain any user-defined substrings."
-
-function filter_matrix_by_custom_exclude(
-    matrix::AbstractMatrix,
-    exclude_terms::Vector{String},
-    indexes,
-    corners
-)
-    unit_col = indexes.idx_t.units[2]       # Column with unit names
-    data_start_row = corners.L1          # First row of actual data
-
-    unit_names = matrix[data_start_row:end, unit_col]
-
-    # Keep units that DO NOT match any exclude term
-    keep_flags = [all(term -> term != u, exclude_terms) for u in unit_names]
-
-    # Keep header rows + matching rows
     keep_rows = vcat(1:(data_start_row - 1), findall(keep_flags) .+ (data_start_row - 1))
 
     return matrix[keep_rows, :]
@@ -151,8 +124,8 @@ end
 function filter_matrix_by_electrolyser_type(
     matrix::AbstractMatrix,
     Electrolyser::String,
-    indexes,
-    corners;
+    column_index,
+    data_start_row;
     electrolyser_exclusion_rules::Dict = electrolyser_exclusion_rules,
     heat_integration_map::Dict = heat_integration_map,
     heat_int_exclusion_rules::Dict = heat_int_exclusion_rules,
@@ -174,16 +147,14 @@ function filter_matrix_by_electrolyser_type(
         exclude_type = electrolyser_exclusion_rules[electrolyser_type]
 
         if electrolyser_type == "Mix"
-            unit_col = indexes.idx_t.units[2]
-            data_start_row = corners.L1
-            unit_names = matrix[data_start_row:end, unit_col]
+            column_values = matrix[data_start_row:end, column_index]
 
             # Inline "Mix" filtering logic
-            keep_flags = [!(occursin("AEC", u) || occursin("SOEC", u)) || occursin("Mix", u) for u in unit_names]
+            keep_flags = [!(occursin("AEC", u) || occursin("SOEC", u)) || occursin("Mix", u) for u in column_values]
             keep_rows = vcat(1:(data_start_row - 1), findall(keep_flags) .+ (data_start_row - 1))
             matrix = matrix[keep_rows, :]
         else
-            matrix = filter_matrix_by_pattern(matrix, exclude_type, indexes, corners)
+            matrix = filter_matrix_by_pattern(matrix, exclude_type, column_index, data_start_row)
         end
     else
         error("Undefined electrolyser type: $electrolyser_type")
@@ -191,14 +162,53 @@ function filter_matrix_by_electrolyser_type(
 
     # Step 2: Filter based on heat integration
     if haskey(heat_int_exclusion_rules, heat_integration)
-        matrix = filter_matrix_by_pattern(matrix, heat_int_exclusion_rules[heat_integration], indexes, corners)
+        matrix = filter_matrix_by_pattern(matrix, heat_int_exclusion_rules[heat_integration], column_index, data_start_row)
     end
 
     return matrix
 end
 
+"Exclude values that contain any user-defined substrings."
 
-# --- Master function to apply all filters ---
+function filter_matrix_by_custom_exclude(
+    matrix::AbstractMatrix,
+    exclude_terms::Vector{String},
+    column_index,
+    data_start_row
+)
+    column_values = matrix[data_start_row:end, column_index]
+
+    # Keep values that DO NOT match any exclude term
+    keep_flags = [all(term -> term != u, exclude_terms) for u in column_values]
+
+    # Keep header rows + matching rows
+    keep_rows = vcat(1:(data_start_row - 1), findall(keep_flags) .+ (data_start_row - 1))
+
+    return matrix[keep_rows, :]
+end
+
+function filter_matrix_by_custom_include(
+    matrix::AbstractMatrix,
+    include_terms,
+    column_index,
+    data_start_row
+)
+    column_values = string.(matrix[data_start_row:end, column_index])
+
+    #Convert into strings
+    include_terms_str = collect(string.(include_terms))
+
+    # Keep values that MATCH (exact equality) one of the include terms
+    keep_flags = [any(term -> term == u, include_terms_str) for u in column_values]
+
+    # Keep header rows + matching rows
+    keep_rows = vcat(1:(data_start_row - 1), findall(keep_flags) .+ (data_start_row - 1))
+
+    return matrix[keep_rows, :]
+end
+
+
+# --- Master function to apply all filters for the techno-economic file ---
 
 "Apply all filters to a list of unit names using the selected configuration."
 function filter_units_auto(Data_units, Data_sources, indexes,
@@ -211,23 +221,25 @@ function filter_units_auto(Data_units, Data_sources, indexes,
     CSP_tech::String,
     Custom_exclude::Vector{String}=String[]
 )
+    column_index = indexes.idx_t.units[2]       # Column with unit names
+    data_start_row = corners.L1                 # First data row (after header) 
 
-    data_units_filtered = filter_matrix_by_mapping(Data_units, Fuel, fuel_map, indexes,corners)
-    data_units_filtered = filter_matrix_by_mapping(data_units_filtered, CO2_capture, co2_map,indexes,corners)
-    data_units_filtered = filter_matrix_by_electrolyser_type(data_units_filtered, Electrolyser,indexes,corners)
-    data_units_filtered = filter_matrix_by_mapping(data_units_filtered, Water_supply, water_map, indexes,corners)
-    data_units_filtered = filter_matrix_by_mapping(data_units_filtered, H2_storage, storage_map,indexes,corners)
-    data_units_filtered = filter_matrix_by_mapping(data_units_filtered, CSP_tech, csp_map,indexes,corners)
-    data_units_filtered = filter_matrix_by_custom_exclude(data_units_filtered, Custom_exclude,indexes,corners)
+    data_units_filtered = filter_matrix_by_mapping(Data_units, Fuel, fuel_map, column_index,data_start_row)
+    data_units_filtered = filter_matrix_by_mapping(data_units_filtered, CO2_capture, co2_map,column_index,data_start_row)
+    data_units_filtered = filter_matrix_by_electrolyser_type(data_units_filtered, Electrolyser,column_index,data_start_row)
+    data_units_filtered = filter_matrix_by_mapping(data_units_filtered, Water_supply, water_map, column_index,data_start_row)
+    data_units_filtered = filter_matrix_by_mapping(data_units_filtered, H2_storage, storage_map,column_index,data_start_row)
+    data_units_filtered = filter_matrix_by_mapping(data_units_filtered, CSP_tech, csp_map,column_index,data_start_row)
+    data_units_filtered = filter_matrix_by_custom_exclude(data_units_filtered, Custom_exclude,column_index,data_start_row)
 
     if ! isnothing(Data_sources)
-        data_sources_filtered = filter_matrix_by_mapping(Data_sources, Fuel, fuel_map, indexes,corners)
-        data_sources_filtered = filter_matrix_by_mapping(data_sources_filtered, CO2_capture, co2_map,indexes,corners)
-        data_sources_filtered = filter_matrix_by_electrolyser_type(data_sources_filtered, Electrolyser,indexes,corners)
-        data_sources_filtered = filter_matrix_by_mapping(data_sources_filtered, Water_supply, water_map,indexes,corners)
-        data_sources_filtered = filter_matrix_by_mapping(data_sources_filtered, H2_storage, storage_map,indexes,corners)
-        data_sources_filtered = filter_matrix_by_mapping(data_sources_filtered, CSP_tech, csp_map,indexes,corners)
-        data_sources_filtered = filter_matrix_by_custom_exclude(data_sources_filtered, Custom_exclude,indexes,corners)
+        data_sources_filtered = filter_matrix_by_mapping(Data_sources, Fuel, fuel_map, column_index,data_start_row)
+        data_sources_filtered = filter_matrix_by_mapping(data_sources_filtered, CO2_capture, co2_map,column_index,data_start_row)
+        data_sources_filtered = filter_matrix_by_electrolyser_type(data_sources_filtered, Electrolyser,column_index,data_start_row)
+        data_sources_filtered = filter_matrix_by_mapping(data_sources_filtered, Water_supply, water_map,column_index,data_start_row)
+        data_sources_filtered = filter_matrix_by_mapping(data_sources_filtered, H2_storage, storage_map,column_index,data_start_row)
+        data_sources_filtered = filter_matrix_by_mapping(data_sources_filtered, CSP_tech, csp_map,column_index,data_start_row)
+        data_sources_filtered = filter_matrix_by_custom_exclude(data_sources_filtered, Custom_exclude,column_index,data_start_row)
     else
         data_sources_filtered = nothing
     end
@@ -236,86 +248,67 @@ function filter_units_auto(Data_units, Data_sources, indexes,
     return data_units_filtered, data_sources_filtered
 end
 
-#=
-units = [
-    "Biomass wood",
-    "MeOH plant - biomass",
-    "Sale of biochar - biofuel",
-    "Biomass straw",
-    "Biomass - Pyrolysis Unit",
-    "Biofuel upgrading unit",
-    "Sale of biochar DME",
-    "Biomass bamboo 1",
-    "Biomass bamboo 2",
-    "Biomass wheat 1",
-    "Biomass wheat 2",
-    "Bamboo1-stage-SOEC (HI)",
-    "Bamboo2-stage-SOEC (HI)",
-    "Wheat1-stage-SOEC (HI)",
-    "Wheat2-stage-SOEC (HI)",
-    "NH3 plant + ASU - AEC (A)",
-    "NH3 plant + ASU - Mix/SOEC (HI)",
-    "H2 client",
-    "H2 pipeline to end-user",
-    "Desalination plant",
-    "Waste water plant",
-    "Drinking water",
-    "Electrolysers AEC",
-    "Electrolysers SOEC heat integrated (HI)",
-    "Electrolysers SOEC (A)",
-    "Electrolysers Mix 75AEC-25SOEC (HI)",
-    "Electrolysers Mix 75AEC-25SOEC (A)",
-    "Sale of oxygen",
-    "Heat from district heating",
-    "Heat sent to district heating",
-    "Heat sent to other process",
-    "H2 tank compressor",
-    "H2 tank valve",
-    "H2 tank",
-    "H2 pipes compressor",
-    "H2 pipes valve",
-    "H2 buried pipes",
-    "Solar fixed",
-    "Solar tracking",
-    "ON_SP198-HH100",
-    "ON_SP198-HH150",
-    "ON_SP237-HH100",
-    "ON_SP237-HH150",
-    "CSP Plant tower 50 MW",
-    "CSP Plant tower 100 MW",
-    "CSP Plant parabolic 50 MW",
-    "CSP Plant parabolic 100 MW",
-    "Charge TES",
-    "Discharge TES",
-    "TES ST 50 MW",
-    "TES ST 100 MW",
-    "TES PT 50 MW",
-    "TES PT 100 MW",
-    "CSP+TES",
-    "Electricity from the grid",
-    "Curtailment",
-    "Charge batteries",
-    "Discharge batteries",
-    "Batteries"
-]
+# --- Master function to apply all filters for the lcia file ---
 
-# Create the 3-column matrix
-matrix = [[units[i] string(i) string(i * 10)] for i in 1:length(units)]
-
-# Convert to actual matrix
-result = reduce(vcat, matrix)
-
-indexes = (idx_t = (units = (1, 1),),)
-corners = (L1 = 1,)
-
-filtered = apply_all_unit_filters(result,indexes,corners;
-    Fuel = "NH3",
-    CO2_capture = "None",
-    Electrolysers = "AEC_A",
-    Water_supply = "Desalination plant",
-    H2_storage = "H2 tank",
-    CSP_tech = "Tower50",
-    Custom_exclude = ["ON_SP198-HH100","ON_SP198-HH150"]  
+"Apply all filters to a list of lcia parameters using the selected filters."
+function filter_lcia_auto(Data_lcia, indexes,
+    corners;
+    Technology_to_keep::Vector{String}=String[],
+    Phase_to_keep::Vector{String}=String[],
+    Method_to_keep::Vector{String}=String[],
+    Impact_categories_to_keep::Vector{String}=String[],
+    Iam_model_to_keep::Vector{String}=String[],
+    Iam_scenario_to_keep::Vector{String}=String[],
+    Lcia_year_to_keep,
+    Year_data,
+    Lcia_tags_list
 )
 
-=#
+    println("Year_data $Year_data")
+    println("Lcia_year_to_keep $Lcia_year_to_keep")
+    # First data row (after header)    
+    data_start_row = corners.L0_lcia + 1  
+
+    # Identify column indices in the lcia table
+
+    Lcia_parameters_name = Data_lcia[indexes.idx_lcia.corner[1], indexes.idx_lcia.corner[2]:end]
+
+    get_col_index(name) = corners.C0_lcia - 1 + findfirst(x -> x == name, Lcia_parameters_name)
+
+    C_technology = get_col_index(LCIAColumnNames.technology)
+    C_phase = get_col_index(LCIAColumnNames.phase)
+    C_method = get_col_index(LCIAColumnNames.method_family)
+    C_impact_categories = get_col_index(LCIAColumnNames.impact_categories)
+    C_iam_model = get_col_index(LCIAColumnNames.iam_model)
+    C_iam_scenario = get_col_index(LCIAColumnNames.iam_scenario)
+    C_lcia_year = get_col_index(LCIAColumnNames.year_lcia)
+    
+
+    data_lcia_filtered = filter_matrix_by_custom_include(Data_lcia, Method_to_keep, C_method, data_start_row)
+    data_lcia_filtered = filter_matrix_by_custom_include(data_lcia_filtered, Iam_model_to_keep, C_iam_model, data_start_row)
+    data_lcia_filtered = filter_matrix_by_custom_include(data_lcia_filtered, Iam_scenario_to_keep, C_iam_scenario, data_start_row)
+
+    if Phase_to_keep[1] != "Keep_all"
+        data_lcia_filtered = filter_matrix_by_custom_include(data_lcia_filtered, Phase_to_keep, C_phase, data_start_row)
+    end
+
+    if Impact_categories_to_keep[1] != "Keep_all"
+        data_lcia_filtered = filter_matrix_by_custom_include(data_lcia_filtered, Impact_categories_to_keep, C_impact_categories, data_start_row)
+    end
+
+    if Lcia_year_to_keep[1] == "Same_as_technoeco"
+        data_lcia_filtered = filter_matrix_by_custom_include(data_lcia_filtered, Year_data, C_lcia_year, data_start_row) 
+    else
+        data_lcia_filtered = filter_matrix_by_custom_include(data_lcia_filtered, Lcia_year_to_keep, C_lcia_year, data_start_row)
+    end
+
+    if Technology_to_keep[1] == "Same_as_technoeco"
+        data_lcia_filtered = filter_matrix_by_custom_include(data_lcia_filtered, Lcia_tags_list, C_technology, data_start_row) 
+    else
+        data_lcia_filtered = filter_matrix_by_custom_include(data_lcia_filtered, Technology_to_keep, C_technology, data_start_row) 
+    end
+
+    println("Data_lcia_filtered 7: $data_lcia_filtered")
+     
+    return data_lcia_filtered
+end

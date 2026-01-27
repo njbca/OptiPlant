@@ -13,19 +13,15 @@ struct subsets_opt_data
     R
     MainFuel
     PU
-    RPU
-    RPU_p
-    nRPU
+    RPU ; nRPU
     Grid_in
     Heat_in
     Grid_out
     Heat_out
     Products
     nProd
-    MinD
-    nMinD
-    Tanks
-    nST
+    MinD ; nMinD
+    Tanks ; nST
     Stor_in
     Stor_out
     O2_sell; nO2s
@@ -39,13 +35,12 @@ struct subsets_opt_data
     PWL; nPWL
     NotPWL
 
-    # Subsets related to price profiles
+    # Main bubsets related to flux profiles
     Heat_sell_p
     Heat_buy_p
     Grid_sell_p
     Grid_buy_p
-
-    # Subsets related to flux profiles
+    RPU_p
     Grid_excess; nGe
     Grid_deficit; nGd
     Heat_excess; nHe
@@ -55,11 +50,15 @@ struct subsets_opt_data
     Grid_CO2_emitted_p; nGCO2em
     Grid_CO2_regulated_p; nGCO2reg
 
+    # Subsets related to lcia hourly data
+    Impact_categories_p ; nImpactCat
+
     # Number of subsets per profile type
     nSubf #Flux
     nSubp #Price
     nSubC_em #CO2 emitted
     nSubC_reg #CO2 regulated
+    nSubLcia_profile #Hourly lcia indicators
 
 end
 
@@ -109,6 +108,7 @@ function build_subsets_opt_data(
     Data_flux_profile = profile_data_filtered.Data_flux_profile
     Data_CO2_profile_reg = profile_data_filtered.Data_CO2_profile_reg
     Data_CO2_profile_em = profile_data_filtered.Data_CO2_profile_em
+    Data_lcia_profile = profile_data_filtered.Data_lcia_profile
 
     L1 = techno_scen_data.corners.L1
     idx_t = techno_scen_data.indexes.idx_t
@@ -116,6 +116,7 @@ function build_subsets_opt_data(
     idx_f = profile_data.indexes.idx_f
     idx_CO2_reg = profile_data.indexes.idx_CO2_reg
     idx_CO2_em = profile_data.indexes.idx_CO2_em
+    idx_lcia_profile = profile_data.indexes.idx_lcia_profile
     
 
     # === Extract subsets from techno-economic and profile data ===
@@ -128,6 +129,8 @@ function build_subsets_opt_data(
 
     Subsets_CO2_reg, nSubC_reg = extract_subset_profiles(Data_CO2_profile_reg, idx_CO2_reg.subsets)
     Subsets_CO2_em, nSubC_em = extract_subset_profiles(Data_CO2_profile_em, idx_CO2_em.subsets)
+
+    Subsets_lcia_profile, nSubLcia_profile = extract_subset_profiles(Data_lcia_profile, idx_lcia_profile.subsets)
 
     # === Reactant used to produce the main product (chemical reactions) ===
     Reactants = round.(Int, zeros(nSubReac))
@@ -149,7 +152,7 @@ function build_subsets_opt_data(
     RPU = findall(x -> occursin(SubsetTags.renewable_pu, x), Subsets)
     nRPU = length(RPU)
     RPU_p = round.(Int, zeros(nRPU))
-    for u = 1:nRPU, j = 1:nSubf
+    for u = 1:nRPU, j = 1:nSubf # This loop is to make sure that subset in renewable technology techno-economic data matches with profile data
         if occursin(Subsets_flux[j], Subsets[RPU[u]])
             RPU_p[u] = j
         end
@@ -160,6 +163,20 @@ function build_subsets_opt_data(
             unit_names = Data_units[L1:end, idx_t.units[2]]
             @error("No profile available for $(unit_names[RPU[u]]) in the selected location: check that the techno-econmic and profiles subsets are matching or exclude the missing unit from the optimization")
         end
+    end
+
+    # === Impact categories profiles ===
+
+    # Small function to sanitize impact categories names
+    sanitize(s) = replace(lowercase(string(s)), r"[^a-z0-9]+" => "_")
+    nImpactCat = length(Impact_categories)
+    Impact_categories_p = round.(Int, zeros(nImpactCat))
+
+    for i = 1:nImpactCat, j = 1:nSubLcia_profile
+        if sanitize(Subsets_lcia_profile[j] == sanitize(Impact_categories[i]))
+            Impact_categories_p[i] = j
+        end
+        println("Impact categories p: $Impact_categories_p")
     end
 
     # === Public grid and district heating ===
@@ -209,7 +226,7 @@ function build_subsets_opt_data(
     Grid_CO2_regulated_p, nGCO2reg = extract_from_subsets(Subsets_CO2_reg, SubsetTags.grid_reg)
 
     return subsets_opt_data(
-        Reactants, R, MainFuel, PU, RPU, RPU_p, nRPU,
+        Reactants, R, MainFuel, PU, RPU, nRPU,
         Grid_in, Heat_in, Grid_out, Heat_out,
         Products, nProd, MinD, nMinD,
         Tanks, nST, Stor_in, Stor_out,
@@ -218,11 +235,12 @@ function build_subsets_opt_data(
         Heat_sell, nHs, Process_heat_sell, nphs,
         Hourly_heat_buy, nHb, Grid_sell, nGs, Grid_buy, nGb,
         PWL, nPWL, NotPWL,
-        Heat_sell_p, Heat_buy_p, Grid_sell_p, Grid_buy_p,
+        Heat_sell_p, Heat_buy_p, Grid_sell_p, Grid_buy_p, RPU_p,
         Grid_excess, nGe, Grid_deficit, nGd,
         Heat_excess, nHe, Heat_deficit, nHd,
         Grid_CO2_emitted_p, nGCO2em, Grid_CO2_regulated_p, nGCO2reg,
-        nSubf, nSubp, nSubC_em, nSubC_reg
+        Impact_categories_p , nImpactCat,
+        nSubf, nSubp, nSubC_em, nSubC_reg, nSubLcia_profile
     )
 end
 

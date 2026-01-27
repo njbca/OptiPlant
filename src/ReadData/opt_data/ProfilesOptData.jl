@@ -18,6 +18,7 @@ struct profiles_opt_data
     CO2_profile_regulated
     CO2_profile_emitted
     Renewable_criterion_profile
+    Lcia_profile
 
 end
 
@@ -67,6 +68,7 @@ function load_and_locate_profile_data(
     Data_CO2_profile_reg = read_xlsx_sheet(wb_profile, SheetTags.co2_regulated, Available_sheets_profiles)
     Data_CO2_profile_em = read_xlsx_sheet(wb_profile, SheetTags.co2_emitted, Available_sheets_profiles)
     Data_rencrit_profile = read_xlsx_sheet(wb_profile, SheetTags.rencrit, Available_sheets_profiles)
+    Data_lcia_profile = read_xlsx_sheet(wb_profile, SheetTags.lcia_hourly, Available_sheets_profiles; warn=true)
 
 
     # === Locate indexes in the profile sheets based on key terms ===
@@ -75,6 +77,7 @@ function load_and_locate_profile_data(
     idx_CO2_reg = locate_indexes(Data_CO2_profile_reg, key_terms_profiles, true)
     idx_CO2_em = locate_indexes(Data_CO2_profile_em, key_terms_profiles, true)
     idx_rencrit = locate_indexes(Data_rencrit_profile, key_terms_profiles, true)
+    idx_lcia_profile = locate_indexes(Data_lcia_profile, key_terms_profiles, true)
 
     # === Helper function to extract corner coordinates ===
     get_corner_table(idx, i) = isnothing(idx.corner) ? nothing : idx.corner[i]
@@ -86,12 +89,14 @@ function load_and_locate_profile_data(
         Data_CO2_profile_reg = Data_CO2_profile_reg,
         Data_CO2_profile_em = Data_CO2_profile_em,
         Data_rencrit_profile = Data_rencrit_profile,
+        Data_lcia_profile = Data_lcia_profile,
         indexes = (
             idx_f = idx_f,
             idx_pr = idx_pr,
             idx_CO2_reg = idx_CO2_reg,
             idx_CO2_em = idx_CO2_em,
-            idx_rencrit = idx_rencrit
+            idx_rencrit = idx_rencrit,
+            idx_lcia_profile = idx_lcia_profile
         ),
         corners = (
             L0_f = get_corner_table(idx_f, 1),
@@ -103,7 +108,9 @@ function load_and_locate_profile_data(
             L0_CO2_em = get_corner_table(idx_CO2_em, 1),
             C0_CO2_em = get_corner_table(idx_CO2_em, 2),
             L0_rencrit = get_corner_table(idx_rencrit, 1),
-            C0_rencrit = get_corner_table(idx_rencrit, 2)
+            C0_rencrit = get_corner_table(idx_rencrit, 2),
+            L0_lcia_profile = get_corner_table(idx_lcia_profile, 1),
+            C0_lcia_profile = get_corner_table(idx_lcia_profile, 2)
         )
     )
 end
@@ -150,6 +157,7 @@ function filter_all_profile_data(
     Data_CO2_profile_reg = profile_data.Data_CO2_profile_reg
     Data_CO2_profile_em = profile_data.Data_CO2_profile_em
     Data_rencrit_profile = profile_data.Data_rencrit_profile
+    Data_lcia_profile = profile_data.Data_lcia_profile
 
     indexes = profile_data.indexes
     corners = profile_data.corners
@@ -160,6 +168,7 @@ function filter_all_profile_data(
     Data_CO2_profile_reg_filtered = filter_profile(Data_CO2_profile_reg, indexes.idx_CO2_reg.locations, corners.C0_CO2_reg, scen.Location)
     Data_CO2_profile_em_filtered = filter_profile(Data_CO2_profile_em, indexes.idx_CO2_em.locations, corners.C0_CO2_em, scen.Location)
     Data_rencrit_profile_filtered = filter_profile(Data_rencrit_profile, indexes.idx_rencrit.locations, corners.C0_rencrit, scen.Location)
+    Data_lcia_profile_filtered = filter_profile(Data_lcia_profile, indexes.idx_lcia_profile.locations, corners.C0_lcia_profile, scen.Location)
 
     # === Additional filters ===
     Data_flux_profile_filtered = filter_profile(Data_flux_profile_filtered, indexes.idx_f.timeseries, corners.C0_f, scen.Power_TS)
@@ -172,7 +181,8 @@ function filter_all_profile_data(
         Data_price_profile = Data_price_profile_filtered,
         Data_CO2_profile_reg = Data_CO2_profile_reg_filtered,
         Data_CO2_profile_em = Data_CO2_profile_em_filtered,
-        Data_rencrit_profile = Data_rencrit_profile_filtered
+        Data_rencrit_profile = Data_rencrit_profile_filtered,
+        Data_lcia_profile = Data_lcia_profile_filtered
     )
 end
 
@@ -223,6 +233,7 @@ function build_profiles_opt_data(
     Data_CO2_profile_reg = profile_data_filtered.Data_CO2_profile_reg
     Data_CO2_profile_em = profile_data_filtered.Data_CO2_profile_em
     Data_rencrit_profile = profile_data_filtered.Data_rencrit_profile
+    Data_lcia_profile = profile_data_filtered.Data_lcia_profile
 
     Time = scen.Time
     T = scen.T
@@ -266,12 +277,21 @@ function build_profiles_opt_data(
         end
     end
 
+    #--------------------------------------------------------
+    #Hourly lcia profiles (all impact categories instead of just CO2)
+    Lcia_profile = zeros(0,T)
+    for i = 1:0, t = 1:T
+        Lcia_profile[i, t] = Data_lcia_profile[corners.L0_lcia_profile + Time[t], corners.C0_lcia_profile + i]
+    end
+
+
     return profiles_opt_data(
         Flux_Profile,
         Price_Profile,
         CO2_profile_regulated,
         CO2_profile_emitted,
-        Renewable_criterion_profile
+        Renewable_criterion_profile,
+        Lcia_profile
     )
 end
 

@@ -10,7 +10,8 @@ SheetTags = (
     co2_emitted = "CO2_emitted",
     rencrit = "Renewable_criterion",
     lcia_hourly = "Lcia_hourly",
-    lciadata = "LCIA_Results"
+    lciadata = "Lcia_results",
+    lciafilters = "Lcia_filters"
 )
 
 #****************Terms used to locate the data within the excel sheets*****************
@@ -44,11 +45,16 @@ key_terms_profiles = Dict(
     "subsets" => "Subsets",
     "corner" => "Index",
     "timeseries" => "Profile time series",
-    "countmethod" => "Counting_method"
+    "countmethod" => "Counting_method",
+    "impactcategoriesprofile" => "Impact_Category"
 )
 
 key_terms_lcia = Dict(
     "corner" => "Technology",
+)
+
+key_terms_lcia_filters = Dict(
+    "corner" => "Filter_categories",
 )
 
 #************************** Scenario names ****************************
@@ -101,20 +107,34 @@ ScenarioTags = (
 LCIAColumnNames = (
     technology = "Technology",
     phase = "Phase",
-    functional_unit = "Functional Unit",
-    data_base_type = "Ecoinvent Database Type",
-    method_family = "Method Family",
-    impact_categories = "Impact_Category",
-    score = "Score",
-    unit = "Impact_Unit"
+    functional_unit = "Functional unit",
+    method_family = "Method family",
+    impact_categories = "Impact category",
+    impact_categories_description = "Impact category description",
+    score = "Value",
+    unit = "Impact category unit",
+    iam_model = "IAM Model",
+    iam_scenario = "Scenario",
+    year_lcia = "Year"
+)
 
+#**************************** LCIA filters column names ***********************
+
+LCIAFilterColumnNames = (
+    technology_filter = "Technology",
+    phase_filter = "Phase",
+    method_family_filter = "Method family",
+    impact_categories_filter = "Impact category",
+    iam_model_filter = "IAM Model",
+    iam_scenario = "Scenario",
+    year_lcia_filter = "Year"
 )
 
 #**************************** LCIA phase map *************************************
 
 lcia_phase_map = Dict(
-    "Infra"    => :inf,
-    "Use"      => :use,
+    "Construction"    => :inf, # inf stand for "infrastructure"
+    "Operation"      => :use,
     "Disposal" => :disp,
 )
 

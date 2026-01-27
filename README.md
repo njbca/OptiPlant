@@ -33,24 +33,9 @@ In the `Run.jl`file change the `datafoldername` and `techno_eco_filename` to you
 
 Run and check your results in the results folder. 
 
-More detailed explanations are given in the documentation: https://njbca.github.io/OptiPlant/dev/usage/ 
+More detailed explanations are given in the documentation: https://njbca.github.io/OptiPlant/dev/userguide/ 
 
-## Use the data analysis dashboards
+## Results analysis
 
-To use the data analysis dashboards and analyze the results write in the powershell terminal:
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-streamlit run src/PlotGraphs/Dashboard_Scenarios.py
-```
-
-Otherwise you can also use the result excel file coming with the package (`Results_general.xlsm`) or use your own analysis method.
-
-
-#Test lines
-using Pkg
-Pkg.add("OptiPlantPtX")
-julia --project=. setup_python.jl  # install Python packages
-using OptiPlantPtX
+A data analysis dashboard is currently under development and will be released soon (a provisory working version is available on the DevDashboards branch).
+In the meantime you can use the result excel file coming with the package (`Results_general.xlsm`) or use your own analysis method.

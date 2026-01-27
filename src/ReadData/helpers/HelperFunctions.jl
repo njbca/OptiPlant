@@ -300,11 +300,6 @@ is added as the first column, representing the row indices.
 # Returns
 - `DataFrame`: A `DataFrame` with columns `:time` followed by profile columns with names like `prefix_1, prefix_2, ...`.
 
-# Example
-```julia
-mat = rand(3, 5)  # 3 profiles, 5 time steps
-df = matrix_to_dataframe(mat, "Flux")
-
 """
 
 
