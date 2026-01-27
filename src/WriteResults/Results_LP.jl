@@ -226,7 +226,7 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
       :sold, :fuelsold_t, :prodcost, :capacity, :el_cons, :costs, :cost_unit, :load_average,
       :FLH, :prodcost_fuel_kg, :prodcost_fuel_GJ, :prodcost_fuel_MWh,
       :prodcost_perunit, :CO2_proc_reg_t, :CO2_regulated,
-      :CO2_perunitfuel_reg, :CO2_totalperGJ_reg, :av_elec_cost
+      :CO2_regulated_per_unit, :CO2_regulated_per_GJfuel, :av_elec_cost
   )
       Result[name] = zeros(U)
   end
@@ -354,8 +354,8 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
   total_fuel_energy = sum(Result[:production][i] for i in sd.MainFuel) * Fuel_energy_content_list[scd.Fuel]
 
   for u in 1:U
-      Result[:CO2_perunitfuel_reg][u] = Result[:CO2_regulated][u] / total_fuel_energy
-      Result[:CO2_totalperGJ_reg][u] = Result[:CO2_regulated][u] / (Result[:production][u] * Fuel_energy_content_list[scd.Fuel])
+      Result[:CO2_regulated_per_GJfuel][u] = Result[:CO2_regulated][u] / total_fuel_energy
+      Result[:CO2_regulated_per_unit][u] = Result[:CO2_regulated][u] / Result[:production][u]
   end
 
   av_elec_cost_1 = 1e3 * sum(Result[:prodcost_perunit][u] * Result[:production][u] for u in sd.PU) /
@@ -381,7 +381,7 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
     Result[:TotCO2tax_up], Result[:TotCO2tax_op], Result[:fuelprice], Result[:sold], Result[:cost_unit],
     Result[:production], Result[:unit_production], Result[:el_cons], Result[:load_average], Result[:FLH],
     Result[:prodcost_fuel_kg], Result[:prodcost_fuel_GJ], Result[:prodcost_fuel_MWh], Result[:av_elec_cost],
-    Result[:CO2_regulated], Result[:CO2_totalperGJ_reg]
+    Result[:CO2_regulated], Result[:CO2_regulated_per_unit], Result[:CO2_regulated_per_GJfuel]
   ]
   
   Result_name = [
@@ -399,7 +399,7 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
       "Load average", "Full load hours",
       "Production cost fuel ($results_currency/$unit_prod_kg)", 
       "Production cost fuel ($results_currency/$unit_tot_energyJ)", "Production cost fuel ($results_currency/$unit_tot_energyWh)", "Av electricity cost(Euros/MWh)",
-      "Regulated CO2e per unit (kgCO2e/GJfuel)", "Regulated CO2e all system (kg CO2e/GJfuel)"
+      "Regulated CO2e total (kgCO2e)", "Regulated CO2e per unit (kgCO2e/output)", "Regulated CO2e all system (kg CO2e/GJfuel)"
   ]
   
   if write_lca_results && !isnothing(opt_data.dat_lcia)
@@ -454,6 +454,7 @@ function add_lcia_results!(Result::Dict{Symbol,Any}, opt_data, opt_results, u::I
 
   # Fill LCA results for unit u
   for (cat_sym, impacts) in scores
+
     inf_val  = u <= length(impacts.inf)  ? impacts.inf[u]  * Capacity[u] : 0.0
     use_val  = u <= length(impacts.use)  ? sum(impacts.use[u] * X[u,t] for t = 1:T) : 0.0
     disp_val = u <= length(impacts.disp) ? impacts.disp[u] * Capacity[u] : 0.0
@@ -464,6 +465,8 @@ function add_lcia_results!(Result::Dict{Symbol,Any}, opt_data, opt_results, u::I
     Result[Symbol(string(cat_sym) * "_disp")][u]  = disp_val
     Result[Symbol(string(cat_sym) * "_total")][u] = total_val
   end
+      
+  #hourly_val = sum(pd.Lcia_profile[i,t] *Bought[sd.Grid_buy[u],t] for t=1:T)
   #=
 
   Result[:climate_change_with_grid][u] = 

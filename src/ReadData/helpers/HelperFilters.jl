@@ -264,8 +264,6 @@ function filter_lcia_auto(Data_lcia, indexes,
     Lcia_tags_list
 )
 
-    println("Year_data $Year_data")
-    println("Lcia_year_to_keep $Lcia_year_to_keep")
     # First data row (after header)    
     data_start_row = corners.L0_lcia + 1  
 
@@ -307,8 +305,6 @@ function filter_lcia_auto(Data_lcia, indexes,
     else
         data_lcia_filtered = filter_matrix_by_custom_include(data_lcia_filtered, Technology_to_keep, C_technology, data_start_row) 
     end
-
-    println("Data_lcia_filtered 7: $data_lcia_filtered")
      
     return data_lcia_filtered
 end

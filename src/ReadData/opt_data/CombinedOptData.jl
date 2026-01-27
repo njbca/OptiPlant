@@ -74,12 +74,19 @@ function build_optimization_data(
     U
 )
 
+    if ! isnothing(Data_lcia_filtered)
+        dat_lcia = build_lcia_opt_data(Data_lcia_filtered, lcia_data, Data_units_filtered, techno_scen_data, U)
+    else
+        dat_lcia = nothing
+    end
+
     dat_sub = build_subsets_opt_data(
         Data_units_filtered,
         techno_scen_data,
         profile_data,
         profile_data_filtered,
-        U
+        U,
+        dat_lcia
     )
 
     dat_t = build_technoeco_opt_data(Data_units_filtered, techno_scen_data)
@@ -96,12 +103,6 @@ function build_optimization_data(
         dat_sub,
         scen
     )
-
-    if ! isnothing(Data_lcia_filtered)
-        dat_lcia = build_lcia_opt_data(Data_lcia_filtered, lcia_data, Data_units_filtered, techno_scen_data, U)
-    else
-        dat_lcia = nothing
-    end
 
     return dat_sub, dat_t, dat_t_sources, dat_p, dat_lcia
 end

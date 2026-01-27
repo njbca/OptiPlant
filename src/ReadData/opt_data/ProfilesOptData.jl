@@ -279,11 +279,10 @@ function build_profiles_opt_data(
 
     #--------------------------------------------------------
     #Hourly lcia profiles (all impact categories instead of just CO2)
-    Lcia_profile = zeros(0,T)
-    for i = 1:0, t = 1:T
+    Lcia_profile = zeros(dat_sub.nSubLcia_profile,T)
+    for i = 1:dat_sub.nSubLcia_profile, t = 1:T
         Lcia_profile[i, t] = Data_lcia_profile[corners.L0_lcia_profile + Time[t], corners.C0_lcia_profile + i]
     end
-
 
     return profiles_opt_data(
         Flux_Profile,

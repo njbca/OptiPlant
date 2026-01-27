@@ -75,13 +75,10 @@ Data_lcia_filters = lcia_data.Data_lcia_filters
 Year_data = [scen.Year]
 # Get the list of lcia tags from the techno-economic file
 Lcia_tags_list = Data_units[techno_scen_data.corners.L1:end, techno_scen_data.indexes.idx_t.lcia_tag[2]]
-println("Lcia_tags_list: $Lcia_tags_list")
 
 # Get the list of filtering parameters from the excel file
 Lciafilters_parameters_name = Data_lcia_filters[lcia_data.indexes.idx_lcia_filters.corner[1], 
                                      lcia_data.indexes.idx_lcia_filters.corner[2]:end]
-
-println("Lciafilterparameters:$Lciafilters_parameters_name")
 
 # Get lcia parameters from the excel table
 get_lcia_filters_param(param; as_string=true, warn=false) = get_data_from_table(
@@ -136,7 +133,7 @@ function build_lcia_opt_data(Data_lcia_filtered, lcia_data, Data_units_filtered,
     # Helper to pull a column from the table
     get_lcia_param(param; as_string=true, warn=false) = get_data_from_table(
         Data_lcia_filtered, param, Lcia_parameters_name, 
-        lcia_data.corners.L0_lcia, lcia_data.corners.C0_lcia; offset=-1,
+        lcia_data.corners.L0_lcia+1, lcia_data.corners.C0_lcia; offset=-1,
         as_string=as_string, warn=warn
     )
 

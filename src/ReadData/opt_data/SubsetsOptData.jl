@@ -101,7 +101,8 @@ function build_subsets_opt_data(
     techno_scen_data,
     profile_data,
     profile_data_filtered,
-    U
+    U,
+    dat_lcia
 )
     # Unpack data
     Data_price_profile = profile_data_filtered.Data_price_profile
@@ -117,7 +118,6 @@ function build_subsets_opt_data(
     idx_CO2_reg = profile_data.indexes.idx_CO2_reg
     idx_CO2_em = profile_data.indexes.idx_CO2_em
     idx_lcia_profile = profile_data.indexes.idx_lcia_profile
-    
 
     # === Extract subsets from techno-economic and profile data ===
     Subsets, nSubsets = extract_subset_technoeco(Data_units, L1, idx_t.subsets)
@@ -132,6 +132,27 @@ function build_subsets_opt_data(
 
     Subsets_lcia_profile, nSubLcia_profile = extract_subset_profiles(Data_lcia_profile, idx_lcia_profile.subsets)
 
+    # === Impact categories profiles ===
+
+    if !isnothing(dat_lcia)
+        impact_categories_symbol = dat_lcia.impact_categories_symbol
+
+        # Small function to sanitize impact categories names
+        sanitize(s) = Symbol(replace(lowercase(string(s)), r"[^a-z0-9]+" => "_"))
+
+        nImpactCat = length(impact_categories_symbol)
+        Impact_categories_p = round.(Int, zeros(nImpactCat))
+
+        for i = 1:nImpactCat, j = 1:nSubLcia_profile
+            if sanitize(Subsets_lcia_profile[j]) == impact_categories_symbol[i]
+                Impact_categories_p[i] = j
+            end
+        end
+    else
+        Impact_categories_p = 0 ; nImpactCat = 0
+
+    end
+   
     # === Reactant used to produce the main product (chemical reactions) ===
     Reactants = round.(Int, zeros(nSubReac))
     for i = 1:nSubsets, j = 1:nSubReac
@@ -163,20 +184,6 @@ function build_subsets_opt_data(
             unit_names = Data_units[L1:end, idx_t.units[2]]
             @error("No profile available for $(unit_names[RPU[u]]) in the selected location: check that the techno-econmic and profiles subsets are matching or exclude the missing unit from the optimization")
         end
-    end
-
-    # === Impact categories profiles ===
-
-    # Small function to sanitize impact categories names
-    sanitize(s) = replace(lowercase(string(s)), r"[^a-z0-9]+" => "_")
-    nImpactCat = length(Impact_categories)
-    Impact_categories_p = round.(Int, zeros(nImpactCat))
-
-    for i = 1:nImpactCat, j = 1:nSubLcia_profile
-        if sanitize(Subsets_lcia_profile[j] == sanitize(Impact_categories[i]))
-            Impact_categories_p[i] = j
-        end
-        println("Impact categories p: $Impact_categories_p")
     end
 
     # === Public grid and district heating ===
