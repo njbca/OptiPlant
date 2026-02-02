@@ -7,7 +7,11 @@ function filter_profile(data, index, C0, selection_type)
         return data
     else
         all_values = data[index[1], index[2] + 1:end]
-        selected = findall(x -> x == selection_type || x == "All", all_values)
+
+        # Gives the possibility to filter a list insead of just one term
+        allowed = selection_type isa AbstractVector ? Set(selection_type) : Set([selection_type])
+
+        selected = findall(x -> (x in allowed) || x == "All", all_values)
         not_selected = setdiff(1:length(all_values), selected)
         return data[:, setdiff(1:size(data, 2), not_selected .+ C0)]
     end

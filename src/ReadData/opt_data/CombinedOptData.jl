@@ -85,8 +85,7 @@ function build_optimization_data(
         techno_scen_data,
         profile_data,
         profile_data_filtered,
-        U,
-        dat_lcia
+        U
     )
 
     dat_t = build_technoeco_opt_data(Data_units_filtered, techno_scen_data)

@@ -93,10 +93,6 @@ function run_optimization_scenarios(
       Data_units_filtered, Data_sources_filtered, Name_selected_units, U = filter_units(techno_scen_data, scen_data)
       apply_scenario_changes!(Data_units_filtered, Name_selected_units, techno_scen_data, scen_data)
 
-      # Get profile data
-      profile_data = load_and_locate_profile_data(wb_profile, Available_sheets_profiles, key_terms_profiles)
-      profile_data_filtered = filter_all_profile_data(profile_data, scen_data)
-
       #Get lcia data if it exists
       # Initialize LCIA-related variables to safe defaults in case no LCIA is provided
       lcia_data = nothing
@@ -105,6 +101,10 @@ function run_optimization_scenarios(
         lcia_data = load_and_locate_lcia_data(wb_lcia, Available_sheets_lcia, key_terms_lcia)
         Data_lcia_filtered = filter_lcia_data(Data_units_filtered, techno_scen_data, lcia_data, scen_data)
       end
+
+      # Get profile data
+      profile_data = load_and_locate_profile_data(wb_profile, Available_sheets_profiles, key_terms_profiles)
+      profile_data_filtered = filter_all_profile_data(profile_data, scen_data, lcia_data)
 
       # Build optimization input data
       dat_sub, dat_t, dat_t_sources, dat_p, dat_lcia = build_optimization_data(
@@ -140,11 +140,20 @@ function run_optimization_scenarios(
       if model == "LP"
         opt_results = Solve_OptiPlant_LP(opt_data, solver)
         if scen_data.Write_flows || scen_data.Write_sold_products || scen_data.Write_fuel_cost
-          write_hourly_results_LP(opt_data, opt_results, N_scen, resultsfolder, results_currency_multiplier,)
+          write_hourly_results_LP(opt_data, opt_results, N_scen, resultsfolder, results_currency_multiplier)
         end
         # Write all results and LCIA/LCA results only if LCIA data is available
-        write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder, results_currency, results_currency_multiplier, 
-          default_results_cost_scale, default_results_capacity_units, default_results_production_units; write_lca_results = !isnothing(opt_data.dat_lcia))
+        write_main_results_LP(opt_data,
+                              opt_results,
+                              N_scen,
+                              resultsfolder,
+                              results_currency,
+                              results_currency_multiplier, 
+                              default_results_cost_scale,
+                              default_results_capacity_units,
+                              default_results_production_units;
+                              write_lca_results = !isnothing(opt_data.dat_lcia),
+                              remove_lcia_phases = Symbol[:inf, :use, :disp, :hourly])
       
       elseif model == "LP_2obj" 
         generate_adaptive_pareto_curve(opt_data, solver, N_scen, resultsfolder,

@@ -104,6 +104,7 @@ function scale_cost_units(
     end
 end
 
+#=
 function simplify_unit_fraction(unit_str::String)
     prefixes = Dict("" => 0, "k" => 3, "M" => 6, "G" => 9)
 
@@ -139,3 +140,4 @@ function simplify_unit_fraction(unit_str::String)
 
     return "$(new_num_p)$(num_base)/$(new_den_p)$(den_base)$(den_label)"
 end
+=#

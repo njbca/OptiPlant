@@ -149,7 +149,8 @@ A named tuple containing the filtered profile arrays:
 
 function filter_all_profile_data(
     profile_data,  # output from load_and_locate_profile_data
-    scen           # scenario object
+    scen,
+    lcia_data           # scenario object
 )
     # Unpack data
     Data_flux_profile = profile_data.Data_flux_profile
@@ -175,6 +176,26 @@ function filter_all_profile_data(
     Data_CO2_profile_reg_filtered = filter_profile(Data_CO2_profile_reg_filtered, indexes.idx_CO2_reg.countmethod, corners.C0_CO2_reg, scen.CO2_count_method_reg)
     Data_CO2_profile_em_filtered = filter_profile(Data_CO2_profile_em_filtered, indexes.idx_CO2_em.countmethod, corners.C0_CO2_em, scen.CO2_count_method_em)
     Data_rencrit_profile_filtered = filter_profile(Data_rencrit_profile_filtered, indexes.idx_rencrit.subsets, corners.C0_rencrit, scen.Current_rencrit)
+
+    # === Filter profile lcia categories ===
+
+    if ! isnothing(lcia_data)
+        # Get the list of filtering parameters from the excel file
+        Lciafilters_parameters_name = lcia_data.Data_lcia_filters[lcia_data.indexes.idx_lcia_filters.corner[1], 
+                                     lcia_data.indexes.idx_lcia_filters.corner[2]:end]
+        # Get lcia parameters from the excel table
+        get_lcia_filters_param(param; as_string=true, warn=false) = get_data_from_table(
+        lcia_data.Data_lcia_filters, param, Lciafilters_parameters_name, 
+        lcia_data.corners.L0_lcia_filters+1, lcia_data.corners.C0_lcia_filters; offset=-1,
+        as_string=as_string, warn=warn
+        )
+
+        Impact_categories_to_keep = get_lcia_filters_param(LCIAFilterColumnNames.impact_categories_filter; warn=true)
+
+        if Impact_categories_to_keep[1] != "Keep_all"
+            Data_lcia_profile_filtered = filter_profile(Data_lcia_profile, indexes.idx_lcia_profile.impactcategoriesprofile, corners.C0_lcia_profile, Impact_categories_to_keep)
+        end
+    end
 
     return (
         Data_flux_profile = Data_flux_profile_filtered,
@@ -235,6 +256,8 @@ function build_profiles_opt_data(
     Data_rencrit_profile = profile_data_filtered.Data_rencrit_profile
     Data_lcia_profile = profile_data_filtered.Data_lcia_profile
 
+    Impact_categories_list_p = dat_sub.Impact_categories_list_p
+
     Time = scen.Time
     T = scen.T
 
@@ -278,10 +301,27 @@ function build_profiles_opt_data(
     end
 
     #--------------------------------------------------------
-    #Hourly lcia profiles (all impact categories instead of just CO2)
-    Lcia_profile = zeros(dat_sub.nSubLcia_profile,T)
-    for i = 1:dat_sub.nSubLcia_profile, t = 1:T
-        Lcia_profile[i, t] = Data_lcia_profile[corners.L0_lcia_profile + Time[t], corners.C0_lcia_profile + i]
+    #Hourly grid impact lcia profiles (all impact categories instead of just CO2)
+    
+    if !isnothing(Impact_categories_list_p)
+        sanitize(s) = Symbol(replace(lowercase(string(s)), r"[^a-z0-9]+" => "_"))
+
+        Lcia_profile = Dict{Symbol, Matrix{Float64}}()
+
+        for r in eachindex(Impact_categories_list_p)
+            cat = sanitize(Impact_categories_list_p[r])
+
+            # Initialize once per category
+            if !haskey(Lcia_profile, cat)
+                Lcia_profile[cat] = zeros(dat_sub.nSubLcia_profile,T)
+            end
+
+            # Fill the hourly profile
+            for i=1:dat_sub.nSubLcia_profile, t in 1:T
+                Lcia_profile[cat][i,t] = Data_lcia_profile[corners.L0_lcia_profile + Time[t],
+                                    corners.C0_lcia_profile + r]
+            end
+        end
     end
 
     return profiles_opt_data(

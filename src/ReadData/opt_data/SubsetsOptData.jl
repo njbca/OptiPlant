@@ -51,7 +51,8 @@ struct subsets_opt_data
     Grid_CO2_regulated_p; nGCO2reg
 
     # Subsets related to lcia hourly data
-    Impact_categories_p ; nImpactCat
+    Grid_lcia_p ; nGLcia
+    Impact_categories_list_p; nImpactCat
 
     # Number of subsets per profile type
     nSubf #Flux
@@ -101,8 +102,7 @@ function build_subsets_opt_data(
     techno_scen_data,
     profile_data,
     profile_data_filtered,
-    U,
-    dat_lcia
+    U
 )
     # Unpack data
     Data_price_profile = profile_data_filtered.Data_price_profile
@@ -131,27 +131,7 @@ function build_subsets_opt_data(
     Subsets_CO2_em, nSubC_em = extract_subset_profiles(Data_CO2_profile_em, idx_CO2_em.subsets)
 
     Subsets_lcia_profile, nSubLcia_profile = extract_subset_profiles(Data_lcia_profile, idx_lcia_profile.subsets)
-
-    # === Impact categories profiles ===
-
-    if !isnothing(dat_lcia)
-        impact_categories_symbol = dat_lcia.impact_categories_symbol
-
-        # Small function to sanitize impact categories names
-        sanitize(s) = Symbol(replace(lowercase(string(s)), r"[^a-z0-9]+" => "_"))
-
-        nImpactCat = length(impact_categories_symbol)
-        Impact_categories_p = round.(Int, zeros(nImpactCat))
-
-        for i = 1:nImpactCat, j = 1:nSubLcia_profile
-            if sanitize(Subsets_lcia_profile[j]) == impact_categories_symbol[i]
-                Impact_categories_p[i] = j
-            end
-        end
-    else
-        Impact_categories_p = 0 ; nImpactCat = 0
-
-    end
+    Impact_categories_list_p, nImpactCat = extract_subset_profiles(Data_lcia_profile, idx_lcia_profile.impactcategoriesprofile)
    
     # === Reactant used to produce the main product (chemical reactions) ===
     Reactants = round.(Int, zeros(nSubReac))
@@ -232,6 +212,9 @@ function build_subsets_opt_data(
     Grid_CO2_emitted_p, nGCO2em = extract_from_subsets(Subsets_CO2_em, SubsetTags.grid_em)
     Grid_CO2_regulated_p, nGCO2reg = extract_from_subsets(Subsets_CO2_reg, SubsetTags.grid_reg)
 
+    # === Subsets related to grid lcia profiles ===
+    Grid_lcia_p, nGLcia = extract_from_subsets(Subsets_lcia_profile, SubsetTags.grid_lcia)
+
     return subsets_opt_data(
         Reactants, R, MainFuel, PU, RPU, nRPU,
         Grid_in, Heat_in, Grid_out, Heat_out,
@@ -246,7 +229,7 @@ function build_subsets_opt_data(
         Grid_excess, nGe, Grid_deficit, nGd,
         Heat_excess, nHe, Heat_deficit, nHd,
         Grid_CO2_emitted_p, nGCO2em, Grid_CO2_regulated_p, nGCO2reg,
-        Impact_categories_p , nImpactCat,
+        Grid_lcia_p, nGLcia, Impact_categories_list_p, nImpactCat,
         nSubf, nSubp, nSubC_em, nSubC_reg, nSubLcia_profile
     )
 end

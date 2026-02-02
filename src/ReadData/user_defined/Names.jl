@@ -46,7 +46,7 @@ key_terms_profiles = Dict(
     "corner" => "Index",
     "timeseries" => "Profile time series",
     "countmethod" => "Counting_method",
-    "impactcategoriesprofile" => "Impact_Category"
+    "impactcategoriesprofile" => "Impact_categories"
 )
 
 key_terms_lcia = Dict(
@@ -219,7 +219,12 @@ SubsetTags = (
 
     # Grid CO2 profiles
     grid_em             = "Grid_CO2_emitted",
-    grid_reg            = "Grid_CO2_regulated"
+    grid_reg            = "Grid_CO2_regulated",
+
+    # Grid Lcia profiles
+    grid_lcia           = "Grid_lcia"
+
+
 )
 
 

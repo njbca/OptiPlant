@@ -66,53 +66,51 @@ function filter_lcia_data(
     scen
 )
 
-# Unpack data
+    # Unpack data
 
-Data_lcia = lcia_data.Data_lcia
-Data_lcia_filters = lcia_data.Data_lcia_filters
+    Data_lcia = lcia_data.Data_lcia
+    Data_lcia_filters = lcia_data.Data_lcia_filters
 
-# Get the year data from the techno-economic file
-Year_data = [scen.Year]
-# Get the list of lcia tags from the techno-economic file
-Lcia_tags_list = Data_units[techno_scen_data.corners.L1:end, techno_scen_data.indexes.idx_t.lcia_tag[2]]
+    # Get the year data from the techno-economic file
+    Year_data = [scen.Year]
+    # Get the list of lcia tags from the techno-economic file
+    Lcia_tags_list = Data_units[techno_scen_data.corners.L1:end, techno_scen_data.indexes.idx_t.lcia_tag[2]]
 
-# Get the list of filtering parameters from the excel file
-Lciafilters_parameters_name = Data_lcia_filters[lcia_data.indexes.idx_lcia_filters.corner[1], 
-                                     lcia_data.indexes.idx_lcia_filters.corner[2]:end]
+    # Get the list of filtering parameters from the excel file
+    Lciafilters_parameters_name = Data_lcia_filters[lcia_data.indexes.idx_lcia_filters.corner[1], 
+                                        lcia_data.indexes.idx_lcia_filters.corner[2]:end]
 
-# Get lcia parameters from the excel table
-get_lcia_filters_param(param; as_string=true, warn=false) = get_data_from_table(
-    Data_lcia_filters, param, Lciafilters_parameters_name, 
-    lcia_data.corners.L0_lcia_filters+1, lcia_data.corners.C0_lcia_filters; offset=-1,
-    as_string=as_string, warn=warn
+    # Get lcia parameters from the excel table
+    get_lcia_filters_param(param; as_string=true, warn=false) = get_data_from_table(
+        Data_lcia_filters, param, Lciafilters_parameters_name, 
+        lcia_data.corners.L0_lcia_filters+1, lcia_data.corners.C0_lcia_filters; offset=-1,
+        as_string=as_string, warn=warn
+        )
+
+    names = LCIAFilterColumnNames
+
+    Technology_to_keep = get_lcia_filters_param(names.technology_filter; warn=true)
+    Phase_to_keep = get_lcia_filters_param(names.phase_filter; warn=true)
+    Method_to_keep = get_lcia_filters_param(names.method_family_filter; warn=true)
+    Impact_categories_to_keep = get_lcia_filters_param(names.impact_categories_filter; warn=true)
+    Iam_model_to_keep = get_lcia_filters_param(names.iam_model_filter; warn=true)
+    Iam_scenario_to_keep = get_lcia_filters_param(names.iam_scenario; warn=true)
+    Lcia_year_to_keep = get_lcia_filters_param(names.year_lcia_filter; as_string=false, warn=true)
+
+    Data_lcia_filtered = filter_lcia_auto(Data_lcia, lcia_data.indexes,
+        lcia_data.corners;
+        Technology_to_keep = Technology_to_keep,
+        Phase_to_keep = Phase_to_keep,
+        Method_to_keep = Method_to_keep,
+        Impact_categories_to_keep = Impact_categories_to_keep,
+        Iam_model_to_keep = Iam_model_to_keep,
+        Iam_scenario_to_keep = Iam_scenario_to_keep,
+        Lcia_year_to_keep = Lcia_year_to_keep,
+        Year_data = Year_data,
+        Lcia_tags_list = Lcia_tags_list
     )
 
-names = LCIAFilterColumnNames
-
-Technology_to_keep = get_lcia_filters_param(names.technology_filter; warn=true)
-Phase_to_keep = get_lcia_filters_param(names.phase_filter; warn=true)
-Method_to_keep = get_lcia_filters_param(names.method_family_filter; warn=true)
-Impact_categories_to_keep = get_lcia_filters_param(names.impact_categories_filter; warn=true)
-Iam_model_to_keep = get_lcia_filters_param(names.iam_model_filter; warn=true)
-Iam_scenario_to_keep = get_lcia_filters_param(names.iam_scenario; warn=true)
-Lcia_year_to_keep = get_lcia_filters_param(names.year_lcia_filter; as_string=false, warn=true)
-
-Data_lcia_filtered = filter_lcia_auto(Data_lcia, lcia_data.indexes,
-    lcia_data.corners;
-    Technology_to_keep = Technology_to_keep,
-    Phase_to_keep = Phase_to_keep,
-    Method_to_keep = Method_to_keep,
-    Impact_categories_to_keep = Impact_categories_to_keep,
-    Iam_model_to_keep = Iam_model_to_keep,
-    Iam_scenario_to_keep = Iam_scenario_to_keep,
-    Lcia_year_to_keep = Lcia_year_to_keep,
-    Year_data = Year_data,
-    Lcia_tags_list = Lcia_tags_list
-)
-
-#Data_lcia_filtered = filter_matrix(Data_lcia,4,"ecoinvent-cutoff-3.11")
-
-return Data_lcia_filtered
+    return Data_lcia_filtered
 
 end
 
