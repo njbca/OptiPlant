@@ -173,7 +173,8 @@ TechnoEcoColumnNames = (
     co2_inf_reg = "CO2e infrastructure regulated (kg CO2e/Capacity/y)",     # CO2 of building infrastructure used for regulations
     co2_proc_fixed_reg = "CO2e process regulated (kg CO2e/output)",            # Constant process emissions used for regulation
     
-    annuity_factor = "Annuity factor"                            # Annuity_factor
+    annuity_factor = "Annuity factor",                            # Annuity_factor
+    lifetime = "Lifetime (years)"                               # Lifetime
 )
 
 #************************* Subsets names **********************

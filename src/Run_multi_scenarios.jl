@@ -37,7 +37,8 @@ function run_optimization_scenarios(
     default_results_capacity_units = "t or MW or MWh",
     default_results_production_units = "kt or GWh",
     save_input_technoeco::Bool = true,
-    save_input_profiles::Bool = true   
+    save_input_profiles::Bool = true,
+    save_input_lcia::Bool = true   
 )
 
     N_scen_total = length(scenarios_to_run)
@@ -133,7 +134,7 @@ function run_optimization_scenarios(
 
       # Save input data if needed
       if save_input_profiles || save_input_technoeco
-        write_input_data(opt_data, save_input_technoeco, save_input_profiles, resultsfolder, N_scen)
+        write_input_data(opt_data, save_input_technoeco, save_input_profiles, save_input_lcia, resultsfolder, N_scen)
       end
 
       # Solve the model and write the results as csv

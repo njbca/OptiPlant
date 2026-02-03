@@ -119,8 +119,10 @@ end
 # Sanitize name into a Symbol
 sanitize(s) = Symbol(replace(lowercase(string(s)), r"[^a-z0-9]+" => "_"))
 
-function build_lcia_opt_data(Data_lcia_filtered, lcia_data, Data_units_filtered, techno_scen_data, U)
+function build_lcia_opt_data(Data_lcia_filtered, lcia_data, Data_units_filtered, techno_scen_data, dat_t, U)
+
     Data_lcia = lcia_data.Data_lcia
+    Lifetime = dat_t.Lifetime
 
     # Extract headers and tags
     Lcia_parameters_name = Data_lcia[lcia_data.indexes.idx_lcia.corner[1], 
@@ -142,6 +144,7 @@ function build_lcia_opt_data(Data_lcia_filtered, lcia_data, Data_units_filtered,
     Score            = get_lcia_param(names.score; as_string=false, warn=true)
 
     lcia_scores = Dict{Symbol, ImpactPhases}()
+    missing_lifetime_tech = Set{String}()
 
     for r in eachindex(Impact_categories)
         cat   = sanitize(Impact_categories[r])
@@ -155,6 +158,21 @@ function build_lcia_opt_data(Data_lcia_filtered, lcia_data, Data_units_filtered,
             lcia_scores[cat].inf  = fill(0.0, U)
             lcia_scores[cat].use  = fill(0.0, U)
             lcia_scores[cat].disp = fill(0.0, U)
+        end
+
+        score = Score[r]
+
+        #Divide infrastructure score by lifetime
+        if phase == :inf
+            if Lifetime[u] == 0
+                if !(Technology[r] in missing_lifetime_tech)
+                    @warn("Unit $(Technology[r])  has no lifetime associated: construction impact score is set to 0")
+                    push!(missing_lifetime_tech, Technology[r])
+                end
+                score = 0.0
+            else
+                score /= Lifetime[u]
+            end
         end
 
         getfield(lcia_scores[cat], phase)[u] = Score[r]

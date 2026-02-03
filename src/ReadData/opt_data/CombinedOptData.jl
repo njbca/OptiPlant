@@ -74,12 +74,6 @@ function build_optimization_data(
     U
 )
 
-    if ! isnothing(Data_lcia_filtered)
-        dat_lcia = build_lcia_opt_data(Data_lcia_filtered, lcia_data, Data_units_filtered, techno_scen_data, U)
-    else
-        dat_lcia = nothing
-    end
-
     dat_sub = build_subsets_opt_data(
         Data_units_filtered,
         techno_scen_data,
@@ -102,6 +96,14 @@ function build_optimization_data(
         dat_sub,
         scen
     )
+
+    if ! isnothing(Data_lcia_filtered)
+        dat_lcia = build_lcia_opt_data(Data_lcia_filtered, lcia_data, Data_units_filtered, techno_scen_data, dat_t, U)
+    else
+        dat_lcia = nothing
+    end
+
+    println("dat_lcia: $dat_lcia")
 
     return dat_sub, dat_t, dat_t_sources, dat_p, dat_lcia
 end
@@ -143,7 +145,7 @@ Files are organized in a dedicated folder within the results directory.
 """
 
 
-function write_input_data(opt_data, save_input_technoeco::Bool, save_input_profiles::Bool, resultsfolder::String, Nscen::Int64)
+function write_input_data(opt_data, save_input_technoeco::Bool, save_input_profiles::Bool, save_input_lcia::Bool, resultsfolder::String, Nscen::Int64)
 
     #Unpack required optimization data
     U = opt_data.U
@@ -153,6 +155,7 @@ function write_input_data(opt_data, save_input_technoeco::Bool, save_input_profi
     pd = opt_data.dat_p #Profile data
     scd = opt_data.dat_scen #Scenario data
     sources_data = opt_data.dat_t_sources #Techno-eco sources data
+    lcia = opt_data.dat_lcia
 
     # Create the folder for input data if it does not exists
     data_used_folder = joinpath(resultsfolder,scd.Result_folder_name,"Data used","Scenario_$Nscen")
@@ -165,6 +168,7 @@ function write_input_data(opt_data, save_input_technoeco::Bool, save_input_profi
         CSV.write(joinpath(data_used_folder , "Price_Profiles.csv"), matrix_to_dataframe(pd.Price_Profile, "Price"))
         CSV.write(joinpath(data_used_folder , "CO2_profiles_regulated.csv"), matrix_to_dataframe(pd.CO2_profile_regulated, "CO2_reg"))
         CSV.write(joinpath(data_used_folder , "CO2_profiles_emitted.csv"), matrix_to_dataframe(pd.CO2_profile_emitted,"CO2_em"))
+        #CSV.write(joinpath(data_used_folder, "Hourly_lcia_profiles.csv"), matrix_to_dataframe(pd.Lcia_profile,"Impact"))
 
         # For 1D vector, use a simpler DataFrame
         df_renewable = DataFrame(t = 1:length(pd.Renewable_criterion_profile),
@@ -189,7 +193,7 @@ function write_input_data(opt_data, save_input_technoeco::Bool, save_input_profi
 
         CSV.write(joinpath(data_used_folder, "Technoeco_data.csv"), df)
 
-        #Repeat for the techno-eco data sources of the file exists
+        # Repeat for the techno-eco data sources of the file exists
         if !isnothing(sources_data)
             dfs = DataFrame()
             for f in fieldnames(typeof(sources_data)) # Fill in the techno-eco data columns and use the field name as column name
@@ -205,6 +209,17 @@ function write_input_data(opt_data, save_input_technoeco::Bool, save_input_profi
             CSV.write(joinpath(data_used_folder, "Technoeco_data_sources.csv"), dfs)
         end
     end
+#=
+    if save_input_lcia
+        df = DataFrame()
+
+        for cat in lcia.impact_categories_symbol
+            df[!, Symbol("$(cat)")]
+        end
+
+
+    end
+=#
 end
 
 end #Module end

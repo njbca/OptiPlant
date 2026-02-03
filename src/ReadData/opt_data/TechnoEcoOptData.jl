@@ -59,6 +59,9 @@ struct technoeco_opt_data
   # Financial parameters
   Annuity_factor                 # Check the Excel for detailed calculations
 
+  # Lifetime
+  Lifetime              # Used to annualize LCIA values
+
 end
 
 # ************ Import techno-economic data ********************
@@ -434,7 +437,8 @@ function build_technoeco_opt_data(Data_units, techno_scen_data)
         get_param(names.co2_inf_reg),                      # CO2_inf_em
         get_param(names.co2_proc_fixed_reg),              # CO2_proc_fixed
 
-        get_param(names.annuity_factor, warn=true)        # Annuity_factor
+        get_param(names.annuity_factor, warn=true),       # Annuity_factor
+        get_param(names.lifetime)                         # Lifetime
     )
 
 end
@@ -489,7 +493,8 @@ function build_technoeco_sources_data(Data_sources, techno_scen_data)
         get_param_string(names.co2_inf_reg),             # CO2_inf_em
         get_param_string(names.co2_proc_fixed_reg),      # CO2_proc_fixed
 
-        get_param_string(names.annuity_factor)           # Annuity_factor
+        get_param_string(names.annuity_factor),          # Annuity_factor
+        get_param_string(names.lifetime)                 # Lifetime
     )
 end
 
