@@ -6,6 +6,7 @@ examples/Run.jl
 examples/Run gl.jl
 RenNinjaToken.txt
 data/Full_model/lcia_data/
+data/ZCS_tests/
 
 # Python virtual env
 .venv/

@@ -153,9 +153,9 @@ function run_optimization_scenarios(
                               results_currency_multiplier, 
                               default_results_cost_scale,
                               default_results_capacity_units,
-                              default_results_production_units;
-                              write_lca_results = !isnothing(opt_data.dat_lcia),
-                              remove_lcia_phases = remove_lcia_phases_from_results)
+                              default_results_production_units,
+                              remove_lcia_phases_from_results;
+                              write_lca_results = !isnothing(opt_data.dat_lcia))
       
       elseif model == "LP_2obj" 
         generate_adaptive_pareto_curve(opt_data, solver, N_scen, resultsfolder,
@@ -163,6 +163,7 @@ function run_optimization_scenarios(
                                         default_results_cost_scale,
                                         default_results_capacity_units,
                                         default_results_production_units,
+                                        remove_lcia_phases_from_results,
                                         N_pareto_points,
                                         interior_points,
                                         objective1,

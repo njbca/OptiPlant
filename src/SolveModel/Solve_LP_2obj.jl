@@ -79,7 +79,7 @@ function Solve_OptiPlant_LP_2obj(opt_data, solver;
   objectives[:climate_change_with_grid] = @expression(Model_LP, sum(pd.CO2_profile_emitted[sd.Grid_CO2_emitted_p[u],t]*Bought[sd.Grid_buy[u],Time[t]] for u=1:sd.nGCO2em,t=1:T if sd.Grid_CO2_emitted_p[u] > 0)
   + sum(lcia.scores[:climate_change].inf[u]*Capacity[u] for u=1:U)
   + sum(lcia.scores[:climate_change].use[u]*X[u,t] for u=1:U,t in Time)
-  + sum(lcia.scores[:climate_change].disp[u] * Capacity[u] for u=1:U))
+  + sum(lcia.scores[:climate_change].disp[u]*Capacity[u] for u=1:U))
 
   #Write objectives for all the lca impact categories
   for (cat,impacts) in lcia.scores
@@ -241,6 +241,7 @@ function generate_adaptive_pareto_curve(opt_data, solver, N_scen, resultsfolder,
                                         default_results_cost_scale,
                                         default_results_capacity_units,
                                         default_results_production_units,
+                                        remove_lcia_phases,
                                         N_pareto_points,
                                         interior_points,
                                         objective1,
@@ -280,7 +281,7 @@ function generate_adaptive_pareto_curve(opt_data, solver, N_scen, resultsfolder,
     write_main_results_LP(opt_data, opt_obj1, N_scen, resultsfolder,
                           results_currency, results_currency_multiplier,
                           default_results_cost_scale, default_results_capacity_units,
-                          default_results_production_units;
+                          default_results_production_units, remove_lcia_phases;
                           model="LP_2obj", pareto_results_folder = pareto_results_folder, Sol_number=1)
 
     # Minimize objective 2
@@ -290,7 +291,7 @@ function generate_adaptive_pareto_curve(opt_data, solver, N_scen, resultsfolder,
     write_main_results_LP(opt_data, opt_obj2, N_scen, resultsfolder,
                           results_currency, results_currency_multiplier,
                           default_results_cost_scale, default_results_capacity_units,
-                          default_results_production_units;
+                          default_results_production_units, remove_lcia_phases;
                           model="LP_2obj", pareto_results_folder = pareto_results_folder, Sol_number=N_pareto_points)
 
     sol_id = 1
@@ -328,7 +329,7 @@ function generate_adaptive_pareto_curve(opt_data, solver, N_scen, resultsfolder,
             write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
                                   results_currency, results_currency_multiplier,
                                   default_results_cost_scale, default_results_capacity_units,
-                                  default_results_production_units;
+                                  default_results_production_units, remove_lcia_phases;
                                   model="LP_2obj", pareto_results_folder = pareto_results_folder, Sol_number=sol_id)
         end
     end

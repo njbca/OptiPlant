@@ -190,9 +190,9 @@ end
 
 function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
    results_currency, results_currency_multiplier,
-   default_results_cost_scale, default_results_capacity_units, default_results_production_units;
+   default_results_cost_scale, default_results_capacity_units, default_results_production_units,remove_lcia_phases;
    model::String ="LP", pareto_results_folder::Union{String,Nothing} = nothing,  Sol_number::Int64= 1,
-   write_lca_results::Bool = true, remove_lcia_phases::Vector{Symbol} = Symbol[:inf, :use, :disp] )                     
+   write_lca_results::Bool = true)                     
 
   #Unpack some of the optimization data
   U = opt_data.U
@@ -228,7 +228,7 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
       :sold, :fuelsold_t, :prodcost, :capacity, :el_cons, :costs, :cost_unit, :load_average,
       :FLH, :prodcost_fuel_kg, :prodcost_fuel_GJ, :prodcost_fuel_MWh,
       :prodcost_perunit, :CO2_proc_reg_t, :CO2_regulated,
-      :CO2_regulated_per_unit, :CO2_regulated_per_GJfuel, :av_elec_cost
+      :CO2_regulated_per_unit, :CO2_regulated_GJ, :av_elec_cost
   )
       Result[name] = zeros(U)
   end
@@ -249,13 +249,16 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
     for cat_symbol in dat_lcia.impact_categories_symbol
       for phase in (:inf, :use, :disp, :hourly, :total)
           Result[Symbol(string(cat_symbol) * "_" * String(phase))] = zeros(U)
+          Result[Symbol(string(cat_symbol) * "_" * String(phase)* "_perGJ")] = zeros(U)
       end
     end
     Result[:climate_change_with_grid] = zeros(U)
+    Result[:climate_change_with_grid_perGJ] = zeros(U)
     Result[:CO2_proc_em_t] = zeros(U)
   end
 
-  unit_el_cons =  unit_prod_kg = unit_tot_energyJ = unit_tot_energyWh = ""
+  #Initialize the variables
+  unit_el_cons =  unit_prod_kg = unit_tot_energyJ = unit_tot_energyWh = unit_co2_reg = ""
 
   # Sum values for profile dependent results
 
@@ -308,6 +311,11 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
       end
   end
 
+  #Energy content and convertions for main fuel
+  yearly_prod_kg, unit_prod_kg = scale_mass_power_energy_units(sum(X[u, t] for u in sd.MainFuel, t =1:T), td.Output_units[sd.MainFuel[1]]; force_unit_prefix = "kg") #Convert yearly production in kilos
+  total_energy_content_GJ, unit_tot_energyJ = scale_mass_power_energy_units(yearly_prod_kg * Fuel_energy_content_list[scd.Fuel],"MJ$(scd.Fuel)"; force_unit_prefix="GJ") #Convert in GJ fuel per year
+  total_energy_content_MWh, unit_tot_energyWh = scale_mass_power_energy_units(yearly_prod_kg * Fuel_energy_content_list[scd.Fuel]/3.6,"kWh$(scd.Fuel)"; force_unit_prefix="MWh") #Convert in MWh fuel per year
+
   # Write the results in a table
   for u = 1:U
     #Scenario data
@@ -345,35 +353,28 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
     Result[:FLH][u]                   = sum(X[u, t] / Capacity[u] for t =1:T)
     Result[:load_average][u]          = Result[:FLH][u] / T
     Result[:prodcost_perunit][u]      = Result[:production][u] == 0 ? 0 : Result[:cost_unit][u] / Result[:production][u]
-    Result[:CO2_regulated][u]         = Capacity[u]*td.CO2_inf_reg[u] + Result[:production][u] * td.CO2_proc_fixed_reg[u] + Result[:CO2_proc_reg_t][u] #Units should be fixed here
-      
+    Result[:CO2_regulated][u], unit_co2_reg = scale_mass_power_energy_units(Capacity[u]*td.CO2_inf_reg[u] + 
+                                        sum(X[u, t] for t =1:T) * td.CO2_proc_fixed_reg[u] + Result[:CO2_proc_reg_t][u],
+                                        "kgCO2e"; force_unit_prefix = "kg"
+                                        ) # In kg CO2e (adapt if input data are not in kgCO2e anymore)
+    Result[:CO2_regulated_GJ][u]      = Result[:CO2_regulated][u] / total_energy_content_GJ #Results in kgCO2e per GJ
+    Result[:CO2_regulated_per_unit][u] = Result[:CO2_regulated][u] / sum(X[u, t] for t =1:T)  #By default in kgCO2e/Basic output unit (i.e. kWh)
+
     #********* Add the Lca results (optional)************
     if write_lca_results == true && !isnothing(dat_lcia)
-      add_lcia_results!(Result, opt_data, opt_results, u)
+      add_lcia_results!(Result, opt_data, opt_results, u, total_energy_content_GJ)
     end
-  end
-
-  # Post-processing for CO₂ intensity regulated and production costs
-  total_fuel_energy = sum(Result[:production][i] for i in sd.MainFuel) * Fuel_energy_content_list[scd.Fuel]
-
-  for u in 1:U
-      Result[:CO2_regulated_per_GJfuel][u] = Result[:CO2_regulated][u] / total_fuel_energy
-      Result[:CO2_regulated_per_unit][u] = Result[:CO2_regulated][u] / Result[:production][u]
   end
 
   av_elec_cost_1 = 1e3 * sum(Result[:prodcost_perunit][u] * Result[:production][u] for u in sd.PU) /
                     sum(Result[:production][u] for u in sd.PU)
   
   for u in sd.MainFuel
-    yearly_prod_kg, unit_prod_kg = scale_mass_power_energy_units(sum(X[u, t] for t =1:T), td.Output_units[u]; force_unit_prefix = "kg") #Convert yearly production in kilos
-    total_energy_content_GJ, unit_tot_energyJ = scale_mass_power_energy_units(yearly_prod_kg * Fuel_energy_content_list[scd.Fuel],"MJ$(scd.Fuel)"; force_unit_prefix="GJ") #Convert in GJ fuel per year
-    total_energy_content_MWh, unit_tot_energyWh = scale_mass_power_energy_units(yearly_prod_kg * Fuel_energy_content_list[scd.Fuel]/3.6,"kWh$(scd.Fuel)"; force_unit_prefix="MWh") #Convert in MWh fuel per year
     Result[:prodcost_fuel_kg][u] = scale_cost_units(Costs,results_currency_multiplier; force_unit ="") / yearly_prod_kg #Force results in currency per kg 
     Result[:prodcost_fuel_GJ][u]   = scale_cost_units(Costs,results_currency_multiplier; force_unit ="") / total_energy_content_GJ #Results in currency per GJ
     Result[:prodcost_fuel_MWh][u]  = scale_cost_units(Costs,results_currency_multiplier; force_unit ="") / total_energy_content_MWh #Results in currency per MWh
     Result[:av_elec_cost][u] = av_elec_cost_1
   end
-
 
   cols = [
     Result[:scenario], Name_selected_units, Result[:year], Result[:location], Result[:profile], Result[:power_TS],
@@ -384,7 +385,7 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
     Result[:TotCO2tax_up], Result[:TotCO2tax_op], Result[:fuelprice], Result[:sold], Result[:cost_unit],
     Result[:production], Result[:unit_production], Result[:el_cons], Result[:load_average], Result[:FLH],
     Result[:prodcost_fuel_kg], Result[:prodcost_fuel_GJ], Result[:prodcost_fuel_MWh], Result[:av_elec_cost],
-    Result[:CO2_regulated], Result[:CO2_regulated_per_unit], Result[:CO2_regulated_per_GJfuel]
+    Result[:CO2_regulated], Result[:CO2_regulated_per_unit], Result[:CO2_regulated_GJ]
   ]
   
   Result_name = [
@@ -401,8 +402,8 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
       "Yearly production", "Units production", "Electricity consumption ($unit_el_cons)", 
       "Load average", "Full load hours",
       "Production cost fuel ($results_currency/$unit_prod_kg)", 
-      "Production cost fuel ($results_currency/$unit_tot_energyJ)", "Production cost fuel ($results_currency/$unit_tot_energyWh)", "Av electricity cost(Euros/MWh)",
-      "Regulated CO2e total (kgCO2e)", "Regulated CO2e per unit (kgCO2e/output)", "Regulated CO2e all system (kg CO2e/GJfuel)"
+      "Production cost fuel ($results_currency/$unit_tot_energyJ)", "Production cost fuel ($results_currency/$unit_tot_energyWh)", "Av electricity cost(EUR/MWh)",
+      "Regulated CO2e total ($unit_co2_reg)", "Regulated CO2e per unit ($unit_co2_reg/output)", "Regulated CO2e all system ($unit_co2_reg/$unit_tot_energyJ)"
   ]
   
   if write_lca_results && !isnothing(dat_lcia)
@@ -442,7 +443,7 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
   end
 end
 
-function add_lcia_results!(Result::Dict{Symbol,Any}, opt_data, opt_results, u::Int)
+function add_lcia_results!(Result::Dict{Symbol,Any}, opt_data, opt_results, u::Int, total_energy_content_GJ)
   U = opt_data.U
   td = opt_data.dat_t #Techno-economic data
   sd = opt_data.dat_sub #Subset data
@@ -456,17 +457,7 @@ function add_lcia_results!(Result::Dict{Symbol,Any}, opt_data, opt_results, u::I
   Bought = opt_results.Bought
   Capacity = opt_results.Capacity  
 
-  # Hourly lcia values
-  for cat_sym in impact_categories_symbol
-    if sd.Grid_buy[1] > 0
-        for u = 1:sd.nGb
-          Result[Symbol(string(cat_sym) * "_hourly")][sd.Grid_buy[u]] =
-            sum(pd.Lcia_grid_profile[cat_sym][t] * Bought[sd.Grid_buy[u], t] for t = 1:T)
-        end
-    end
-  end
-
-  # Special category climate change with grid hourly
+  # ------ Special category climate change with grid hourly
 
   # Emitted CO₂ accounting
   if sd.Grid_CO2_emitted_p[1] > 0 && sd.Grid_buy[1] > 0
@@ -482,9 +473,21 @@ function add_lcia_results!(Result::Dict{Symbol,Any}, opt_data, opt_results, u::I
     + sum(scores[:climate_change].inf[u]*Capacity[u] for u=1:U)
     + sum(scores[:climate_change].use[u]*X[u,t] for u=1:U,t=1:T)
     + sum(scores[:climate_change].disp[u] * Capacity[u] for u=1:U)
+
+    Result[:climate_change_with_grid_perGJ][u] = Result[:climate_change_with_grid][u] / total_energy_content_GJ
   end
-  
-  # Fill LCA results for unit u
+
+  # ------ Hourly lcia values
+  for cat_sym in impact_categories_symbol
+    if sd.Grid_buy[1] > 0
+        for u = 1:sd.nGb
+          Result[Symbol(string(cat_sym) * "_hourly")][sd.Grid_buy[u]] =
+            sum(pd.Lcia_grid_profile[cat_sym][t] * Bought[sd.Grid_buy[u], t] for t = 1:T)
+        end
+    end
+  end
+
+  # Other lcia results for unit u
   for (cat_sym, impacts) in scores
 
     inf_val  = u <= length(impacts.inf)  ? impacts.inf[u]  * Capacity[u] : 0.0
@@ -496,34 +499,48 @@ function add_lcia_results!(Result::Dict{Symbol,Any}, opt_data, opt_results, u::I
     Result[Symbol(string(cat_sym) * "_use")][u]   = use_val
     Result[Symbol(string(cat_sym) * "_disp")][u]  = disp_val
     Result[Symbol(string(cat_sym) * "_total")][u] = total_val
-  end
 
+    #Results per GJ of fuel produced
+    Result[Symbol(string(cat_sym) * "_inf_perGJ")][u]   = inf_val / total_energy_content_GJ
+    Result[Symbol(string(cat_sym) * "_use_perGJ")][u]   = use_val / total_energy_content_GJ
+    Result[Symbol(string(cat_sym) * "_disp_perGJ")][u]  = disp_val / total_energy_content_GJ
+    Result[Symbol(string(cat_sym) * "_total_perGJ")][u] = total_val / total_energy_content_GJ
+  end
 end
 
 function append_lcia_columns!(cols::Vector, Result_name::Vector{String}, Result::Dict{Symbol,Any}, opt_data)
     dat_lcia = opt_data.dat_lcia
+
+    # Add special category: climate change with grid
+    push!(cols, Result[:climate_change_with_grid])
+    append!(Result_name, ["climate_change_with_grid total"])
+
+    push!(cols, Result[:climate_change_with_grid_perGJ])
+    append!(Result_name, ["climate_change_with_grid total per GJ"])
 
     for cat_sym in dat_lcia.impact_categories_symbol
         cat_name = String(cat_sym)
 
         # Append column data
         for phase in (:inf, :use, :disp, :hourly, :total)
-            push!(cols, Result[Symbol(cat_name * "_" * String(phase))])
+          push!(cols, Result[Symbol(cat_name * "_" * String(phase))])
+          push!(cols, Result[Symbol(cat_name * "_" * String(phase) * "_perGJ")])
         end
 
         # Append readable column names
         append!(Result_name, [
-            cat_name * " (infra)",
-            cat_name * " (use)",
-            cat_name * " (disposal)",
-            cat_name * " (hourly)",
-            cat_name * " (total)"
+            cat_name * " construction",
+            cat_name * " operation",
+            cat_name * " disposal",
+            cat_name * " hourly",
+            cat_name * " total",            
+            cat_name * " construction per GJ",
+            cat_name * " operation per GJ",
+            cat_name * " disposal per GJ",
+            cat_name * " hourly per GJ",
+            cat_name * " total per GJ"
         ])
     end
-
-    # Add special category: climate change with grid
-    push!(cols, Result[:climate_change_with_grid])
-    append!(Result_name, ["climate_change_with_grid (total)"])
 end
 
 """
@@ -539,11 +556,11 @@ function remove_lcia_columns!(df::DataFrame, lcia_data, remove_phases::Vector{Sy
 
     # Map phase symbols to their text labels
     phase_labels = Dict(
-        :inf   => " (infra)",
-        :use   => " (use)",
-        :disp  => " (disposal)",
-        :hourly => " (hourly)",
-        :total => " (total)"
+        :inf   => " construction",
+        :use   => " operation",
+        :disp  => " disposal",
+        :hourly => " hourly",
+        :total => " total"
     )
 
     existing_cols = Set(names(df))

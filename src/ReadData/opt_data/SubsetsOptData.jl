@@ -128,12 +128,6 @@ function build_subsets_opt_data(
     Subsets_CO2_em, nSubC_em = extract_subset_profiles(Data_CO2_profile_em, idx_CO2_em.subsets)
 
     Impact_categories_list_p, nImpactCat = extract_subset_profiles(Data_lcia_profile, idx_lcia_profile.impactcategoriesprofile)
-
-    println("Subsets_flux: $Subsets_flux")
-    println("Subsets_price: $Subsets_price")
-    println("Subsets_CO2_reg: $Subsets_CO2_reg")
-    println("Subsets_CO2_em: $Subsets_CO2_em")
-    println("Impact_categories_list_p: $Impact_categories_list_p")
    
     # === Reactant used to produce the main product (chemical reactions) ===
     Reactants = round.(Int, zeros(nSubReac))
