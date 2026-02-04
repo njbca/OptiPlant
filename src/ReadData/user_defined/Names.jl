@@ -221,11 +221,6 @@ SubsetTags = (
     # Grid CO2 profiles
     grid_em             = "Grid_CO2_emitted",
     grid_reg            = "Grid_CO2_regulated",
-
-    # Grid Lcia profiles
-    grid_lcia           = "Grid_lcia"
-
-
 )
 
 

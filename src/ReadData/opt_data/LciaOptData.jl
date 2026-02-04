@@ -160,18 +160,17 @@ function build_lcia_opt_data(Data_lcia_filtered, lcia_data, Data_units_filtered,
             lcia_scores[cat].disp = fill(0.0, U)
         end
 
-        score = Score[r]
-
         #Divide infrastructure score by lifetime
+        
         if phase == :inf
             if Lifetime[u] == 0
                 if !(Technology[r] in missing_lifetime_tech)
                     @warn("Unit $(Technology[r])  has no lifetime associated: construction impact score is set to 0")
                     push!(missing_lifetime_tech, Technology[r])
                 end
-                score = 0.0
+                Score[r] = 0.0
             else
-                score /= Lifetime[u]
+                Score[r] = Score[r] / Lifetime[u]
             end
         end
 

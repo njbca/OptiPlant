@@ -36,6 +36,7 @@ function run_optimization_scenarios(
     default_results_cost_scale = "M", #Million
     default_results_capacity_units = "t or MW or MWh",
     default_results_production_units = "kt or GWh",
+    remove_lcia_phases_from_results = Symbol[:inf, :use, :disp, :hourly],
     save_input_technoeco::Bool = true,
     save_input_profiles::Bool = true,
     save_input_lcia::Bool = true   
@@ -154,7 +155,7 @@ function run_optimization_scenarios(
                               default_results_capacity_units,
                               default_results_production_units;
                               write_lca_results = !isnothing(opt_data.dat_lcia),
-                              remove_lcia_phases = Symbol[:inf, :use, :disp, :hourly])
+                              remove_lcia_phases = remove_lcia_phases_from_results)
       
       elseif model == "LP_2obj" 
         generate_adaptive_pareto_curve(opt_data, solver, N_scen, resultsfolder,

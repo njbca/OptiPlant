@@ -88,7 +88,7 @@ function Solve_OptiPlant_LP_2obj(opt_data, solver;
         sum(impacts.inf[u] * Capacity[u] for u in 1:U) +
         sum(impacts.use[u] * X[u,t] for u in 1:U, t in Time) +
         sum(impacts.disp[u] * Capacity[u] for u=1:U) +
-        sum(pd.Lcia_profile[cat][sd.Grid_lcia_p[u],t] * Bought[sd.Grid_buy[u],Time[t]] for u=1:sd.nGb, t=1:T if sd.Grid_buy[u] > 0 && sd.Grid_lcia_p[u] > 0)
+        sum(pd.Lcia_grid_profile[cat][t] * Bought[sd.Grid_buy[u],Time[t]] for u=1:sd.nGb, t=1:T if sd.Grid_buy[u] > 0)
     )
   end
 

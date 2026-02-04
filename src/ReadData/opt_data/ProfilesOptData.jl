@@ -18,7 +18,7 @@ struct profiles_opt_data
     CO2_profile_regulated
     CO2_profile_emitted
     Renewable_criterion_profile
-    Lcia_profile
+    Lcia_grid_profile
 
 end
 
@@ -306,19 +306,19 @@ function build_profiles_opt_data(
     if !isnothing(Impact_categories_list_p)
         sanitize(s) = Symbol(replace(lowercase(string(s)), r"[^a-z0-9]+" => "_"))
 
-        Lcia_profile = Dict{Symbol, Matrix{Float64}}()
+        Lcia_grid_profile = Dict{Symbol, Vector{Float64}}()
 
         for r in eachindex(Impact_categories_list_p)
             cat = sanitize(Impact_categories_list_p[r])
 
             # Initialize once per category
-            if !haskey(Lcia_profile, cat)
-                Lcia_profile[cat] = zeros(dat_sub.nSubLcia_profile,T)
+            if !haskey(Lcia_grid_profile, cat)
+                Lcia_grid_profile[cat] = zeros(T)
             end
 
             # Fill the hourly profile
-            for i=1:dat_sub.nSubLcia_profile, t in 1:T
-                Lcia_profile[cat][i,t] = Data_lcia_profile[corners.L0_lcia_profile + Time[t],
+            for t in 1:T
+                Lcia_grid_profile[cat][t] = Data_lcia_profile[corners.L0_lcia_profile + Time[t],
                                     corners.C0_lcia_profile + r]
             end
         end
@@ -330,7 +330,7 @@ function build_profiles_opt_data(
         CO2_profile_regulated,
         CO2_profile_emitted,
         Renewable_criterion_profile,
-        Lcia_profile
+        Lcia_grid_profile
     )
 end
 

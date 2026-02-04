@@ -458,10 +458,10 @@ function add_lcia_results!(Result::Dict{Symbol,Any}, opt_data, opt_results, u::I
 
   # Hourly lcia values
   for cat_sym in impact_categories_symbol
-    if sd.Grid_lcia_p[1] > 0 && sd.Grid_buy[1] > 0
+    if sd.Grid_buy[1] > 0
         for u = 1:sd.nGb
           Result[Symbol(string(cat_sym) * "_hourly")][sd.Grid_buy[u]] =
-            sum(pd.Lcia_profile[cat_sym][sd.Grid_lcia_p[u], t] * Bought[sd.Grid_buy[u], t] for t = 1:T)
+            sum(pd.Lcia_grid_profile[cat_sym][t] * Bought[sd.Grid_buy[u], t] for t = 1:T)
         end
     end
   end

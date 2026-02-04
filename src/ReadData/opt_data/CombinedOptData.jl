@@ -103,8 +103,6 @@ function build_optimization_data(
         dat_lcia = nothing
     end
 
-    println("dat_lcia: $dat_lcia")
-
     return dat_sub, dat_t, dat_t_sources, dat_p, dat_lcia
 end
 
@@ -168,7 +166,7 @@ function write_input_data(opt_data, save_input_technoeco::Bool, save_input_profi
         CSV.write(joinpath(data_used_folder , "Price_Profiles.csv"), matrix_to_dataframe(pd.Price_Profile, "Price"))
         CSV.write(joinpath(data_used_folder , "CO2_profiles_regulated.csv"), matrix_to_dataframe(pd.CO2_profile_regulated, "CO2_reg"))
         CSV.write(joinpath(data_used_folder , "CO2_profiles_emitted.csv"), matrix_to_dataframe(pd.CO2_profile_emitted,"CO2_em"))
-        #CSV.write(joinpath(data_used_folder, "Hourly_lcia_profiles.csv"), matrix_to_dataframe(pd.Lcia_profile,"Impact"))
+        CSV.write(joinpath(data_used_folder, "Hourly_lcia_profiles.csv"), lciahourly_to_dataframe(pd.Lcia_grid_profile))
 
         # For 1D vector, use a simpler DataFrame
         df_renewable = DataFrame(t = 1:length(pd.Renewable_criterion_profile),
@@ -209,17 +207,21 @@ function write_input_data(opt_data, save_input_technoeco::Bool, save_input_profi
             CSV.write(joinpath(data_used_folder, "Technoeco_data_sources.csv"), dfs)
         end
     end
-#=
+
     if save_input_lcia
-        df = DataFrame()
+        
+        df = DataFrame(Unit = Name_selected_units)
 
         for cat in lcia.impact_categories_symbol
-            df[!, Symbol("$(cat)")]
+            phases = lcia.scores[cat]
+            df[!, Symbol("$(cat)_inf")]  = phases.inf
+            df[!, Symbol("$(cat)_use")]  = phases.use
+            df[!, Symbol("$(cat)_disp")] = phases.disp
         end
 
-
+        CSV.write(joinpath(data_used_folder, "Lcia_tech_data.csv"), df)
     end
-=#
+
 end
 
 end #Module end

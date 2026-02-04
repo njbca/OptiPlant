@@ -51,7 +51,6 @@ struct subsets_opt_data
     Grid_CO2_regulated_p; nGCO2reg
 
     # Subsets related to lcia hourly data
-    Grid_lcia_p ; nGLcia
     Impact_categories_list_p; nImpactCat
 
     # Number of subsets per profile type
@@ -59,8 +58,6 @@ struct subsets_opt_data
     nSubp #Price
     nSubC_em #CO2 emitted
     nSubC_reg #CO2 regulated
-    nSubLcia_profile #Hourly lcia indicators
-
 end
 
 """
@@ -130,8 +127,13 @@ function build_subsets_opt_data(
     Subsets_CO2_reg, nSubC_reg = extract_subset_profiles(Data_CO2_profile_reg, idx_CO2_reg.subsets)
     Subsets_CO2_em, nSubC_em = extract_subset_profiles(Data_CO2_profile_em, idx_CO2_em.subsets)
 
-    Subsets_lcia_profile, nSubLcia_profile = extract_subset_profiles(Data_lcia_profile, idx_lcia_profile.subsets)
     Impact_categories_list_p, nImpactCat = extract_subset_profiles(Data_lcia_profile, idx_lcia_profile.impactcategoriesprofile)
+
+    println("Subsets_flux: $Subsets_flux")
+    println("Subsets_price: $Subsets_price")
+    println("Subsets_CO2_reg: $Subsets_CO2_reg")
+    println("Subsets_CO2_em: $Subsets_CO2_em")
+    println("Impact_categories_list_p: $Impact_categories_list_p")
    
     # === Reactant used to produce the main product (chemical reactions) ===
     Reactants = round.(Int, zeros(nSubReac))
@@ -212,9 +214,6 @@ function build_subsets_opt_data(
     Grid_CO2_emitted_p, nGCO2em = extract_from_subsets(Subsets_CO2_em, SubsetTags.grid_em)
     Grid_CO2_regulated_p, nGCO2reg = extract_from_subsets(Subsets_CO2_reg, SubsetTags.grid_reg)
 
-    # === Subsets related to grid lcia profiles ===
-    Grid_lcia_p, nGLcia = extract_from_subsets(Subsets_lcia_profile, SubsetTags.grid_lcia)
-
     return subsets_opt_data(
         Reactants, R, MainFuel, PU, RPU, nRPU,
         Grid_in, Heat_in, Grid_out, Heat_out,
@@ -229,8 +228,8 @@ function build_subsets_opt_data(
         Grid_excess, nGe, Grid_deficit, nGd,
         Heat_excess, nHe, Heat_deficit, nHd,
         Grid_CO2_emitted_p, nGCO2em, Grid_CO2_regulated_p, nGCO2reg,
-        Grid_lcia_p, nGLcia, Impact_categories_list_p, nImpactCat,
-        nSubf, nSubp, nSubC_em, nSubC_reg, nSubLcia_profile
+        Impact_categories_list_p, nImpactCat,
+        nSubf, nSubp, nSubC_em, nSubC_reg
     )
 end
 

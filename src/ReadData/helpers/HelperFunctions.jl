@@ -321,3 +321,18 @@ function matrix_to_dataframe(mat::AbstractMatrix, prefix::String = "col")
     return df
 end
 
+function lciahourly_to_dataframe(d::Dict{Symbol, Vector{Float64}})
+
+    df = DataFrame()
+
+    for (name, vec) in d
+        df[!, name] = vec[:] 
+    end
+
+    df.time = 1:nrow(df)
+    select!(df, :time, Not(:time))
+
+    return df
+
+end
+
