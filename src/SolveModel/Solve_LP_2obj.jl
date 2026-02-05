@@ -76,11 +76,6 @@ function Solve_OptiPlant_LP_2obj(opt_data, solver;
   + sum(td.CO2_inf_reg[u]*Capacity[u] for u=1:U)
   + sum(td.CO2_proc_fixed_reg[u]*X[u,t] for u=1:U,t in Time))
 
-  objectives[:climate_change_with_grid] = @expression(Model_LP, sum(pd.CO2_profile_emitted[sd.Grid_CO2_emitted_p[u],t]*Bought[sd.Grid_buy[u],Time[t]] for u=1:sd.nGCO2em,t=1:T if sd.Grid_CO2_emitted_p[u] > 0)
-  + sum(lcia.scores[:climate_change].inf[u]*Capacity[u] for u=1:U)
-  + sum(lcia.scores[:climate_change].use[u]*X[u,t] for u=1:U,t in Time)
-  + sum(lcia.scores[:climate_change].disp[u]*Capacity[u] for u=1:U))
-
   #Write objectives for all the lca impact categories
   for (cat,impacts) in lcia.scores
 

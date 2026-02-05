@@ -15,10 +15,22 @@ mutable struct ImpactPhases
     ImpactPhases() = new(Float64[], Float64[], Float64[])
 end
 
+
+mutable struct ImpactPhasesUnits
+    inf::String
+    use::String
+    disp::String
+    hourly::String
+    total::String
+    ImpactPhasesUnits() = new("", "", "", "", "")
+end
+
+
 # Struct to hold all lcia parameters
 mutable struct lcia_opt_data
     impact_categories_symbol :: Vector{Symbol}
-    scores ::Dict{Symbol, ImpactPhases}
+    scores :: Dict{Symbol, ImpactPhases}
+    lcia_units :: Dict{Symbol, ImpactPhasesUnits}
 end
 
 # **************** Import lcia data ********************
@@ -142,17 +154,22 @@ function build_lcia_opt_data(Data_lcia_filtered, lcia_data, Data_units_filtered,
     Impact_categories = get_lcia_param(names.impact_categories; warn=true)
     Phase            = get_lcia_param(names.phase; warn=true)
     Score            = get_lcia_param(names.score; as_string=false, warn=true)
+    Unit        = get_lcia_param(names.lcia_unit; warn=true)
 
     lcia_scores = Dict{Symbol, ImpactPhases}()
+    lcia_units = Dict{Symbol, ImpactPhasesUnits}()
     missing_lifetime_tech = Set{String}()
 
     for r in eachindex(Impact_categories)
         cat   = sanitize(Impact_categories[r])
         phase = get(lcia_phase_map, Phase[r], nothing)
-        u     = findfirst(==(Technology[r]), Lcia_tags_list)
-        isnothing(u) && continue
+        isnothing(phase) && continue
 
-        # Initialize category storage, default value is 0
+        u = findfirst(==(Technology[r]), Lcia_tags_list)
+        isnothing(u) && continue
+        
+
+        # Initialize lcia scores, default value is 0
         if !haskey(lcia_scores, cat)
             lcia_scores[cat] = ImpactPhases()
             lcia_scores[cat].inf  = fill(0.0, U)
@@ -175,8 +192,33 @@ function build_lcia_opt_data(Data_lcia_filtered, lcia_data, Data_units_filtered,
         end
 
         getfield(lcia_scores[cat], phase)[u] = Score[r]
+
+        # Initialize lcia units, default value is ""
+        if !haskey(lcia_units, cat)
+            lcia_units[cat] = ImpactPhasesUnits()
+        end
+        
+        # Write unit for this phase (override construction phase)
+        if phase == :inf
+            # infrastructure phase unit → "unit per year"
+            setfield!(lcia_units[cat], :inf, string(Unit[r], " (annualised)"))
+        else
+            # all other phases use the CSV-provided unit
+            setfield!(lcia_units[cat], phase, String(Unit[r]))
+        end
+        
+        # Fill missing hourly/total units
+        for units in values(lcia_units)
+            if units.hourly == ""
+                units.hourly = units.use
+            end
+            if units.total == ""
+                units.total = units.use
+            end
+        end
+
     end
-    return lcia_opt_data(unique(sanitize.(Impact_categories)), lcia_scores)
+    return lcia_opt_data(unique(sanitize.(Impact_categories)), lcia_scores, lcia_units)
 end
 
 end #Module

@@ -68,9 +68,10 @@ function write_hourly_results_LP(opt_data, opt_results, N_scen, resultsfolder, c
 
     #Counted grid "real" emissions (emissions not affected by regulations and taxes)
     Grid_real_emissions = zeros(T, 1)
-    if sd.Grid_CO2_emitted_p != 0
+    if haskey(pd.Lcia_grid_profile, :climate_change)
       for t = 1:T
-        Grid_real_emissions[t, 1] = pd.CO2_profile_emitted[sd.Grid_CO2_emitted_p[1], t] * Bought[sd.Grid_buy[1], t]
+        #Grid_real_emissions[t, 1] = pd.CO2_profile_emitted[sd.Grid_CO2_emitted_p[1], t] * Bought[sd.Grid_buy[1], t]
+        Grid_real_emissions[t, 1] = pd.Lcia_grid_profile[:climate_change][t] * Bought[sd.Grid_buy[1], t]
       end
     end
 
@@ -252,9 +253,6 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
           Result[Symbol(string(cat_symbol) * "_" * String(phase)* "_perGJ")] = zeros(U)
       end
     end
-    Result[:climate_change_with_grid] = zeros(U)
-    Result[:climate_change_with_grid_perGJ] = zeros(U)
-    Result[:CO2_proc_em_t] = zeros(U)
   end
 
   #Initialize the variables
@@ -310,6 +308,16 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
               sum(pd.CO2_profile_regulated[sd.Grid_CO2_regulated_p[u], t] * Bought[sd.Grid_buy[u], t] for t = 1:T) #In kg CO2e
       end
   end
+
+  # Emitted CO₂ accounting
+  #=
+  if sd.Grid_CO2_emitted_p[1] > 0 && sd.Grid_buy[1] > 0
+      for g = 1:sd.nGCO2em
+          Result[:CO2_proc_em_t][sd.Grid_buy[g]] =
+              sum(pd.CO2_profile_emitted[sd.Grid_CO2_emitted_p[g], t] * Bought[sd.Grid_buy[g], t] for t = 1:T) #In kg CO2e
+      end
+  end
+  =#
 
   #Energy content and convertions for main fuel
   yearly_prod_kg, unit_prod_kg = scale_mass_power_energy_units(sum(X[u, t] for u in sd.MainFuel, t =1:T), td.Output_units[sd.MainFuel[1]]; force_unit_prefix = "kg") #Convert yearly production in kilos
@@ -403,11 +411,11 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
       "Load average", "Full load hours",
       "Production cost fuel ($results_currency/$unit_prod_kg)", 
       "Production cost fuel ($results_currency/$unit_tot_energyJ)", "Production cost fuel ($results_currency/$unit_tot_energyWh)", "Av electricity cost(EUR/MWh)",
-      "Regulated CO2e total ($unit_co2_reg)", "Regulated CO2e per unit ($unit_co2_reg/output)", "Regulated CO2e all system ($unit_co2_reg/$unit_tot_energyJ)"
+      "Regulated CO2e total ($unit_co2_reg)", "Regulated CO2e per unit ($unit_co2_reg/output)", "Regulated CO2e total ($unit_co2_reg/$unit_tot_energyJ)"
   ]
   
   if write_lca_results && !isnothing(dat_lcia)
-    append_lcia_columns!(cols, Result_name, Result, opt_data)
+    append_lcia_columns!(cols, Result_name, Result, opt_data,unit_tot_energyJ)
   end
 
   df_results = DataFrame(cols, :auto)
@@ -457,32 +465,12 @@ function add_lcia_results!(Result::Dict{Symbol,Any}, opt_data, opt_results, u::I
   Bought = opt_results.Bought
   Capacity = opt_results.Capacity  
 
-  # ------ Special category climate change with grid hourly
-
-  # Emitted CO₂ accounting
-  if sd.Grid_CO2_emitted_p[1] > 0 && sd.Grid_buy[1] > 0
-      for u = 1:sd.nGCO2em
-          Result[:CO2_proc_em_t][sd.Grid_buy[u]] =
-              sum(pd.CO2_profile_emitted[sd.Grid_CO2_emitted_p[u], t] * Bought[sd.Grid_buy[u], t] for t = 1:T) #In kg CO2e
-      end
-  end
-
-  for u=1:U
-    Result[:climate_change_with_grid][u] = 
-    Result[:CO2_proc_em_t][u]
-    + sum(scores[:climate_change].inf[u]*Capacity[u] for u=1:U)
-    + sum(scores[:climate_change].use[u]*X[u,t] for u=1:U,t=1:T)
-    + sum(scores[:climate_change].disp[u] * Capacity[u] for u=1:U)
-
-    Result[:climate_change_with_grid_perGJ][u] = Result[:climate_change_with_grid][u] / total_energy_content_GJ
-  end
-
-  # ------ Hourly lcia values
+  # ------ Hourly lcia values for grid
   for cat_sym in impact_categories_symbol
-    if sd.Grid_buy[1] > 0
-        for u = 1:sd.nGb
-          Result[Symbol(string(cat_sym) * "_hourly")][sd.Grid_buy[u]] =
-            sum(pd.Lcia_grid_profile[cat_sym][t] * Bought[sd.Grid_buy[u], t] for t = 1:T)
+    if sd.Grid_buy[1] > 0 && haskey(pd.Lcia_grid_profile,cat_sym)
+        for g = 1:sd.nGb
+          Result[Symbol(string(cat_sym) * "_hourly")][sd.Grid_buy[g]] =
+            sum(pd.Lcia_grid_profile[cat_sym][t] * Bought[sd.Grid_buy[g], t] for t = 1:T)
         end
     end
   end
@@ -508,15 +496,10 @@ function add_lcia_results!(Result::Dict{Symbol,Any}, opt_data, opt_results, u::I
   end
 end
 
-function append_lcia_columns!(cols::Vector, Result_name::Vector{String}, Result::Dict{Symbol,Any}, opt_data)
+function append_lcia_columns!(cols::Vector, Result_name::Vector{String}, Result::Dict{Symbol,Any}, opt_data, unit_tot_energyJ)
+
     dat_lcia = opt_data.dat_lcia
-
-    # Add special category: climate change with grid
-    push!(cols, Result[:climate_change_with_grid])
-    append!(Result_name, ["climate_change_with_grid total"])
-
-    push!(cols, Result[:climate_change_with_grid_perGJ])
-    append!(Result_name, ["climate_change_with_grid total per GJ"])
+    unit = dat_lcia.lcia_units
 
     for cat_sym in dat_lcia.impact_categories_symbol
         cat_name = String(cat_sym)
@@ -524,21 +507,23 @@ function append_lcia_columns!(cols::Vector, Result_name::Vector{String}, Result:
         # Append column data
         for phase in (:inf, :use, :disp, :hourly, :total)
           push!(cols, Result[Symbol(cat_name * "_" * String(phase))])
+        end
+        for phase in (:inf, :use, :disp, :hourly, :total)
           push!(cols, Result[Symbol(cat_name * "_" * String(phase) * "_perGJ")])
         end
 
         # Append readable column names
         append!(Result_name, [
-            cat_name * " construction",
-            cat_name * " operation",
-            cat_name * " disposal",
-            cat_name * " hourly",
-            cat_name * " total",            
-            cat_name * " construction per GJ",
-            cat_name * " operation per GJ",
-            cat_name * " disposal per GJ",
-            cat_name * " hourly per GJ",
-            cat_name * " total per GJ"
+            cat_name * " construction [$(unit[cat_sym].inf)]",
+            cat_name * " operation [$(unit[cat_sym].use)]",
+            cat_name * " disposal [$(unit[cat_sym].disp)]",
+            cat_name * " hourly [$(unit[cat_sym].hourly)]",
+            cat_name * " total [$(unit[cat_sym].total)]",            
+            cat_name * " construction [$(unit[cat_sym].inf)/$unit_tot_energyJ]",
+            cat_name * " operation [$(unit[cat_sym].use)/$unit_tot_energyJ]",
+            cat_name * " disposal [$(unit[cat_sym].disp)/$unit_tot_energyJ]",
+            cat_name * " hourly [$(unit[cat_sym].hourly)/$unit_tot_energyJ]",
+            cat_name * " total [$(unit[cat_sym].total)/$unit_tot_energyJ]"
         ])
     end
 end
@@ -567,15 +552,16 @@ function remove_lcia_columns!(df::DataFrame, lcia_data, remove_phases::Vector{Sy
     to_remove = String[]
 
     for cat_sym in lcia_data.impact_categories_symbol
-        cat_name = String(cat_sym)
-        for phase in remove_phases
-            if haskey(phase_labels, phase)
-                col_name = cat_name * phase_labels[phase]
-                if col_name in existing_cols
-                    push!(to_remove, col_name)
+      cat_name = String(cat_sym)
+      for phase in remove_phases
+          if haskey(phase_labels, phase)
+            for col in existing_cols
+                if startswith(col, cat_name * phase_labels[phase])
+                    push!(to_remove, col)
                 end
             end
-        end
+          end
+      end
     end
 
     # Remove columns if found

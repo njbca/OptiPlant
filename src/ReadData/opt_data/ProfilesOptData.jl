@@ -68,7 +68,7 @@ function load_and_locate_profile_data(
     Data_CO2_profile_reg = read_xlsx_sheet(wb_profile, SheetTags.co2_regulated, Available_sheets_profiles)
     Data_CO2_profile_em = read_xlsx_sheet(wb_profile, SheetTags.co2_emitted, Available_sheets_profiles)
     Data_rencrit_profile = read_xlsx_sheet(wb_profile, SheetTags.rencrit, Available_sheets_profiles)
-    Data_lcia_profile = read_xlsx_sheet(wb_profile, SheetTags.lcia_hourly, Available_sheets_profiles; warn=true)
+    Data_lcia_profile = read_xlsx_sheet(wb_profile, SheetTags.lcia_hourly, Available_sheets_profiles)
 
 
     # === Locate indexes in the profile sheets based on key terms ===
@@ -176,6 +176,7 @@ function filter_all_profile_data(
     Data_CO2_profile_reg_filtered = filter_profile(Data_CO2_profile_reg_filtered, indexes.idx_CO2_reg.countmethod, corners.C0_CO2_reg, scen.CO2_count_method_reg)
     Data_CO2_profile_em_filtered = filter_profile(Data_CO2_profile_em_filtered, indexes.idx_CO2_em.countmethod, corners.C0_CO2_em, scen.CO2_count_method_em)
     Data_rencrit_profile_filtered = filter_profile(Data_rencrit_profile_filtered, indexes.idx_rencrit.subsets, corners.C0_rencrit, scen.Current_rencrit)
+    Data_lcia_profile_filtered = filter_profile(Data_lcia_profile, indexes.idx_lcia_profile.locations, corners.C0_lcia_profile, scen.CO2_count_method_em)
 
     # === Filter profile lcia categories ===
 
@@ -302,12 +303,10 @@ function build_profiles_opt_data(
 
     #--------------------------------------------------------
     #Hourly grid impact lcia profiles (all impact categories instead of just CO2)
+    Lcia_grid_profile = Dict{Symbol, Vector{Float64}}()
     
     if !isnothing(Impact_categories_list_p)
         sanitize(s) = Symbol(replace(lowercase(string(s)), r"[^a-z0-9]+" => "_"))
-
-        Lcia_grid_profile = Dict{Symbol, Vector{Float64}}()
-
         for r in eachindex(Impact_categories_list_p)
             cat = sanitize(Impact_categories_list_p[r])
 
