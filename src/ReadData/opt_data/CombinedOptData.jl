@@ -208,7 +208,7 @@ function write_input_data(opt_data, save_input_technoeco::Bool, save_input_profi
         end
     end
 
-    if save_input_lcia
+    if save_input_lcia && !isnothing(lcia)
         
         df = DataFrame(Unit = Name_selected_units)
 

@@ -11,17 +11,11 @@ solver = "HiGHS"  # Change to "Gurobi" if you have the license
 # Or any personalized vector of scenarios
 scenarios_to_run = 1:1
 
-# Run and time the execution. Wrap in try/catch so a single scenario error doesn't stop the batch.
-try
-    run_optimization_scenarios(
-        datafoldername,
-        techno_eco_filename,
-        scenario_set,
-        solver,
-        scenarios_to_run;
-        save_input_profiles = true,
-        save_input_technoeco =  true)
-catch e
-    println("Error running scenarios: ", e)
-    @show(stacktrace(catch_backtrace()))
-end
+run_optimization_scenarios(
+    datafoldername,
+    techno_eco_filename,
+    scenario_set,
+    solver,
+    scenarios_to_run;
+    save_input_profiles = true,
+    save_input_technoeco =  true)
