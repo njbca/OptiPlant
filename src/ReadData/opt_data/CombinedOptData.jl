@@ -132,7 +132,7 @@ Files are organized in a dedicated folder within the results directory.
 
 # Behavior
 - Creates a subfolder `"Data used/Scenario_Nscen"` under the scenario result folder.
-- Saves profile matrices as CSV files: flux, price, CO₂ (regulated and emitted), and renewable criterion.
+- Saves profile matrices as CSV files: flux, price, CO₂ regulated, Lcia profiles, and renewable criterion.
 - Saves techno-economic data for selected units, including optional source data if provided.
 - Inserts unit names as the first column in techno-economic CSV files.
 
@@ -165,7 +165,6 @@ function write_input_data(opt_data, save_input_technoeco::Bool, save_input_profi
         CSV.write(joinpath(data_used_folder , "Flux_Profiles.csv"), matrix_to_dataframe(pd.Flux_Profile,"Flux"))
         CSV.write(joinpath(data_used_folder , "Price_Profiles.csv"), matrix_to_dataframe(pd.Price_Profile, "Price"))
         CSV.write(joinpath(data_used_folder , "CO2_profiles_regulated.csv"), matrix_to_dataframe(pd.CO2_profile_regulated, "CO2_reg"))
-        CSV.write(joinpath(data_used_folder , "CO2_profiles_emitted.csv"), matrix_to_dataframe(pd.CO2_profile_emitted,"CO2_em"))
         CSV.write(joinpath(data_used_folder, "Hourly_lcia_profiles.csv"), lciahourly_to_dataframe(pd.Lcia_grid_profile))
 
         # For 1D vector, use a simpler DataFrame

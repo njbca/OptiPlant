@@ -7,7 +7,6 @@ SheetTags = (
     flux = "Flux",
     price = "Price",
     co2_regulated = "CO2_regulated",
-    co2_emitted = "CO2_emitted",
     rencrit = "Renewable_criterion",
     lcia_hourly = "Lcia_hourly",
     lciadata = "Lcia_results",
@@ -219,7 +218,6 @@ SubsetTags = (
     heat_deficit        = "Heat_deficit",
 
     # Grid CO2 profiles
-    grid_em             = "Grid_CO2_emitted",
     grid_reg            = "Grid_CO2_regulated",
 )
 

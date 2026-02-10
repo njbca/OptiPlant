@@ -46,8 +46,7 @@ struct subsets_opt_data
     Heat_excess; nHe
     Heat_deficit; nHd
 
-    # Subsets related to CO2 profiles
-    Grid_CO2_emitted_p; nGCO2em
+    # Subsets related to regulated CO2 profiles
     Grid_CO2_regulated_p; nGCO2reg
 
     # Subsets related to lcia hourly data
@@ -56,7 +55,6 @@ struct subsets_opt_data
     # Number of subsets per profile type
     nSubf #Flux
     nSubp #Price
-    nSubC_em #CO2 emitted
     nSubC_reg #CO2 regulated
 end
 
@@ -84,7 +82,7 @@ A `subsets_opt_data` object containing:
 - **Market interactions**: Subsets for selling/buying O₂, biochar, heat, process heat, CH₄, grid, etc.
 - **Electrolyzer piecewise linear function**: `PWL`, `nPWL`, `NotPWL`.
 - **Profile subsets**: Links between units and corresponding flux, price, and CO₂ profiles.
-- **Counts of subsets**: `nSubf`, `nSubp`, `nSubC_em`, `nSubC_reg`.
+- **Counts of subsets**: `nSubf`, `nSubp`, `nSubC_reg`.
 
 # Notes
 - Reactants are identified by matching techno-economic subsets with reactant subsets.
@@ -105,7 +103,6 @@ function build_subsets_opt_data(
     Data_price_profile = profile_data_filtered.Data_price_profile
     Data_flux_profile = profile_data_filtered.Data_flux_profile
     Data_CO2_profile_reg = profile_data_filtered.Data_CO2_profile_reg
-    Data_CO2_profile_em = profile_data_filtered.Data_CO2_profile_em
     Data_lcia_profile = profile_data_filtered.Data_lcia_profile
 
     L1 = techno_scen_data.corners.L1
@@ -113,7 +110,6 @@ function build_subsets_opt_data(
     idx_pr = profile_data.indexes.idx_pr
     idx_f = profile_data.indexes.idx_f
     idx_CO2_reg = profile_data.indexes.idx_CO2_reg
-    idx_CO2_em = profile_data.indexes.idx_CO2_em
     idx_lcia_profile = profile_data.indexes.idx_lcia_profile
 
     # === Extract subsets from techno-economic and profile data ===
@@ -125,7 +121,6 @@ function build_subsets_opt_data(
     Subsets_price, nSubp = extract_subset_profiles(Data_price_profile, idx_pr.subsets)
 
     Subsets_CO2_reg, nSubC_reg = extract_subset_profiles(Data_CO2_profile_reg, idx_CO2_reg.subsets)
-    Subsets_CO2_em, nSubC_em = extract_subset_profiles(Data_CO2_profile_em, idx_CO2_em.subsets)
 
     Impact_categories_list_p, nImpactCat = extract_subset_profiles(Data_lcia_profile, idx_lcia_profile.impactcategoriesprofile)
    
@@ -205,7 +200,6 @@ function build_subsets_opt_data(
     Heat_deficit, nHd = extract_from_subsets(Subsets_flux, SubsetTags.heat_deficit)
 
     # === Subsets related to grid CO2 profiles ===
-    Grid_CO2_emitted_p, nGCO2em = extract_from_subsets(Subsets_CO2_em, SubsetTags.grid_em)
     Grid_CO2_regulated_p, nGCO2reg = extract_from_subsets(Subsets_CO2_reg, SubsetTags.grid_reg)
 
     return subsets_opt_data(
@@ -221,9 +215,9 @@ function build_subsets_opt_data(
         Heat_sell_p, Heat_buy_p, Grid_sell_p, Grid_buy_p, RPU_p,
         Grid_excess, nGe, Grid_deficit, nGd,
         Heat_excess, nHe, Heat_deficit, nHd,
-        Grid_CO2_emitted_p, nGCO2em, Grid_CO2_regulated_p, nGCO2reg,
+        Grid_CO2_regulated_p, nGCO2reg,
         Impact_categories_list_p, nImpactCat,
-        nSubf, nSubp, nSubC_em, nSubC_reg
+        nSubf, nSubp, nSubC_reg
     )
 end
 

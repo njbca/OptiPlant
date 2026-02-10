@@ -16,7 +16,6 @@ struct profiles_opt_data
     Flux_Profile
     Price_Profile
     CO2_profile_regulated
-    CO2_profile_emitted
     Renewable_criterion_profile
     Lcia_grid_profile
 
@@ -45,9 +44,8 @@ A named tuple containing:
 - `Data_flux_profile`: Raw flux profile data.
 - `Data_price_profile`: Raw price profile data.
 - `Data_CO2_profile_reg`: CO₂ profiles used for regulation.
-- `Data_CO2_profile_em`: CO₂ profiles not used for regulation.
 - `Data_rencrit_profile`: Renewable criterion profiles.
-- `indexes`: Sub-tuple with located index structures (`idx_f`, `idx_pr`, `idx_CO2_reg`, `idx_CO2_em`, `idx_rencrit`).
+- `indexes`: Sub-tuple with located index structures (`idx_f`, `idx_pr`, `idx_CO2_reg`, `idx_rencrit`).
 - `corners`: Sub-tuple with corner coordinates (`L0_*`, `C0_*`) for aligning data slices.
 
 # Notes
@@ -66,7 +64,6 @@ function load_and_locate_profile_data(
     Data_flux_profile = read_xlsx_sheet(wb_profile, SheetTags.flux, Available_sheets_profiles; warn=true)
     Data_price_profile = read_xlsx_sheet(wb_profile, SheetTags.price, Available_sheets_profiles; warn=true)
     Data_CO2_profile_reg = read_xlsx_sheet(wb_profile, SheetTags.co2_regulated, Available_sheets_profiles)
-    Data_CO2_profile_em = read_xlsx_sheet(wb_profile, SheetTags.co2_emitted, Available_sheets_profiles)
     Data_rencrit_profile = read_xlsx_sheet(wb_profile, SheetTags.rencrit, Available_sheets_profiles)
     Data_lcia_profile = read_xlsx_sheet(wb_profile, SheetTags.lcia_hourly, Available_sheets_profiles)
 
@@ -75,7 +72,6 @@ function load_and_locate_profile_data(
     idx_f = locate_indexes(Data_flux_profile, key_terms_profiles, true)
     idx_pr = locate_indexes(Data_price_profile, key_terms_profiles, true)
     idx_CO2_reg = locate_indexes(Data_CO2_profile_reg, key_terms_profiles, true)
-    idx_CO2_em = locate_indexes(Data_CO2_profile_em, key_terms_profiles, true)
     idx_rencrit = locate_indexes(Data_rencrit_profile, key_terms_profiles, true)
     idx_lcia_profile = locate_indexes(Data_lcia_profile, key_terms_profiles, true)
 
@@ -87,14 +83,12 @@ function load_and_locate_profile_data(
         Data_flux_profile = Data_flux_profile,
         Data_price_profile = Data_price_profile,
         Data_CO2_profile_reg = Data_CO2_profile_reg,
-        Data_CO2_profile_em = Data_CO2_profile_em,
         Data_rencrit_profile = Data_rencrit_profile,
         Data_lcia_profile = Data_lcia_profile,
         indexes = (
             idx_f = idx_f,
             idx_pr = idx_pr,
             idx_CO2_reg = idx_CO2_reg,
-            idx_CO2_em = idx_CO2_em,
             idx_rencrit = idx_rencrit,
             idx_lcia_profile = idx_lcia_profile
         ),
@@ -105,8 +99,6 @@ function load_and_locate_profile_data(
             C0_pr = get_corner_table(idx_pr, 2),
             L0_CO2_reg = get_corner_table(idx_CO2_reg, 1),
             C0_CO2_reg = get_corner_table(idx_CO2_reg, 2),
-            L0_CO2_em = get_corner_table(idx_CO2_em, 1),
-            C0_CO2_em = get_corner_table(idx_CO2_em, 2),
             L0_rencrit = get_corner_table(idx_rencrit, 1),
             C0_rencrit = get_corner_table(idx_rencrit, 2),
             L0_lcia_profile = get_corner_table(idx_lcia_profile, 1),
@@ -131,14 +123,13 @@ renewable criterion.
 - `profile_data`: Output from `load_and_locate_profile_data`, containing raw profile arrays, 
   indexes, and corner coordinates.
 - `scen`: Scenario object with attributes controlling the filtering process 
-  (`Location`, `Power_TS`, `CO2_count_method_reg`, `CO2_count_method_em`, `Current_rencrit`).
+  (`Location`, `Power_TS`, `CO2_count_method_reg`, `Current_rencrit`).
 
 # Returns
 A named tuple containing the filtered profile arrays:
 - `Data_flux_profile`
 - `Data_price_profile`
 - `Data_CO2_profile_reg`
-- `Data_CO2_profile_em`
 - `Data_rencrit_profile`
 
 # Notes
@@ -156,7 +147,6 @@ function filter_all_profile_data(
     Data_flux_profile = profile_data.Data_flux_profile
     Data_price_profile = profile_data.Data_price_profile
     Data_CO2_profile_reg = profile_data.Data_CO2_profile_reg
-    Data_CO2_profile_em = profile_data.Data_CO2_profile_em
     Data_rencrit_profile = profile_data.Data_rencrit_profile
     Data_lcia_profile = profile_data.Data_lcia_profile
 
@@ -167,16 +157,14 @@ function filter_all_profile_data(
     Data_flux_profile_filtered = filter_profile(Data_flux_profile, indexes.idx_f.locations, corners.C0_f, scen.Location)
     Data_price_profile_filtered = filter_profile(Data_price_profile, indexes.idx_pr.locations, corners.C0_pr, scen.Location)
     Data_CO2_profile_reg_filtered = filter_profile(Data_CO2_profile_reg, indexes.idx_CO2_reg.locations, corners.C0_CO2_reg, scen.Location)
-    Data_CO2_profile_em_filtered = filter_profile(Data_CO2_profile_em, indexes.idx_CO2_em.locations, corners.C0_CO2_em, scen.Location)
     Data_rencrit_profile_filtered = filter_profile(Data_rencrit_profile, indexes.idx_rencrit.locations, corners.C0_rencrit, scen.Location)
     Data_lcia_profile_filtered = filter_profile(Data_lcia_profile, indexes.idx_lcia_profile.locations, corners.C0_lcia_profile, scen.Location)
 
     # === Additional filters ===
     Data_flux_profile_filtered = filter_profile(Data_flux_profile_filtered, indexes.idx_f.timeseries, corners.C0_f, scen.Power_TS)
     Data_CO2_profile_reg_filtered = filter_profile(Data_CO2_profile_reg_filtered, indexes.idx_CO2_reg.countmethod, corners.C0_CO2_reg, scen.CO2_count_method_reg)
-    Data_CO2_profile_em_filtered = filter_profile(Data_CO2_profile_em_filtered, indexes.idx_CO2_em.countmethod, corners.C0_CO2_em, scen.CO2_count_method_em)
     Data_rencrit_profile_filtered = filter_profile(Data_rencrit_profile_filtered, indexes.idx_rencrit.subsets, corners.C0_rencrit, scen.Current_rencrit)
-    Data_lcia_profile_filtered = filter_profile(Data_lcia_profile, indexes.idx_lcia_profile.locations, corners.C0_lcia_profile, scen.CO2_count_method_em)
+    Data_lcia_profile_filtered = filter_profile(Data_lcia_profile, indexes.idx_lcia_profile.countmethod, corners.C0_lcia_profile, scen.CO2_count_method_em)
 
     # === Filter profile lcia categories ===
 
@@ -202,7 +190,6 @@ function filter_all_profile_data(
         Data_flux_profile = Data_flux_profile_filtered,
         Data_price_profile = Data_price_profile_filtered,
         Data_CO2_profile_reg = Data_CO2_profile_reg_filtered,
-        Data_CO2_profile_em = Data_CO2_profile_em_filtered,
         Data_rencrit_profile = Data_rencrit_profile_filtered,
         Data_lcia_profile = Data_lcia_profile_filtered
     )
@@ -222,10 +209,10 @@ data with the model's indexing scheme (`corners`) and produces matrices sized ac
 
 # Arguments
 - `profile_data_filtered`: Filtered data structure containing raw profile arrays
-  (`Data_flux_profile`, `Data_price_profile`, `Data_CO2_profile_reg`, `Data_CO2_profile_em`, `Data_rencrit_profile`).
+  (`Data_flux_profile`, `Data_price_profile`, `Data_CO2_profile_reg`, `Data_rencrit_profile`).
 - `profile_data`: Data structure containing metadata about profile array indexing (`corners`).
 - `dat_sub`: Object with the number of subcategories used for each type of profile
-  (`nSubf`, `nSubp`, `nSubC_reg`, `nSubC_em`).
+  (`nSubf`, `nSubp`, `nSubC_reg`).
 - `scen`: Scenario object containing time mapping (`Time`), time horizon (`T`), and renewable criterion selection (`Current_rencrit`).
 
 # Returns
@@ -233,7 +220,6 @@ A `profiles_opt_data` object containing:
 - `Flux_Profile` (`nSubf x T`): Matrix of flux profiles per subcategory.
 - `Price_Profile` (`nSubp x T`): Matrix of price profiles per subcategory.
 - `CO2_profile_regulated` (`nSubC_reg x T`): Matrix of CO₂ emissions accounted for regulation.
-- `CO2_profile_emitted` (`nSubC_em x T`): Matrix of CO₂ emissions not used for regulation.
 - `Renewable_criterion_profile` (`T`): Vector of renewable criterion values across time.
 
 # Notes
@@ -253,7 +239,6 @@ function build_profiles_opt_data(
     Data_flux_profile = profile_data_filtered.Data_flux_profile
     Data_price_profile = profile_data_filtered.Data_price_profile
     Data_CO2_profile_reg = profile_data_filtered.Data_CO2_profile_reg
-    Data_CO2_profile_em = profile_data_filtered.Data_CO2_profile_em
     Data_rencrit_profile = profile_data_filtered.Data_rencrit_profile
     Data_lcia_profile = profile_data_filtered.Data_lcia_profile
 
@@ -283,13 +268,6 @@ function build_profiles_opt_data(
     CO2_profile_regulated = zeros(dat_sub.nSubC_reg, T)
     for i = 1:dat_sub.nSubC_reg, t = 1:T
         CO2_profile_regulated[i, t] = Data_CO2_profile_reg[corners.L0_CO2_reg + Time[t], corners.C0_CO2_reg + i]
-    end
-
-    #--------------------------------------------------------
-    # CO2 profile: not used for regulation
-    CO2_profile_emitted = zeros(dat_sub.nSubC_em, T)
-    for i = 1:dat_sub.nSubC_em, t = 1:T
-        CO2_profile_emitted[i, t] = Data_CO2_profile_em[corners.L0_CO2_em + Time[t], corners.C0_CO2_em + i]
     end
 
     #--------------------------------------------------------
@@ -327,7 +305,6 @@ function build_profiles_opt_data(
         Flux_Profile,
         Price_Profile,
         CO2_profile_regulated,
-        CO2_profile_emitted,
         Renewable_criterion_profile,
         Lcia_grid_profile
     )

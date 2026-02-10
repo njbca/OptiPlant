@@ -70,7 +70,6 @@ function write_hourly_results_LP(opt_data, opt_results, N_scen, resultsfolder, c
     Grid_real_emissions = zeros(T, 1)
     if haskey(pd.Lcia_grid_profile, :climate_change)
       for t = 1:T
-        #Grid_real_emissions[t, 1] = pd.CO2_profile_emitted[sd.Grid_CO2_emitted_p[1], t] * Bought[sd.Grid_buy[1], t]
         Grid_real_emissions[t, 1] = pd.Lcia_grid_profile[:climate_change][t] * Bought[sd.Grid_buy[1], t]
       end
     end
@@ -309,16 +308,6 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
       end
   end
 
-  # Emitted CO₂ accounting
-  #=
-  if sd.Grid_CO2_emitted_p[1] > 0 && sd.Grid_buy[1] > 0
-      for g = 1:sd.nGCO2em
-          Result[:CO2_proc_em_t][sd.Grid_buy[g]] =
-              sum(pd.CO2_profile_emitted[sd.Grid_CO2_emitted_p[g], t] * Bought[sd.Grid_buy[g], t] for t = 1:T) #In kg CO2e
-      end
-  end
-  =#
-
   #Energy content and convertions for main fuel
   yearly_prod_kg, unit_prod_kg = scale_mass_power_energy_units(sum(X[u, t] for u in sd.MainFuel, t =1:T), td.Output_units[sd.MainFuel[1]]; force_unit_prefix = "kg") #Convert yearly production in kilos
   total_energy_content_GJ, unit_tot_energyJ = scale_mass_power_energy_units(yearly_prod_kg * Fuel_energy_content_list[scd.Fuel],"MJ$(scd.Fuel)"; force_unit_prefix="GJ") #Convert in GJ fuel per year
@@ -471,6 +460,8 @@ function add_lcia_results!(Result::Dict{Symbol,Any}, opt_data, opt_results, u::I
         for g = 1:sd.nGb
           Result[Symbol(string(cat_sym) * "_hourly")][sd.Grid_buy[g]] =
             sum(pd.Lcia_grid_profile[cat_sym][t] * Bought[sd.Grid_buy[g], t] for t = 1:T)
+
+          Result[Symbol(string(cat_sym) * "_hourly_perGJ")][sd.Grid_buy[g]]  = Result[Symbol(string(cat_sym) * "_hourly")][sd.Grid_buy[g]]/ total_energy_content_GJ
         end
     end
   end
