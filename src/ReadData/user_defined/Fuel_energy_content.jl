@@ -3,6 +3,9 @@
 Fuel_energy_content_list = Dict(
     "H2" => 120,
     "MeOH" => 19.9,
+    "MeOH B1" => 19.9,
+    "MeOH B2" => 19.9,
+    "MeOH CO2" => 19.9,
     "Bio-e-MeOH" => 19.9,
     "NH3" => 18.6,
     "DME-B2" => 28.8,

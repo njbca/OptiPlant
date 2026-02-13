@@ -7,7 +7,7 @@ using CSV, DataFrames, XLSX
 
 export write_hourly_results_LP, write_main_results_LP
 
-function write_hourly_results_LP(opt_data, opt_results, N_scen, resultsfolder, currency_multiplier)
+function write_hourly_results_LP(opt_data, opt_results, scenario_number, resultsfolder, currency_multiplier)
   
   #Unpack some of the optimization data
   U = opt_data.U
@@ -36,7 +36,7 @@ function write_hourly_results_LP(opt_data, opt_results, N_scen, resultsfolder, c
   Infos[8] = "CO2 capture: "*scd.CO2_capture
   Infos[9] = "CO2taxWTTup: "*"$(scd.CO2taxWTTup)"
   Infos[10] = "CO2taxWTTop: "*"$(scd.CO2taxWTTop)"
-  Infos[11] = "CO2WTTop_treshhold: "*"$(scd.CO2WTTop_treshhold)"
+  Infos[11] = "CO2WTTop_treshold: "*"$(scd.CO2WTTop_treshold)"
   Infos[12] = "Renewable criterion: "*scd.Current_rencrit
   Infos[13] = "Renewable application: "*"$(scd.Criterion_application)"
   Infos[14] = "CSP tech: "*scd.CSP_tech
@@ -76,11 +76,10 @@ function write_hourly_results_LP(opt_data, opt_results, N_scen, resultsfolder, c
 
     #Counted grid "legal" emissions (emissions affected by regulations and taxes)
     Grid_legal_emissions = zeros(T, 1)
-    if sd.Grid_CO2_regulated_p != 0
-      for t = 1:T
-        Grid_legal_emissions[t, 1] = pd.CO2_profile_regulated[sd.Grid_CO2_regulated_p[1], t] * Bought[sd.Grid_buy[1], t]
-      end
+    for t = 1:T
+      Grid_legal_emissions[t, 1] = pd.Grid_CO2_profile_regulated[t] * Bought[sd.Grid_buy[1], t]
     end
+
 
     df_flow = DataFrame(
         [Infos Time Solution_X Sc_tot pd.Renewable_criterion_profile Grid_legal_emissions Grid_real_emissions],
@@ -102,7 +101,7 @@ function write_hourly_results_LP(opt_data, opt_results, N_scen, resultsfolder, c
           "Real grid emissions"]
           )
     end
-    flows = "F_$N_scen.csv"
+    flows = "F_$scenario_number.csv"
     CSV.write(joinpath(flows_result_folder, flows), df_flow)
 
   end
@@ -129,7 +128,7 @@ function write_hourly_results_LP(opt_data, opt_results, N_scen, resultsfolder, c
       rename!(df_sold, ["Informations";"Time";Name_selected_units])
     end
     #File name
-    sold = "S_$N_scen.csv"
+    sold = "S_$scenario_number.csv"
     #Write the Csv file
     CSV.write(joinpath(sold_result_folder,sold),df_sold)
   end
@@ -181,14 +180,14 @@ function write_hourly_results_LP(opt_data, opt_results, N_scen, resultsfolder, c
         )
     end
     #File name
-    fuel_cost = "B_$N_scen.csv"
+    fuel_cost = "B_$scenario_number.csv"
     #Write the Csv file
     CSV.write(joinpath(bought_result_folder,fuel_cost),df_fuel_cost)
   end
 
 end
 
-function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
+function write_main_results_LP(opt_data, opt_results, scenario_number, resultsfolder,
    results_currency, results_currency_multiplier,
    default_results_cost_scale, default_results_capacity_units, default_results_production_units,remove_lcia_phases;
    model::String ="LP", pareto_results_folder::Union{String,Nothing} = nothing,  Sol_number::Int64= 1,
@@ -224,7 +223,7 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
   #Numeric results
   for name in (
       :fuelprice, :fuelprice_t, :fixedOM, :varOM, :investment, :investment_annualised, :production, 
-      :TotCO2tax_up, :TotCO2tax_op, :CO2taxWTTup, :CO2taxWTTop, :CO2WTTop_treshhold, 
+      :TotCO2tax_up, :TotCO2tax_op, :CO2taxWTTup, :CO2taxWTTop, :CO2WTTop_treshold, 
       :sold, :fuelsold_t, :prodcost, :capacity, :el_cons, :costs, :cost_unit, :load_average,
       :FLH, :prodcost_fuel_kg, :prodcost_fuel_GJ, :prodcost_fuel_MWh,
       :prodcost_perunit, :CO2_proc_reg_t, :CO2_regulated,
@@ -237,7 +236,8 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
   str_arrays = (
     :year, :location, :profile, :fuel, :electrolyser,
     :CO2_capture, :CSP_tech, :power_TS, :sim_hours,
-    :CO2_count_method_reg, :rencrit, :crit_app, :scenario,
+    :CO2_count_method_reg, :Hourly_lcia_count_method, 
+    :rencrit, :crit_app, :scenario,
     :unit_capacity, :unit_production
     )
   for name in str_arrays
@@ -301,10 +301,10 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
   end
 
   # Regulated CO₂ accounting
-  if sd.Grid_CO2_regulated_p[1] > 0 && sd.Grid_buy[1] > 0
-      for u = 1:sd.nGCO2reg
+  if sd.Grid_buy[1] > 0
+      for u = 1:sd.nGb
           Result[:CO2_proc_reg_t][sd.Grid_buy[u]] =
-              sum(pd.CO2_profile_regulated[sd.Grid_CO2_regulated_p[u], t] * Bought[sd.Grid_buy[u], t] for t = 1:T) #In kg CO2e
+              sum(pd.Grid_CO2_profile_regulated[t] * Bought[sd.Grid_buy[u], t] for t = 1:T) #In kg CO2e
       end
   end
 
@@ -327,9 +327,10 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
     Result[:power_TS][u]              = scd.Power_TS
     Result[:sim_hours][u]             = scd.Sim_hours
     Result[:CO2_count_method_reg][u]  = scd.CO2_count_method_reg
+    Result[:Hourly_lcia_count_method][u]  = scd.Hourly_lcia_count_method
     Result[:CO2taxWTTup][u]           = scd.CO2taxWTTup
     Result[:CO2taxWTTop][u]           = scd.CO2taxWTTop
-    Result[:CO2WTTop_treshhold][u]    = scd.CO2WTTop_treshhold
+    Result[:CO2WTTop_treshold][u]    = scd.CO2WTTop_treshold
     Result[:rencrit][u]               = scd.Current_rencrit
     Result[:crit_app][u]              = string(scd.Criterion_application)
 
@@ -376,8 +377,8 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
   cols = [
     Result[:scenario], Name_selected_units, Result[:year], Result[:location], Result[:profile], Result[:power_TS],
     Result[:fuel], Result[:electrolyser], Result[:CO2_capture], Result[:CSP_tech], Result[:sim_hours],
-    Result[:CO2_count_method_reg], Result[:CO2taxWTTup], Result[:CO2taxWTTop], 
-    Result[:CO2WTTop_treshhold], Result[:rencrit], Result[:crit_app],
+    Result[:CO2_count_method_reg], Result[:Hourly_lcia_count_method], Result[:CO2taxWTTup], Result[:CO2taxWTTop], 
+    Result[:CO2WTTop_treshold], Result[:rencrit], Result[:crit_app],
     Result[:capacity], Result[:unit_capacity], Result[:investment], Result[:investment_annualised], Result[:fixedOM], Result[:varOM],
     Result[:TotCO2tax_up], Result[:TotCO2tax_op], Result[:fuelprice], Result[:sold], Result[:cost_unit],
     Result[:production], Result[:unit_production], Result[:el_cons], Result[:load_average], Result[:FLH],
@@ -387,9 +388,10 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
   
   Result_name = [
       "Scenario", "Type of unit", "Year data", "Location", "Profile", "Power time series name", "Fuel", "Electrolyser",
-      "CO2 capture", "CSP technology", "Simulation hours", "Hourly CO2 accounting method for regulation", 
+      "CO2 capture", "CSP technology", "Simulation hours", "Hourly CO2 accounting method for regulation",
+      "Hourly lcia count method", 
       "CO2 tax level upstream (EUR/kgCO2)", "CO2 tax level operational (EUR/kgCO2)", 
-      "Max yearly emission treshhold", "Renewable criterion", "Criterion application",
+      "Max yearly emission treshold", "Renewable criterion", "Criterion application",
       "Installed capacity", "Units Capacity", 
       "Total investment ($(default_results_cost_scale*results_currency))", "Annualised investment ($(default_results_cost_scale*results_currency))",
       "Fixed O&M ($(default_results_cost_scale*results_currency))", "Variable O&M ($(default_results_cost_scale*results_currency))", 
@@ -422,7 +424,7 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
   if model == "LP_2obj"
 
     # Create the folder to write the results if it does not exists
-    pareto_main_results_folder = joinpath(pareto_results_folder,"Main results","Scenario_$(N_scen)")
+    pareto_main_results_folder = joinpath(pareto_results_folder,"Main results","Scenario_$(scenario_number)")
     if !isdir(pareto_main_results_folder)
       mkpath(pareto_main_results_folder)
     end
@@ -435,7 +437,7 @@ function write_main_results_LP(opt_data, opt_results, N_scen, resultsfolder,
     if !isdir(main_results_folder)
       mkpath(main_results_folder)
     end
-    results_file = "Scenario_$(N_scen).csv"
+    results_file = "Scenario_$(scenario_number).csv"
     CSV.write(joinpath(main_results_folder, results_file), df_results)
   end
 end

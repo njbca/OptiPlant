@@ -74,8 +74,8 @@ ScenarioTags = (
     h2_storage                 = "H2 storage",
     power_ts                   = "Profile time series",
     simulation_hours           = "Simulation hours",
-    co2_count_method_reg       = "Hourly CO2 count method regulation",
-    co2_count_method_em        = "Hourly CO2 count method emission",
+    co2_count_method_reg       = "Hourly CO2 count method for regulation",
+    hourly_lcia_count_method   = "Hourly lcia count method",
     co2_tax_wttop              = "CO2taxWTTop",
     co2_tax_wttup              = "CO2taxWTTup",
     co2_wttop_threshold        = "CO2treshWTTop",
@@ -216,9 +216,6 @@ SubsetTags = (
     grid_deficit        = "Grid_deficit",
     heat_excess         = "Heat_excess",
     heat_deficit        = "Heat_deficit",
-
-    # Grid CO2 profiles
-    grid_reg            = "Grid_CO2_regulated",
 )
 
 

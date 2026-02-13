@@ -8,7 +8,7 @@ export subsets_opt_data, build_subsets_opt_data
 # Struct to hold all relevant subsets
 
 struct subsets_opt_data
-    # Subsets related to techno-economics
+    # Subsets related to techno-economics (given as row number in the data set i.e. RPU = [3, 13, 14])
     Reactants
     R
     MainFuel
@@ -46,16 +46,12 @@ struct subsets_opt_data
     Heat_excess; nHe
     Heat_deficit; nHd
 
-    # Subsets related to regulated CO2 profiles
-    Grid_CO2_regulated_p; nGCO2reg
-
     # Subsets related to lcia hourly data
     Impact_categories_list_p; nImpactCat
 
     # Number of subsets per profile type
     nSubf #Flux
     nSubp #Price
-    nSubC_reg #CO2 regulated
 end
 
 """
@@ -119,8 +115,6 @@ function build_subsets_opt_data(
 
     Subsets_flux, nSubf = extract_subset_profiles(Data_flux_profile, idx_f.subsets)
     Subsets_price, nSubp = extract_subset_profiles(Data_price_profile, idx_pr.subsets)
-
-    Subsets_CO2_reg, nSubC_reg = extract_subset_profiles(Data_CO2_profile_reg, idx_CO2_reg.subsets)
 
     Impact_categories_list_p, nImpactCat = extract_subset_profiles(Data_lcia_profile, idx_lcia_profile.impactcategoriesprofile)
    
@@ -199,9 +193,6 @@ function build_subsets_opt_data(
     Heat_excess, nHe = extract_from_subsets(Subsets_flux, SubsetTags.heat_excess)
     Heat_deficit, nHd = extract_from_subsets(Subsets_flux, SubsetTags.heat_deficit)
 
-    # === Subsets related to grid CO2 profiles ===
-    Grid_CO2_regulated_p, nGCO2reg = extract_from_subsets(Subsets_CO2_reg, SubsetTags.grid_reg)
-
     return subsets_opt_data(
         Reactants, R, MainFuel, PU, RPU, nRPU,
         Grid_in, Heat_in, Grid_out, Heat_out,
@@ -215,9 +206,8 @@ function build_subsets_opt_data(
         Heat_sell_p, Heat_buy_p, Grid_sell_p, Grid_buy_p, RPU_p,
         Grid_excess, nGe, Grid_deficit, nGd,
         Heat_excess, nHe, Heat_deficit, nHd,
-        Grid_CO2_regulated_p, nGCO2reg,
         Impact_categories_list_p, nImpactCat,
-        nSubf, nSubp, nSubC_reg
+        nSubf, nSubp
     )
 end
 

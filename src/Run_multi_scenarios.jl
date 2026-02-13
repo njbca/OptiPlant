@@ -68,7 +68,8 @@ function run_optimization_scenarios(
 
     for N_scen in 1:N_scen_total
       # Extract scenario data
-      scen_data = build_scenario_opt_data(wb_techno, scenario_set, Available_sheets_techno, scenarios_to_run[N_scen])
+      scenario_number = scenarios_to_run[N_scen]
+      scen_data = build_scenario_opt_data(wb_techno, scenario_set, Available_sheets_techno, scenario_number)
 
       # If defined by the user in the excel, get profile data from the scenario list (inconvenient: open the file at each iteration)
       if profiles_filename == "Check_techno_eco"
@@ -106,7 +107,7 @@ function run_optimization_scenarios(
 
       # Get profile data
       profile_data = load_and_locate_profile_data(wb_profile, Available_sheets_profiles, key_terms_profiles)
-      profile_data_filtered = filter_all_profile_data(profile_data, scen_data, lcia_data)
+      profile_data_filtered = filter_all_profile_data(Data_units_filtered, profile_data, techno_scen_data, scen_data, lcia_data)
 
       # Build optimization input data
       dat_sub, dat_t, dat_t_sources, dat_p, dat_lcia = build_optimization_data(
@@ -135,19 +136,19 @@ function run_optimization_scenarios(
 
       # Save input data if needed
       if save_input_profiles || save_input_technoeco
-        write_input_data(opt_data, save_input_technoeco, save_input_profiles, save_input_lcia, resultsfolder, N_scen)
+        write_input_data(opt_data, save_input_technoeco, save_input_profiles, save_input_lcia, resultsfolder, scenario_number)
       end
 
       # Solve the model and write the results as csv
       if model == "LP"
         opt_results = Solve_OptiPlant_LP(opt_data, solver)
         if scen_data.Write_flows || scen_data.Write_sold_products || scen_data.Write_fuel_cost
-          write_hourly_results_LP(opt_data, opt_results, N_scen, resultsfolder, results_currency_multiplier)
+          write_hourly_results_LP(opt_data, opt_results, scenario_number, resultsfolder, results_currency_multiplier)
         end
         # Write all results and LCIA/LCA results only if LCIA data is available
         write_main_results_LP(opt_data,
                               opt_results,
-                              N_scen,
+                              scenario_number,
                               resultsfolder,
                               results_currency,
                               results_currency_multiplier, 
@@ -158,7 +159,7 @@ function run_optimization_scenarios(
                               write_lca_results = !isnothing(opt_data.dat_lcia))
       
       elseif model == "LP_2obj" 
-        generate_adaptive_pareto_curve(opt_data, solver, N_scen, resultsfolder,
+        generate_adaptive_pareto_curve(opt_data, solver, scenario_number, resultsfolder,
                                         results_currency, results_currency_multiplier,
                                         default_results_cost_scale,
                                         default_results_capacity_units,

@@ -132,7 +132,7 @@ Files are organized in a dedicated folder within the results directory.
 
 # Behavior
 - Creates a subfolder `"Data used/Scenario_Nscen"` under the scenario result folder.
-- Saves profile matrices as CSV files: flux, price, CO₂ regulated, Lcia profiles, and renewable criterion.
+- Saves profile matrices as CSV files: flux, price, Grid CO₂ regulated, Lcia profiles, and renewable criterion.
 - Saves techno-economic data for selected units, including optional source data if provided.
 - Inserts unit names as the first column in techno-economic CSV files.
 
@@ -164,13 +164,13 @@ function write_input_data(opt_data, save_input_technoeco::Bool, save_input_profi
     if save_input_profiles
         CSV.write(joinpath(data_used_folder , "Flux_Profiles.csv"), matrix_to_dataframe(pd.Flux_Profile,"Flux"))
         CSV.write(joinpath(data_used_folder , "Price_Profiles.csv"), matrix_to_dataframe(pd.Price_Profile, "Price"))
-        CSV.write(joinpath(data_used_folder , "CO2_profiles_regulated.csv"), matrix_to_dataframe(pd.CO2_profile_regulated, "CO2_reg"))
-        CSV.write(joinpath(data_used_folder, "Hourly_lcia_profiles.csv"), lciahourly_to_dataframe(pd.Lcia_grid_profile))
+        CSV.write(joinpath(data_used_folder, "Grid_hourly_lcia_profiles.csv"), lciahourly_to_dataframe(pd.Lcia_grid_profile))
 
         # For 1D vector, use a simpler DataFrame
-        df_renewable = DataFrame(t = 1:length(pd.Renewable_criterion_profile),
-                             value = pd.Renewable_criterion_profile)
-        CSV.write(joinpath(data_used_folder , "Renewable_criterion_profiles.csv"), df_renewable)
+        df_renewable_crit = DataFrame(t = 1:length(pd.Renewable_criterion_profile), value = pd.Renewable_criterion_profile)
+        df_CO2_grid_profiles = DataFrame(t = 1:length(pd.Grid_CO2_profile_regulated), value = pd.Grid_CO2_profile_regulated)
+        CSV.write(joinpath(data_used_folder , "Renewable_criterion_profiles.csv"), df_renewable_crit)
+        CSV.write(joinpath(data_used_folder , "Grid_CO2_profiles_regulated.csv"), df_CO2_grid_profiles)
     end
 
     if save_input_technoeco

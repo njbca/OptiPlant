@@ -56,7 +56,7 @@ function Solve_OptiPlant_LP(opt_data, solver)
   + sum(pd.Price_Profile[sd.Grid_buy_p[u],t]*Bought[sd.Grid_buy[u],Time[t]]*pd.Renewable_criterion_profile[t] for u=1:sd.nGb,t=1:T if sd.Grid_buy_p[u] > 0 && sd.Grid_buy[u] > 0)
   + sum((pd.Price_Profile[sd.Grid_buy_p[u],t]+scd.NonRenCostPenalty)*Bought[sd.Grid_buy[u],Time[t]]*(1-pd.Renewable_criterion_profile[t]) for u=1:sd.nGb,t=1:T if sd.Grid_buy_p[u] > 0 && sd.Grid_buy[u] > 0)
   + sum(pd.Price_Profile[sd.Heat_buy_p[u],t]*Bought[sd.Hourly_heat_buy[u],Time[t]] for u=1:sd.nHb,t=1:T if sd.Heat_buy_p[u] > 0 && sd.Hourly_heat_buy[u] > 0)
-  + sum(scd.CO2taxWTTop*pd.CO2_profile_regulated[sd.Grid_CO2_regulated_p[u],t]*Bought[sd.Grid_buy[u],Time[t]] for u=1:sd.nGCO2reg,t=1:T if sd.Grid_CO2_regulated_p[u] > 0 && sd.Grid_buy[u] > 0)
+  + sum(scd.CO2taxWTTop*pd.Grid_CO2_profile_regulated[t]*Bought[sd.Grid_buy[u],Time[t]] for u=1:sd.nGb, t=1:T if sd.Grid_buy[u] > 0)
   + sum((td.Invest[u]*td.Annuity_factor[u] + td.FixOM[u] + scd.CO2taxWTTup*td.CO2_inf_reg[u])*Capacity[u] for u=1:U)
   + sum((td.VarOM[u] + scd.CO2taxWTTop*td.CO2_proc_fixed_reg[u])*X[u,t] for u=1:U,t in Time)
   - sum(td.Fuel_Selling_fixed[u]*Sold[u,t] for u=1:U,t in Time)
@@ -65,9 +65,9 @@ function Solve_OptiPlant_LP(opt_data, solver)
   )
 
   #Enforcement of a maximum WTT operational emissions over a year in kg CO2e, Treshold also mean that grid electricity intensity is below x value. 
-  if scd.CO2WTTop_treshhold >= 0
-    @constraint(Model_LP, sum(pd.CO2_profile_regulated[sd.Grid_CO2_regulated_p[u],t]*Bought[sd.Grid_buy[u],Time[t]] for u=1:sd.nGCO2reg,t=1:T if sd.Grid_CO2_regulated_p[u] > 0)
-    + sum(td.CO2_proc_fixed_reg[u]*X[u,t] for u=1:U,t in Time) <= scd.CO2WTTop_treshhold*Fuel_energy_content*sum(Sold[i,t] for t in Time, i in sd.MinD))
+  if scd.CO2WTTop_treshold >= 0
+    @constraint(Model_LP, sum(pd.Grid_CO2_profile_regulated[t]*Bought[sd.Grid_buy[u],Time[t]] for t=1:T if sd.Grid_buy[u] > 0)
+    + sum(td.CO2_proc_fixed_reg[u]*X[u,t] for u=1:U,t in Time) <= scd.CO2WTTop_treshold*Fuel_energy_content*sum(Sold[i,t] for t in Time, i in sd.MinD))
   end
 
   #Enforcement of renewable criterion satisfied at all time

@@ -23,10 +23,10 @@ struct scenario_opt_data
     H2_storage::String
     Power_TS::String
     CO2_count_method_reg::String
-    CO2_count_method_em::String
+    Hourly_lcia_count_method::String
     CO2taxWTTop::Float64
     CO2taxWTTup::Float64
-    CO2WTTop_treshhold::Float64
+    CO2WTTop_treshold::Float64
     Current_rencrit::String
     Criterion_application::Float64
     NonRenCostPenalty::Float64
@@ -83,8 +83,8 @@ A `scenario_opt_data` object containing:
 - **General scenario info**: `Scenario_name`, `Scenario`, `Year`
 - **Profiles**: `Profile_name`, `Profile_folder_name`, `Location`
 - **System configuration**: `Fuel`, `Electrolyser`, `CO2_capture`, `CSP_tech`, `Water_supply`, `H2_storage`, `Power_TS`
-- **CO₂ regulation**: `CO2_count_method_reg`, `CO2_count_method_em`, `CO2taxWTTop`, `CO2taxWTTup`,
-  `CO2WTTop_treshhold`, `Current_rencrit`, `Criterion_application`, `NonRenCostPenalty`
+- **CO₂ regulation**: `CO2_count_method_reg`, `Hourly_lcia_count_method`, `CO2taxWTTop`, `CO2taxWTTup`,
+  `CO2WTTop_treshold`, `Current_rencrit`, `Criterion_application`, `NonRenCostPenalty`
 - **Files and references**: `Lcia_filename`, `Result_folder_name`, `Input_data`, `Input_ref`
 - **Options**: Capacity, ramping, negative prices, product sales options, output toggles, etc.
 - **Simulation hours**: `Sim_hours`, time horizon (`Time`, `T`, `Tstart`), demand target structure (`T_period`, `Time_demand_target`), and periodicity flag (`periodic_demand_targets`)
@@ -141,13 +141,15 @@ function build_scenario_opt_data(wb_techno, Scenarios_set, Available_sheets_tech
 
     # CO2 regulation
     CO2_count_method_reg = getval(ScenarioTags.co2_count_method_reg; default="None", as_string=true)
-    CO2_count_method_em  = getval(ScenarioTags.co2_count_method_em; default="None", as_string=true)
     CO2taxWTTop          = getval(ScenarioTags.co2_tax_wttop; default=0)
     CO2taxWTTup          = getval(ScenarioTags.co2_tax_wttup; default=0)
-    CO2WTTop_treshhold   = getval(ScenarioTags.co2_wttop_threshold; default="None", as_string=true)
-    CO2WTTop_treshhold   = isa(CO2WTTop_treshhold, String) ? -1 : CO2WTTop_treshhold
+    CO2WTTop_treshold   = getval(ScenarioTags.co2_wttop_threshold; default="None", as_string=true)
+    CO2WTTop_treshold   = isa(CO2WTTop_treshold, String) ? -1 : CO2WTTop_treshold
     Current_rencrit      = getval(ScenarioTags.renewable_criterion; default="None", as_string=true)
     Criterion_application= getval(ScenarioTags.criterion_application; default=0)
+
+    # Hourly lcia
+    Hourly_lcia_count_method  = getval(ScenarioTags.hourly_lcia_count_method; default="None", as_string=true)
 
 
     NonRenCostPenalty = Criterion_application == -1 ? 0 : Criterion_application
@@ -229,10 +231,10 @@ function build_scenario_opt_data(wb_techno, Scenarios_set, Available_sheets_tech
         H2_storage,
         Power_TS,
         CO2_count_method_reg,
-        CO2_count_method_em,
+        Hourly_lcia_count_method,
         CO2taxWTTop,
         CO2taxWTTup,
-        CO2WTTop_treshhold,
+        CO2WTTop_treshold,
         Current_rencrit,
         Criterion_application,
         NonRenCostPenalty,
