@@ -167,21 +167,22 @@ function filter_all_profile_data(
 
     # === Filter by profile time series origin (MERRA, SARAH, etc...) ===
     Data_flux_profile_filtered = filter_profile(Data_flux_profile_filtered, indexes.idx_f.timeseries, corners.C0_f, scen.Power_TS)
+    # === Filter flux by removing those not defined in the Data_units sheet (no subsets) ===
+    Subsets, nSubsets = extract_subset_technoeco(Data_units, L1, idx_t.subsets) 
+    Data_flux_profile_filtered = filter_profile(Data_flux_profile_filtered, indexes.idx_f.subsets, corners.C0_f, Subsets)
+
     # === Filter by CO2 accounting method
     Data_CO2_profile_reg_filtered = filter_profile(Data_CO2_profile_reg_filtered, indexes.idx_CO2_reg.countmethod, corners.C0_CO2_reg, scen.CO2_count_method_reg)
     # === Filter by renewable criterion applied method ===
     Data_rencrit_profile_filtered = filter_profile(Data_rencrit_profile_filtered, indexes.idx_rencrit.subsets, corners.C0_rencrit, scen.Current_rencrit)
+
     # === Filter by lcia hourly accounting method ===
-    Data_lcia_profile_filtered = filter_profile(Data_lcia_profile, indexes.idx_lcia_profile.countmethod, corners.C0_lcia_profile, scen.Hourly_lcia_count_method)
+    Data_lcia_profile_filtered = filter_profile(Data_lcia_profile_filtered, indexes.idx_lcia_profile.countmethod, corners.C0_lcia_profile, scen.Hourly_lcia_count_method)
 
-    # === Filter flux by removing those not defined in the Data_units sheet (no subsets) ===
-
-    Subsets, nSubsets = extract_subset_technoeco(Data_units, L1, idx_t.subsets) 
-    Data_flux_profile_filtered = filter_profile(Data_flux_profile_filtered,indexes.idx_f.subsets, corners.C0_f, Subsets)
-
-    # === Filter profile lcia categories ===
+    # === Filter by criterion defined in the lcia data file ===
 
     if ! isnothing(lcia_data)
+
         # Get the list of filtering parameters from the excel file
         Lciafilters_parameters_name = lcia_data.Data_lcia_filters[lcia_data.indexes.idx_lcia_filters.corner[1], 
                                      lcia_data.indexes.idx_lcia_filters.corner[2]:end]
@@ -192,10 +193,14 @@ function filter_all_profile_data(
         as_string=as_string, warn=warn
         )
 
+        sanitize_string(s) = String(replace(lowercase(string(s)), r"[^a-z0-9]+" => "_"))
         Impact_categories_to_keep = get_lcia_filters_param(LCIAFilterColumnNames.impact_categories_filter; warn=true)
 
         if Impact_categories_to_keep[1] != "Keep_all"
-            Data_lcia_profile_filtered = filter_profile(Data_lcia_profile, indexes.idx_lcia_profile.impactcategoriesprofile, corners.C0_lcia_profile, Impact_categories_to_keep)
+            for i in eachindex(Impact_categories_to_keep)
+                Impact_categories_to_keep[i] = sanitize_string(Impact_categories_to_keep[i])
+            end
+            Data_lcia_profile_filtered = filter_profile(Data_lcia_profile_filtered, indexes.idx_lcia_profile.impactcategoriesprofile, corners.C0_lcia_profile, Impact_categories_to_keep)
         end
     end
 
@@ -279,8 +284,10 @@ function build_profiles_opt_data(
     #--------------------------------------------------------
     # CO2 Profiles: the one accounted for regulation
     Grid_CO2_profile_regulated = zeros(T)
-    for t = 1:T
-        Grid_CO2_profile_regulated[t] = Data_CO2_profile_reg[corners.L0_CO2_reg + Time[t], corners.C0_CO2_reg]
+    if ! isnothing(Data_CO2_profile_reg)
+        for t = 1:T
+            Grid_CO2_profile_regulated[t] = Data_CO2_profile_reg[corners.L0_CO2_reg + Time[t], corners.C0_CO2_reg]
+        end
     end
 
     #--------------------------------------------------------

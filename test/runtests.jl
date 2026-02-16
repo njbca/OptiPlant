@@ -21,7 +21,7 @@ using OptiPlantPtX
     @testset "Sequential run LP" begin
         result = run_optimization_scenarios(
             "Full_model",
-            "Full_data_simple",
+            "Full_data",
             "ScenariosToRun",
             "HiGHS",
             3:4;
@@ -35,10 +35,10 @@ using OptiPlantPtX
     @testset "Sequential run LP_2obj" begin
         result = run_optimization_scenarios(
             "Full_model",
-            "Full_data_simple",
+            "Full_data",
             "ScenariosToRun",
             "HiGHS",
-            1:1;
+            [1];
             model = "LP_2obj", #LP_2obj
             N_pareto_points = 6,
             interior_points = 2,

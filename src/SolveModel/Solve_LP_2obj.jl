@@ -63,7 +63,7 @@ function Solve_OptiPlant_LP_2obj(opt_data, solver;
   + sum(pd.Price_Profile[sd.Grid_buy_p[u],t]*Bought[sd.Grid_buy[u],Time[t]]*pd.Renewable_criterion_profile[t] for u=1:sd.nGb,t=1:T if sd.Grid_buy_p[u] > 0 && sd.Grid_buy[u] > 0)
   + sum((pd.Price_Profile[sd.Grid_buy_p[u],t]+scd.NonRenCostPenalty)*Bought[sd.Grid_buy[u],Time[t]]*(1-pd.Renewable_criterion_profile[t]) for u=1:sd.nGb,t=1:T if sd.Grid_buy_p[u] > 0 && sd.Grid_buy[u] > 0)
   + sum(pd.Price_Profile[sd.Heat_buy_p[u],t]*Bought[sd.Hourly_heat_buy[u],Time[t]] for u=1:sd.nHb,t=1:T if sd.Heat_buy_p[u] > 0 && sd.Hourly_heat_buy[u] > 0)
-  + sum(scd.CO2taxWTTop*pd.Grid_CO2_profile_regulated[t]*Bought[sd.Grid_buy[u],Time[t]] for t=1:T if sd.Grid_buy[u] > 0)
+  + sum(scd.CO2taxWTTop*pd.Grid_CO2_profile_regulated[t]*Bought[sd.Grid_buy[u],Time[t]] for u=1:sd.nGb, t=1:T if sd.Grid_buy[u] > 0)
   + sum((td.Invest[u]*td.Annuity_factor[u] + td.FixOM[u] + scd.CO2taxWTTup*td.CO2_inf_reg[u])*Capacity[u] for u=1:U)
   + sum((td.VarOM[u] + scd.CO2taxWTTop*td.CO2_proc_fixed_reg[u])*X[u,t] for u=1:U,t in Time)
   - sum(td.Fuel_Selling_fixed[u]*Sold[u,t] for u=1:U,t in Time)
@@ -72,7 +72,7 @@ function Solve_OptiPlant_LP_2obj(opt_data, solver;
   )
 
   #"Total" emissions count equation in kg CO2e per year
-  objectives[:emissions_CO2e_regulated] = @expression(Model_LP, sum(pd.Grid_CO2_profile_regulated[t]*Bought[sd.Grid_buy[u],Time[t]] for t=1:T)
+  objectives[:emissions_CO2e_regulated] = @expression(Model_LP, sum(pd.Grid_CO2_profile_regulated[t]*Bought[sd.Grid_buy[u],Time[t]] for u=1:sd.nGb, t=1:T)
   + sum(td.CO2_inf_reg[u]*Capacity[u] for u=1:U)
   + sum(td.CO2_proc_fixed_reg[u]*X[u,t] for u=1:U,t in Time))
 
