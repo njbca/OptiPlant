@@ -1,0 +1,620 @@
+module Results_LP
+
+include("../ReadData/user_defined/Fuel_energy_content.jl")
+include("HelperFunctionsWrite.jl")
+
+using CSV, DataFrames, XLSX
+
+export write_hourly_results_LP, write_main_results_LP
+
+function write_hourly_results_LP(opt_data, opt_results, scenario_number, resultsfolder, currency_multiplier;
+                                model::String ="LP", pareto_results_folder::Union{String,Nothing} = nothing,  Sol_number::Int64= 1)
+  
+  #Unpack some of the optimization data
+  U = opt_data.U
+  Name_selected_units = [string(x) for x in opt_data.Name_selected_units] #Extract and convert into a vector of strings
+  td = opt_data.dat_t #Techno-economic data
+  sd = opt_data.dat_sub #Subset data
+  pd = opt_data.dat_p #Profile data
+  scd = opt_data.dat_scen #Scenario data
+
+  X = opt_results.Flows
+  Sold = opt_results.Sold
+  Bought = opt_results.Bought
+
+  T = scd.T
+  Time = scd.Time
+
+  # Vector with main scenarios informations
+  Infos = Array{String,1}(undef,T)
+  Infos[1] = "Scenario: "*scd.Scenario_name
+  Infos[2] = "Year data: "*scd.Year
+  Infos[3] = "Profile: "*scd.Profile_name
+  Infos[4] = "Power time series name: "*scd.Power_TS
+  Infos[5] = "Location: "*scd.Location
+  Infos[6] = "Fuel: "*scd.Fuel
+  Infos[7] = "Electrolyser: "*scd.Electrolyser
+  Infos[8] = "CO2 capture: "*scd.CO2_capture
+  Infos[9] = "CO2taxWTTup: "*"$(scd.CO2taxWTTup)"
+  Infos[10] = "CO2taxWTTop: "*"$(scd.CO2taxWTTop)"
+  Infos[11] = "CO2WTTop_treshold: "*"$(scd.CO2WTTop_treshold)"
+  Infos[12] = "Renewable criterion: "*scd.Current_rencrit
+  Infos[13] = "Renewable application: "*"$(scd.Criterion_application)"
+  Infos[14] = "CSP tech: "*scd.CSP_tech
+
+  for i = 15:T
+      Infos[i] = " "
+  end
+  
+  #---------------- Optimal variable flows and total specific consumption -------------
+  if scd.Write_flows == true
+
+    #Total electricity consumption
+    Sc_tot = zeros(T)
+    for t = 1:T
+      Sc_tot[t] = sum(td.Sc_nom[u] * X[u, t] for u=1:U)
+    end
+
+    # Flows
+    Solution_X = zeros(T, U)
+    for u = 1:U, t = 1:T
+        Solution_X[t, u] = X[u, t]
+    end
+
+    #Counted grid "real" emissions (emissions not affected by regulations and taxes)
+    Grid_real_emissions = zeros(T, 1)
+    if haskey(pd.Lcia_grid_profile, :climate_change)
+      for t = 1:T
+        Grid_real_emissions[t, 1] = pd.Lcia_grid_profile[:climate_change][t] * Bought[sd.Grid_buy[1], t]
+      end
+    end
+
+    #Counted grid "legal" emissions (emissions affected by regulations and taxes)
+    Grid_legal_emissions = zeros(T, 1)
+    for t = 1:T
+      Grid_legal_emissions[t, 1] = pd.Grid_CO2_profile_regulated[t] * Bought[sd.Grid_buy[1], t]
+    end
+
+
+    df_flow = DataFrame(
+        [Infos Time Solution_X Sc_tot pd.Renewable_criterion_profile Grid_legal_emissions Grid_real_emissions],
+        :auto
+    )
+
+    if !isnothing(td.Output_units)
+      rename!(
+        df_flow,
+        ["Informations"; "Time"; Name_selected_units .* " [" .* td.Output_units .* "]"; "Electricity consumption [kWhe]"; 
+          "Certified grid electricity (1=true)"; "Legal grid emissions"; 
+          "Real grid emissions"]
+          )
+    else
+      rename!(
+        df_flow,
+        ["Informations"; "Time"; Name_selected_units ; "Electricity consumption [kWhe]"; 
+          "Certified grid electricity (1=true)"; "Legal grid emissions"; 
+          "Real grid emissions"]
+          )
+    end
+
+    if model == "LP_2obj"
+      # Create the folder to write the results if it does not exists
+      pareto_main_results_folder = joinpath(pareto_results_folder,"Hourly results","Flows","Scenario_$(scenario_number)")
+      if !isdir(pareto_main_results_folder)
+        mkpath(pareto_main_results_folder)
+      end
+
+      flows = "Sol_$(Sol_number).csv"
+      CSV.write(joinpath(pareto_main_results_folder, flows), df_flow)
+
+    else
+
+      #Check if the folder were to write data exists, create if it does not
+      flows_result_folder = joinpath(resultsfolder,scd.Result_folder_name,"Hourly results","Flows")
+      if !isdir(flows_result_folder)
+        mkpath(flows_result_folder)
+      end
+
+      flows = "F_$scenario_number.csv"
+      CSV.write(joinpath(flows_result_folder, flows), df_flow)
+
+    end
+
+  end
+
+  #---------------- Variable sold ---------------------------------
+  if scd.Write_sold_products == true
+
+    Solution_Sold = zeros(T,U)
+    for u=1:U, t=1:T
+      Solution_Sold[t,u] = Sold[u,t]
+    end
+    #Data frame definition
+    df_sold = DataFrame([Infos Time Solution_Sold], :auto)
+    #Headlines
+    if !isnothing(td.Output_units)
+      rename!(df_sold, ["Informations";"Time";Name_selected_units .* " [" .* td.Output_units .* "]"])
+    else
+      rename!(df_sold, ["Informations";"Time";Name_selected_units])
+    end
+
+    if model == "LP_2obj"
+      # Create the folder to write the results if it does not exists
+      pareto_main_results_folder = joinpath(pareto_results_folder,"Hourly results","Sold","Scenario_$(scenario_number)")
+      if !isdir(pareto_main_results_folder)
+        mkpath(pareto_main_results_folder)
+      end
+
+      sold = "Sol_$(Sol_number).csv"
+      CSV.write(joinpath(pareto_main_results_folder, sold), df_sold)
+
+    else
+      #Check if the folder were to write data exists, create if it does not
+      sold_result_folder = joinpath(resultsfolder,scd.Result_folder_name,"Hourly results","Sold")
+      if !isdir(sold_result_folder)
+        mkpath(sold_result_folder)
+      end
+      #File name
+      sold = "S_$scenario_number.csv"
+      #Write the Csv file
+      CSV.write(joinpath(sold_result_folder,sold),df_sold)
+    end
+  end
+
+  #----------------Variable fuel cost (~ bought)---------------------------------
+  if scd.Write_fuel_cost == true
+
+    #Data frame definition
+    Fuel_cost= zeros(U,T)
+    Fuel_cost_t_ren = zeros(U,T)
+    Fuel_cost_t_noren = zeros(U,T)
+
+    Solution_Bought = zeros(T,U)
+    println("Size Solution_Bought: $(size(Solution_Bought))")
+    println("Size Bought: $(size(Bought))")
+    for u=1:U, t=1:T
+      Solution_Bought[t,u] = Bought[u,t]
+    end
+  
+    if sd.Grid_buy[1] > 0 && sd.Grid_buy_p[1] > 0
+      for u=1:sd.nGb, t=1:T
+        Fuel_cost_t_ren[sd.Grid_buy[u],t] = pd.Price_Profile[sd.Grid_buy_p[u],t]*Bought[sd.Grid_buy[u],t]*pd.Renewable_criterion_profile[t]*currency_multiplier #Price of certified electricity
+        Fuel_cost_t_noren[sd.Grid_buy[u],t] = (pd.Price_Profile[sd.Grid_buy_p[u],t]+scd.NonRenCostPenalty)*Bought[sd.Grid_buy[u],t]*(1-pd.Renewable_criterion_profile[t])*currency_multiplier #Price of non-certified electricity
+      end
+    end
+
+    if sd.Hourly_heat_buy[1] > 0 && sd.Heat_buy_p[1] > 0
+      for u=1:sd.nHb, t=1:T
+        Fuel_cost_t_ren[sd.Hourly_heat_buy[u],t] = pd.Price_Profile[sd.Heat_buy_p[u],t]*Bought[sd.Hourly_heat_buy[u],t]*currency_multiplier
+      end
+    end
+
+    for u=1:U, t=1:T
+      Fuel_cost[u,t] = Fuel_cost_t_ren[u,t] + Fuel_cost_t_noren[u,t] + td.Fuel_Buying_fixed[u]*Bought[u,t]*currency_multiplier
+    end
+    df_fuel_cost = DataFrame([Infos Time transpose(Fuel_cost_t_ren) transpose(Fuel_cost_t_noren) transpose(Fuel_cost) Solution_Bought], :auto)
+    #Headlines
+    if !isnothing(td.Output_units)
+      rename!(
+        df_fuel_cost,
+        ["Informations";"Time"; Name_selected_units.*"_Ren".* " [" .* td.Output_units .* "]";
+        Name_selected_units.*"_NotRen".* " [" .* td.Output_units .* "]";
+        Name_selected_units.*"_total".* " [" .* td.Output_units .* "]";
+        Name_selected_units.*"_Bought".* " [" .* td.Output_units .* "]"]
+        )
+    else
+      rename!(
+        df_fuel_cost,
+        ["Informations";"Time"; Name_selected_units.*"_Ren";
+        Name_selected_units.*"_NotRen";
+        Name_selected_units.*"_total";
+        Name_selected_units.*"_Bought"]
+        )
+    end
+    
+    if model == "LP_2obj"
+
+      # Create the folder to write the results if it does not exists
+      pareto_main_results_folder = joinpath(pareto_results_folder,"Hourly results","Bought","Scenario_$(scenario_number)")
+      if !isdir(pareto_main_results_folder)
+        mkpath(pareto_main_results_folder)
+      end
+
+      fuel = "Sol_$(Sol_number).csv"
+      CSV.write(joinpath(pareto_main_results_folder, fuel), df_fuel_cost)
+
+    else
+
+      bought_result_folder = joinpath(resultsfolder,scd.Result_folder_name,"Hourly results","Bought")
+      if !isdir(bought_result_folder)
+        mkpath(bought_result_folder)
+      end
+      #File name
+      fuel_cost = "B_$scenario_number.csv"
+      #Write the Csv file
+      CSV.write(joinpath(bought_result_folder,fuel_cost),df_fuel_cost)
+    end
+  end
+
+end
+
+function write_main_results_LP(opt_data, opt_results, scenario_number, resultsfolder,
+   results_currency, results_currency_multiplier,
+   default_results_cost_scale, default_results_capacity_units, default_results_production_units,remove_lcia_phases;
+   model::String ="LP", pareto_results_folder::Union{String,Nothing} = nothing,  Sol_number::Int64= 1,
+   write_lca_results::Bool = true)                     
+
+  #Unpack some of the optimization data
+  U = opt_data.U
+  Name_selected_units = [string(x) for x in opt_data.Name_selected_units] #Extract and convert into a vector of strings
+  td = opt_data.dat_t #Techno-economic data
+  sd = opt_data.dat_sub #Subset data
+  pd = opt_data.dat_p #Profile data
+  scd = opt_data.dat_scen #Scenario data
+  dat_lcia = opt_data.dat_lcia #Lcia data
+  T = scd.T
+
+  X = opt_results.Flows
+  Sold = opt_results.Sold
+  Bought = opt_results.Bought
+  Capacity = opt_results.Capacity
+
+  if model == "LP_2obj"
+    Costs = opt_results.Objectives[:costs]
+  else
+    Costs = opt_results.Costs
+  end
+
+  #Function to scale cost units to the default unit (i.e. Millions) and apply a conversion rate
+  scale_c(value) = scale_cost_units(value, results_currency_multiplier; force_unit = default_results_cost_scale)
+
+  # ========= Initialization ==========
+
+  Result = Dict{Symbol, Any}()
+  #Numeric results
+  for name in (
+      :fuelprice, :fuelprice_t, :fixedOM, :varOM, :investment, :investment_annualised, :production, 
+      :TotCO2tax_up, :TotCO2tax_op, :CO2taxWTTup, :CO2taxWTTop, :CO2WTTop_treshold, 
+      :sold, :fuelsold_t, :prodcost, :capacity, :el_cons, :costs, :cost_unit, :load_average,
+      :FLH, :prodcost_fuel_kg, :prodcost_fuel_GJ, :prodcost_fuel_MWh,
+      :prodcost_perunit, :CO2_proc_reg_t, :CO2_regulated,
+      :CO2_regulated_per_unit, :CO2_regulated_GJ, :av_elec_cost
+  )
+      Result[name] = zeros(U)
+  end
+
+  #String results
+  str_arrays = (
+    :year, :location, :profile, :fuel, :electrolyser,
+    :CO2_capture, :CSP_tech, :power_TS, :sim_hours,
+    :CO2_count_method_reg, :Hourly_lcia_count_method, 
+    :rencrit, :crit_app, :scenario,
+    :unit_capacity, :unit_production
+    )
+  for name in str_arrays
+      Result[name] = Array{String, 1}(undef, U)
+  end
+
+  #Lca results
+  if write_lca_results == true
+    for cat_symbol in dat_lcia.impact_categories_symbol
+      for phase in (:inf, :use, :disp, :hourly, :total)
+          Result[Symbol(string(cat_symbol) * "_" * String(phase))] = zeros(U)
+          Result[Symbol(string(cat_symbol) * "_" * String(phase)* "_perGJ")] = zeros(U)
+      end
+    end
+  end
+
+  #Initialize the variables
+  unit_el_cons =  unit_prod_kg = unit_tot_energyJ = unit_tot_energyWh = unit_co2_reg = ""
+
+  # Sum values for profile dependent results
+
+  # Hourly electricity purchases from the grid
+  if sd.Grid_buy[1] > 0 && sd.Grid_buy_p[1] > 0
+      for u = 1:sd.nGb
+        Result[:fuelprice_t][sd.Grid_buy[u]] =
+          scale_c(
+            sum(pd.Price_Profile[sd.Grid_buy_p[u], t] * Bought[sd.Grid_buy[u], t] * pd.Renewable_criterion_profile[t] for t = 1:T) +
+            sum(pd.Price_Profile[sd.Grid_buy_p[u], t] * Bought[sd.Grid_buy[u], t] * (1 - pd.Renewable_criterion_profile[t]) for t = 1:T)
+             )
+      end
+  end
+
+  # Hourly heat purchases
+  if sd.Hourly_heat_buy[1] > 0 && sd.Heat_buy_p[1] > 0
+      for u = 1:sd.nHb
+          Result[:fuelprice_t][sd.Hourly_heat_buy[u]] =
+            scale_c(
+                sum(pd.Price_Profile[sd.Heat_buy_p[u], t] * Bought[sd.Hourly_heat_buy[u], t] for t = 1:T)
+            )
+      end
+  end
+
+  # Electricity sales to the grid
+  if scd.Option_hourly_elec_sale && sd.Grid_sell[1] > 0 && sd.Grid_sell_p[1] > 0
+      for u = 1:sd.nGs
+          Result[:fuelsold_t][sd.Grid_sell[u]] =
+              scale_c(
+                sum(pd.Price_Profile[sd.Grid_sell_p[u], t] * Sold[sd.Grid_sell[u], t] for t = 1:T)
+              )
+      end
+  end
+
+  # Heat sales
+  if scd.Option_hourly_heat_sale && sd.Heat_sell[1] > 0 && sd.Heal_sell_p[1] > 0
+      for u = 1:sd.nHs
+          Result[:fuelsold_t][sd.Heat_sell[u]] =
+          scale_c(
+              sum(pd.Price_Profile[sd.Heat_sell_p[u], t] * Sold[sd.Heat_sell[u], t] for t = 1:T)
+           )
+      end
+  end
+
+  # Regulated CO₂ accounting
+  if sd.Grid_buy[1] > 0
+      for u = 1:sd.nGb
+          Result[:CO2_proc_reg_t][sd.Grid_buy[u]] =
+              sum(pd.Grid_CO2_profile_regulated[t] * Bought[sd.Grid_buy[u], t] for t = 1:T) #In kg CO2e
+      end
+  end
+
+  #Energy content and convertions for main fuel
+  yearly_prod_kg, unit_prod_kg = scale_mass_power_energy_units(sum(X[u, t] for u in sd.MainFuel, t =1:T), td.Output_units[sd.MainFuel[1]]; force_unit_prefix = "kg") #Convert yearly production in kilos
+  total_energy_content_GJ, unit_tot_energyJ = scale_mass_power_energy_units(yearly_prod_kg * Fuel_energy_content_list[scd.Fuel],"MJ$(scd.Fuel)"; force_unit_prefix="GJ") #Convert in GJ fuel per year
+  total_energy_content_MWh, unit_tot_energyWh = scale_mass_power_energy_units(yearly_prod_kg * Fuel_energy_content_list[scd.Fuel]/3.6,"kWh$(scd.Fuel)"; force_unit_prefix="MWh") #Convert in MWh fuel per year
+
+  # Write the results in a table
+  for u = 1:U
+    #Scenario data
+    Result[:scenario][u]              = scd.Scenario_name
+    Result[:year][u]                  = scd.Year
+    Result[:location][u]              = scd.Location
+    Result[:profile][u]               = scd.Profile_name
+    Result[:fuel][u]                  = scd.Fuel
+    Result[:electrolyser][u]          = scd.Electrolyser
+    Result[:CO2_capture][u]           = scd.CO2_capture
+    Result[:CSP_tech][u]              = scd.CSP_tech
+    Result[:power_TS][u]              = scd.Power_TS
+    Result[:sim_hours][u]             = scd.Sim_hours
+    Result[:CO2_count_method_reg][u]  = scd.CO2_count_method_reg
+    Result[:Hourly_lcia_count_method][u]  = scd.Hourly_lcia_count_method
+    Result[:CO2taxWTTup][u]           = scd.CO2taxWTTup
+    Result[:CO2taxWTTop][u]           = scd.CO2taxWTTop
+    Result[:CO2WTTop_treshold][u]    = scd.CO2WTTop_treshold
+    Result[:rencrit][u]               = scd.Current_rencrit
+    Result[:crit_app][u]              = string(scd.Criterion_application)
+
+    Result[:capacity][u], Result[:unit_capacity][u] = scale_mass_power_energy_units(Capacity[u], td.Capacity_units[u];force_unit_prefix = default_results_capacity_units)
+    Result[:investment][u]            = scale_c(td.Invest[u] * Capacity[u])
+    Result[:investment_annualised][u] = Result[:investment][u] * td.Annuity_factor[u]
+    Result[:fixedOM][u]               = scale_c(td.FixOM[u] * Capacity[u])
+    Result[:varOM][u]                 = scale_c(sum(td.VarOM[u] * X[u, t] for t =1:T))
+    Result[:TotCO2tax_up][u]          = scale_c(scd.CO2taxWTTup * td.CO2_inf_reg[u] * Capacity[u])
+    Result[:TotCO2tax_op][u]          = scale_c(sum(scd.CO2taxWTTop * td.CO2_proc_fixed_reg[u] * X[u, t] for t =1:T) + scd.CO2taxWTTop * Result[:CO2_proc_reg_t][u])
+    Result[:fuelprice][u]             = scale_c(sum(td.Fuel_Buying_fixed[u] * Bought[u, t] for t =1:T)) + Result[:fuelprice_t][u]
+    Result[:sold][u]                  = - scale_c(sum(td.Fuel_Selling_fixed[u] * Sold[u, t] for t =1:T)) + Result[:fuelsold_t][u]
+    Result[:cost_unit][u]             = Result[:investment_annualised][u] + Result[:fixedOM][u] + Result[:varOM][u] + 
+                                        Result[:fuelprice][u] + Result[:sold][u] +
+                                        Result[:TotCO2tax_up][u] + Result[:TotCO2tax_op][u]
+    Result[:production][u], Result[:unit_production][u] = scale_mass_power_energy_units(sum(X[u, t] for t =1:T), td.Output_units[u]; force_unit_prefix = default_results_production_units)
+    Result[:el_cons][u], unit_el_cons = scale_mass_power_energy_units(sum(td.Sc_nom[u]*X[u,t] for t =1:T),td.Output_units[sd.PU[1]] ; force_unit_prefix = default_results_production_units)
+    Result[:FLH][u]                   = sum(X[u, t] / Capacity[u] for t =1:T)
+    Result[:load_average][u]          = Result[:FLH][u] / T
+    Result[:prodcost_perunit][u]      = Result[:production][u] == 0 ? 0 : Result[:cost_unit][u] / Result[:production][u]
+    Result[:CO2_regulated][u], unit_co2_reg = scale_mass_power_energy_units(Capacity[u]*td.CO2_inf_reg[u] + 
+                                        sum(X[u, t] for t =1:T) * td.CO2_proc_fixed_reg[u] + Result[:CO2_proc_reg_t][u],
+                                        "kgCO2e"; force_unit_prefix = "kg"
+                                        ) # In kg CO2e (adapt if input data are not in kgCO2e anymore)
+    Result[:CO2_regulated_GJ][u]      = Result[:CO2_regulated][u] / total_energy_content_GJ #Results in kgCO2e per GJ
+    Result[:CO2_regulated_per_unit][u] = Result[:CO2_regulated][u] / sum(X[u, t] for t =1:T)  #By default in kgCO2e/Basic output unit (i.e. kWh)
+
+    #********* Add the Lca results (optional)************
+    if write_lca_results == true && !isnothing(dat_lcia)
+      add_lcia_results!(Result, opt_data, opt_results, u, total_energy_content_GJ)
+    end
+  end
+
+  av_elec_cost_1 = 1e3 * sum(Result[:prodcost_perunit][u] * Result[:production][u] for u in sd.PU) /
+                    sum(Result[:production][u] for u in sd.PU)
+  
+  for u in sd.MainFuel
+    Result[:prodcost_fuel_kg][u] = scale_cost_units(Costs,results_currency_multiplier; force_unit ="") / yearly_prod_kg #Force results in currency per kg 
+    Result[:prodcost_fuel_GJ][u]   = scale_cost_units(Costs,results_currency_multiplier; force_unit ="") / total_energy_content_GJ #Results in currency per GJ
+    Result[:prodcost_fuel_MWh][u]  = scale_cost_units(Costs,results_currency_multiplier; force_unit ="") / total_energy_content_MWh #Results in currency per MWh
+    Result[:av_elec_cost][u] = av_elec_cost_1
+  end
+
+  cols = [
+    Result[:scenario], Name_selected_units, Result[:year], Result[:location], Result[:profile], Result[:power_TS],
+    Result[:fuel], Result[:electrolyser], Result[:CO2_capture], Result[:CSP_tech], Result[:sim_hours],
+    Result[:CO2_count_method_reg], Result[:Hourly_lcia_count_method], Result[:CO2taxWTTup], Result[:CO2taxWTTop], 
+    Result[:CO2WTTop_treshold], Result[:rencrit], Result[:crit_app],
+    Result[:capacity], Result[:unit_capacity], Result[:investment], Result[:investment_annualised], Result[:fixedOM], Result[:varOM],
+    Result[:TotCO2tax_up], Result[:TotCO2tax_op], Result[:fuelprice], Result[:sold], Result[:cost_unit],
+    Result[:production], Result[:unit_production], Result[:el_cons], Result[:load_average], Result[:FLH],
+    Result[:prodcost_fuel_kg], Result[:prodcost_fuel_GJ], Result[:prodcost_fuel_MWh], Result[:av_elec_cost],
+    Result[:CO2_regulated], Result[:CO2_regulated_per_unit], Result[:CO2_regulated_GJ]
+  ]
+  
+  Result_name = [
+      "Scenario", "Type of unit", "Year data", "Location", "Profile", "Power time series name", "Fuel", "Electrolyser",
+      "CO2 capture", "CSP technology", "Simulation hours", "Hourly CO2 accounting method for regulation",
+      "Hourly lcia count method", 
+      "CO2 tax level upstream (EUR/kgCO2)", "CO2 tax level operational (EUR/kgCO2)", 
+      "Max yearly emission treshold", "Renewable criterion", "Criterion application",
+      "Installed capacity", "Units Capacity", 
+      "Total investment ($(default_results_cost_scale*results_currency))", "Annualised investment ($(default_results_cost_scale*results_currency))",
+      "Fixed O&M ($(default_results_cost_scale*results_currency))", "Variable O&M ($(default_results_cost_scale*results_currency))", 
+      "CO2 tax infrastructure ($(default_results_cost_scale*results_currency))", "CO2 tax process ($(default_results_cost_scale*results_currency))", 
+      "Fuel cost ($(default_results_cost_scale*results_currency))", "Sale ($(default_results_cost_scale*results_currency))", 
+      "Cost per unit ($(default_results_cost_scale*results_currency))",
+      "Yearly production", "Units production", "Electricity consumption ($unit_el_cons)", 
+      "Load average", "Full load hours",
+      "Production cost fuel ($results_currency/$unit_prod_kg)", 
+      "Production cost fuel ($results_currency/$unit_tot_energyJ)", "Production cost fuel ($results_currency/$unit_tot_energyWh)", "Av electricity cost(EUR/MWh)",
+      "Regulated CO2e total ($unit_co2_reg)", "Regulated CO2e per unit ($unit_co2_reg/output)", "Regulated CO2e total ($unit_co2_reg/$unit_tot_energyJ)"
+  ]
+  
+  if write_lca_results && !isnothing(dat_lcia)
+    append_lcia_columns!(cols, Result_name, Result, opt_data,unit_tot_energyJ)
+  end
+
+  df_results = DataFrame(cols, :auto)
+  rename!(df_results, Result_name)
+
+  # Drop columns where all entries are "None"
+  cols_to_keep = [col for col in names(df_results) if any(x -> x != "None", df_results[:, col])]
+  df_results = select(df_results, cols_to_keep)
+
+  #Drop unwanted phase columns
+  if write_lca_results && !isempty(remove_lcia_phases)
+      remove_lcia_columns!(df_results, dat_lcia, remove_lcia_phases)
+  end
+
+  if model == "LP_2obj"
+
+    # Create the folder to write the results if it does not exists
+    pareto_main_results_folder = joinpath(pareto_results_folder,"Main results","Scenario_$(scenario_number)")
+    if !isdir(pareto_main_results_folder)
+      mkpath(pareto_main_results_folder)
+    end
+    results_file = "Sol_$(Sol_number).csv"
+    CSV.write(joinpath(pareto_main_results_folder, results_file), df_results)
+
+  else
+    # Create the folder to write the results if it does not exists
+    main_results_folder = joinpath(resultsfolder,scd.Result_folder_name,"Main results")
+    if !isdir(main_results_folder)
+      mkpath(main_results_folder)
+    end
+    results_file = "Scenario_$(scenario_number).csv"
+    CSV.write(joinpath(main_results_folder, results_file), df_results)
+  end
+end
+
+function add_lcia_results!(Result::Dict{Symbol,Any}, opt_data, opt_results, u::Int, total_energy_content_GJ)
+  U = opt_data.U
+  td = opt_data.dat_t #Techno-economic data
+  sd = opt_data.dat_sub #Subset data
+  pd = opt_data.dat_p #Profile data
+  scd = opt_data.dat_scen #Scenario data
+  scores = opt_data.dat_lcia.scores
+  impact_categories_symbol = opt_data.dat_lcia.impact_categories_symbol 
+  T = opt_data.dat_scen.T
+
+  X = opt_results.Flows
+  Bought = opt_results.Bought
+  Capacity = opt_results.Capacity  
+
+  # ------ Hourly lcia values for grid
+  for cat_sym in impact_categories_symbol
+    if sd.Grid_buy[1] > 0 && haskey(pd.Lcia_grid_profile,cat_sym)
+        for g = 1:sd.nGb
+          Result[Symbol(string(cat_sym) * "_hourly")][sd.Grid_buy[g]] =
+            sum(pd.Lcia_grid_profile[cat_sym][t] * Bought[sd.Grid_buy[g], t] for t = 1:T)
+
+          Result[Symbol(string(cat_sym) * "_hourly_perGJ")][sd.Grid_buy[g]]  = Result[Symbol(string(cat_sym) * "_hourly")][sd.Grid_buy[g]]/ total_energy_content_GJ
+        end
+    end
+  end
+
+  # Other lcia results for unit u
+  for (cat_sym, impacts) in scores
+
+    inf_val  = u <= length(impacts.inf)  ? impacts.inf[u]  * Capacity[u] : 0.0
+    use_val  = u <= length(impacts.use)  ? sum(impacts.use[u] * X[u,t] for t = 1:T) : 0.0
+    disp_val = u <= length(impacts.disp) ? impacts.disp[u] * Capacity[u] : 0.0
+    total_val = inf_val + use_val + disp_val + Result[Symbol(string(cat_sym) * "_hourly")][u]
+
+    Result[Symbol(string(cat_sym) * "_inf")][u]   = inf_val
+    Result[Symbol(string(cat_sym) * "_use")][u]   = use_val
+    Result[Symbol(string(cat_sym) * "_disp")][u]  = disp_val
+    Result[Symbol(string(cat_sym) * "_total")][u] = total_val
+
+    #Results per GJ of fuel produced
+    Result[Symbol(string(cat_sym) * "_inf_perGJ")][u]   = inf_val / total_energy_content_GJ
+    Result[Symbol(string(cat_sym) * "_use_perGJ")][u]   = use_val / total_energy_content_GJ
+    Result[Symbol(string(cat_sym) * "_disp_perGJ")][u]  = disp_val / total_energy_content_GJ
+    Result[Symbol(string(cat_sym) * "_total_perGJ")][u] = total_val / total_energy_content_GJ
+  end
+end
+
+function append_lcia_columns!(cols::Vector, Result_name::Vector{String}, Result::Dict{Symbol,Any}, opt_data, unit_tot_energyJ)
+
+    dat_lcia = opt_data.dat_lcia
+    unit = dat_lcia.lcia_units
+
+    for cat_sym in dat_lcia.impact_categories_symbol
+        cat_name = String(cat_sym)
+
+        # Append column data
+        for phase in (:inf, :use, :disp, :hourly, :total)
+          push!(cols, Result[Symbol(cat_name * "_" * String(phase))])
+        end
+        for phase in (:inf, :use, :disp, :hourly, :total)
+          push!(cols, Result[Symbol(cat_name * "_" * String(phase) * "_perGJ")])
+        end
+
+        # Append readable column names
+        append!(Result_name, [
+            cat_name * " construction [$(unit[cat_sym].inf)]",
+            cat_name * " operation [$(unit[cat_sym].use)]",
+            cat_name * " disposal [$(unit[cat_sym].disp)]",
+            cat_name * " hourly [$(unit[cat_sym].hourly)]",
+            cat_name * " total [$(unit[cat_sym].total)]",            
+            cat_name * " construction [$(unit[cat_sym].inf)/$unit_tot_energyJ]",
+            cat_name * " operation [$(unit[cat_sym].use)/$unit_tot_energyJ]",
+            cat_name * " disposal [$(unit[cat_sym].disp)/$unit_tot_energyJ]",
+            cat_name * " hourly [$(unit[cat_sym].hourly)/$unit_tot_energyJ]",
+            cat_name * " total [$(unit[cat_sym].total)/$unit_tot_energyJ]"
+        ])
+    end
+end
+
+"""
+    remove_lcia_columns!(df::DataFrame, lcia_data; remove_phases = Symbol[])
+
+Remove selected LCIA phase columns (e.g. `[:inf, :use]`) from `df`.
+
+If `remove_phases` is empty, nothing is removed.
+"""
+function remove_lcia_columns!(df::DataFrame, lcia_data, remove_phases::Vector{Symbol})
+
+    isempty(remove_phases) && return df  # nothing to remove
+
+    # Map phase symbols to their text labels
+    phase_labels = Dict(
+        :inf   => " construction",
+        :use   => " operation",
+        :disp  => " disposal",
+        :hourly => " hourly",
+        :total => " total"
+    )
+
+    existing_cols = Set(names(df))
+    to_remove = String[]
+
+    for cat_sym in lcia_data.impact_categories_symbol
+      cat_name = String(cat_sym)
+      for phase in remove_phases
+          if haskey(phase_labels, phase)
+            for col in existing_cols
+                if startswith(col, cat_name * phase_labels[phase])
+                    push!(to_remove, col)
+                end
+            end
+          end
+      end
+    end
+
+    # Remove columns if found
+    if !isempty(to_remove)
+        select!(df, Not(to_remove))
+    end
+
+    return df
+end
+
+
+end #Module
