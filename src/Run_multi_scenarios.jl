@@ -135,7 +135,7 @@ function run_optimization_scenarios(
       )
 
       # Save input data if needed
-      if save_input_profiles || save_input_technoeco
+      if save_input_profiles || save_input_technoeco || save_input_lcia
         write_input_data(opt_data, save_input_technoeco, save_input_profiles, save_input_lcia, resultsfolder, scenario_number)
       end
 

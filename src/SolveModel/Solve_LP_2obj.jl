@@ -272,12 +272,17 @@ function generate_adaptive_pareto_curve(opt_data, solver, N_scen, resultsfolder,
     # Minimize objective 1
     opt_obj1 = Solve_OptiPlant_LP_2obj(opt_data, solver;
                                        objective_to_minimize=objective1)
+
     add_solution!(pareto_front, pareto_front_scaled, 1, opt_obj1)
+
     write_main_results_LP(opt_data, opt_obj1, N_scen, resultsfolder,
                           results_currency, results_currency_multiplier,
                           default_results_cost_scale, default_results_capacity_units,
                           default_results_production_units, remove_lcia_phases;
                           model="LP_2obj", pareto_results_folder = pareto_results_folder, Sol_number=1)
+
+    write_hourly_results_LP(opt_data, opt_obj1, N_scen, resultsfolder, results_currency_multiplier;
+                            model ="LP_2obj", pareto_results_folder = pareto_results_folder, Sol_number=1)
 
     # Minimize objective 2
     opt_obj2 = Solve_OptiPlant_LP_2obj(opt_data, solver;
@@ -288,6 +293,10 @@ function generate_adaptive_pareto_curve(opt_data, solver, N_scen, resultsfolder,
                           default_results_cost_scale, default_results_capacity_units,
                           default_results_production_units, remove_lcia_phases;
                           model="LP_2obj", pareto_results_folder = pareto_results_folder, Sol_number=N_pareto_points)
+
+    write_hourly_results_LP(opt_data, opt_obj1, N_scen, resultsfolder, results_currency_multiplier;
+                          model ="LP_2obj", pareto_results_folder = pareto_results_folder, Sol_number=N_pareto_points)
+
 
     sol_id = 1
 
@@ -326,6 +335,9 @@ function generate_adaptive_pareto_curve(opt_data, solver, N_scen, resultsfolder,
                                   default_results_cost_scale, default_results_capacity_units,
                                   default_results_production_units, remove_lcia_phases;
                                   model="LP_2obj", pareto_results_folder = pareto_results_folder, Sol_number=sol_id)
+            
+            write_hourly_results_LP(opt_data, opt_obj1, N_scen, resultsfolder, results_currency_multiplier;
+                                    model ="LP_2obj", pareto_results_folder = pareto_results_folder, Sol_number=sol_id)
         end
     end
 

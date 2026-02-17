@@ -7,7 +7,8 @@ using CSV, DataFrames, XLSX
 
 export write_hourly_results_LP, write_main_results_LP
 
-function write_hourly_results_LP(opt_data, opt_results, scenario_number, resultsfolder, currency_multiplier)
+function write_hourly_results_LP(opt_data, opt_results, scenario_number, resultsfolder, currency_multiplier;
+                                model::String ="LP", pareto_results_folder::Union{String,Nothing} = nothing,  Sol_number::Int64= 1)
   
   #Unpack some of the optimization data
   U = opt_data.U
@@ -47,12 +48,6 @@ function write_hourly_results_LP(opt_data, opt_results, scenario_number, results
   
   #---------------- Optimal variable flows and total specific consumption -------------
   if scd.Write_flows == true
-
-    #Check if the folder were to write data exists, create if it does not
-    flows_result_folder = joinpath(resultsfolder,scd.Result_folder_name,"Hourly results","Flows")
-    if !isdir(flows_result_folder)
-      mkpath(flows_result_folder)
-    end
 
     #Total electricity consumption
     Sc_tot = zeros(T)
@@ -101,19 +96,34 @@ function write_hourly_results_LP(opt_data, opt_results, scenario_number, results
           "Real grid emissions"]
           )
     end
-    flows = "F_$scenario_number.csv"
-    CSV.write(joinpath(flows_result_folder, flows), df_flow)
+
+    if model == "LP_2obj"
+      # Create the folder to write the results if it does not exists
+      pareto_main_results_folder = joinpath(pareto_results_folder,"Hourly results","Flows","Scenario_$(scenario_number)")
+      if !isdir(pareto_main_results_folder)
+        mkpath(pareto_main_results_folder)
+      end
+
+      flows = "Sol_$(Sol_number).csv"
+      CSV.write(joinpath(pareto_main_results_folder, flows), df_flow)
+
+    else
+
+      #Check if the folder were to write data exists, create if it does not
+      flows_result_folder = joinpath(resultsfolder,scd.Result_folder_name,"Hourly results","Flows")
+      if !isdir(flows_result_folder)
+        mkpath(flows_result_folder)
+      end
+
+      flows = "F_$scenario_number.csv"
+      CSV.write(joinpath(flows_result_folder, flows), df_flow)
+
+    end
 
   end
 
   #---------------- Variable sold ---------------------------------
   if scd.Write_sold_products == true
-
-    #Check if the folder were to write data exists, create if it does not
-    sold_result_folder = joinpath(resultsfolder,scd.Result_folder_name,"Hourly results","Sold")
-    if !isdir(sold_result_folder)
-      mkpath(sold_result_folder)
-    end
 
     Solution_Sold = zeros(T,U)
     for u=1:U, t=1:T
@@ -127,36 +137,58 @@ function write_hourly_results_LP(opt_data, opt_results, scenario_number, results
     else
       rename!(df_sold, ["Informations";"Time";Name_selected_units])
     end
-    #File name
-    sold = "S_$scenario_number.csv"
-    #Write the Csv file
-    CSV.write(joinpath(sold_result_folder,sold),df_sold)
+
+    if model == "LP_2obj"
+      # Create the folder to write the results if it does not exists
+      pareto_main_results_folder = joinpath(pareto_results_folder,"Hourly results","Sold","Scenario_$(scenario_number)")
+      if !isdir(pareto_main_results_folder)
+        mkpath(pareto_main_results_folder)
+      end
+
+      sold = "Sol_$(Sol_number).csv"
+      CSV.write(joinpath(pareto_main_results_folder, sold), df_sold)
+
+    else
+      #Check if the folder were to write data exists, create if it does not
+      sold_result_folder = joinpath(resultsfolder,scd.Result_folder_name,"Hourly results","Sold")
+      if !isdir(sold_result_folder)
+        mkpath(sold_result_folder)
+      end
+      #File name
+      sold = "S_$scenario_number.csv"
+      #Write the Csv file
+      CSV.write(joinpath(sold_result_folder,sold),df_sold)
+    end
   end
 
   #----------------Variable fuel cost (~ bought)---------------------------------
   if scd.Write_fuel_cost == true
 
-    bought_result_folder = joinpath(resultsfolder,scd.Result_folder_name,"Hourly results","Bought")
-    if !isdir(bought_result_folder)
-      mkpath(bought_result_folder)
-    end
-
     #Data frame definition
     Fuel_cost= zeros(U,T)
     Fuel_cost_t_ren = zeros(U,T)
     Fuel_cost_t_noren = zeros(U,T)
+
     Solution_Bought = zeros(T,U)
+    println("Size Solution_Bought: $(size(Solution_Bought))")
+    println("Size Bought: $(size(Bought))")
     for u=1:U, t=1:T
       Solution_Bought[t,u] = Bought[u,t]
     end
   
-    for u=1:sd.nGb, t=1:T
-      Fuel_cost_t_ren[sd.Grid_buy[u],t] = pd.Price_Profile[sd.Grid_buy_p[u],t]*Bought[sd.Grid_buy[u],t]*pd.Renewable_criterion_profile[t]*currency_multiplier #Price of certified electricity
-      Fuel_cost_t_noren[sd.Grid_buy[u],t] = (pd.Price_Profile[sd.Grid_buy_p[u],t]+scd.NonRenCostPenalty)*Bought[sd.Grid_buy[u],t]*(1-pd.Renewable_criterion_profile[t])*currency_multiplier #Price of non-certified electricity
+    if sd.Grid_buy[1] > 0 && sd.Grid_buy_p[1] > 0
+      for u=1:sd.nGb, t=1:T
+        Fuel_cost_t_ren[sd.Grid_buy[u],t] = pd.Price_Profile[sd.Grid_buy_p[u],t]*Bought[sd.Grid_buy[u],t]*pd.Renewable_criterion_profile[t]*currency_multiplier #Price of certified electricity
+        Fuel_cost_t_noren[sd.Grid_buy[u],t] = (pd.Price_Profile[sd.Grid_buy_p[u],t]+scd.NonRenCostPenalty)*Bought[sd.Grid_buy[u],t]*(1-pd.Renewable_criterion_profile[t])*currency_multiplier #Price of non-certified electricity
+      end
     end
-    for u=1:sd.nHb, t=1:T
-      Fuel_cost_t_ren[sd.Hourly_heat_buy[u],t] = pd.Price_Profile[sd.Heat_buy_p[u],t]*Bought[sd.Hourly_heat_buy[u],t]*currency_multiplier
+
+    if sd.Hourly_heat_buy[1] > 0 && sd.Heat_buy_p[1] > 0
+      for u=1:sd.nHb, t=1:T
+        Fuel_cost_t_ren[sd.Hourly_heat_buy[u],t] = pd.Price_Profile[sd.Heat_buy_p[u],t]*Bought[sd.Hourly_heat_buy[u],t]*currency_multiplier
+      end
     end
+
     for u=1:U, t=1:T
       Fuel_cost[u,t] = Fuel_cost_t_ren[u,t] + Fuel_cost_t_noren[u,t] + td.Fuel_Buying_fixed[u]*Bought[u,t]*currency_multiplier
     end
@@ -179,10 +211,29 @@ function write_hourly_results_LP(opt_data, opt_results, scenario_number, results
         Name_selected_units.*"_Bought"]
         )
     end
-    #File name
-    fuel_cost = "B_$scenario_number.csv"
-    #Write the Csv file
-    CSV.write(joinpath(bought_result_folder,fuel_cost),df_fuel_cost)
+    
+    if model == "LP_2obj"
+
+      # Create the folder to write the results if it does not exists
+      pareto_main_results_folder = joinpath(pareto_results_folder,"Hourly results","Bought","Scenario_$(scenario_number)")
+      if !isdir(pareto_main_results_folder)
+        mkpath(pareto_main_results_folder)
+      end
+
+      fuel = "Sol_$(Sol_number).csv"
+      CSV.write(joinpath(pareto_main_results_folder, fuel), df_fuel_cost)
+
+    else
+
+      bought_result_folder = joinpath(resultsfolder,scd.Result_folder_name,"Hourly results","Bought")
+      if !isdir(bought_result_folder)
+        mkpath(bought_result_folder)
+      end
+      #File name
+      fuel_cost = "B_$scenario_number.csv"
+      #Write the Csv file
+      CSV.write(joinpath(bought_result_folder,fuel_cost),df_fuel_cost)
+    end
   end
 
 end
