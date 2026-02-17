@@ -19,7 +19,7 @@ using Documenter
 modules_list = Module[]
 
 makedocs(
-    sitename = "OptiPlantPtX.jl",    
+    sitename = "OptiPlant",    
     modules = modules_list,
     authors = "Nicolas Campion, Sebastian Banda",
     repo = "https://github.com/njbca/OptiPlant",
@@ -43,6 +43,6 @@ makedocs(
 
 deploydocs(
     repo = "github.com/njbca/OptiPlant",
-    devbranch = "Development",
+    devbranch = "master",
     push_preview = true
 )
