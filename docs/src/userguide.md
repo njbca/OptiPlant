@@ -148,6 +148,6 @@ If the opened csv results file looks like this, then you probably have a problem
 ![Excel comma error 1](images/Excel_comma_error1.png)
 
 
-To solve this, it possible to change the separators for your Windows system (explanations on this website)[https://www.supportyourtech.com/tech/how-to-change-the-windows-11-list-separator-a-step-by-step-guide/] 
+To solve this, it possible to change the separators for your Windows system (explanations on [this website](https://www.supportyourtech.com/tech/how-to-change-the-windows-11-list-separator-a-step-by-step-guide/))
 
 In excel, it is also possible to you can separators settings in `File > Options > Advanced` and make some changes in some of the excel tabs:  `Home , Number and 1000 sperator box`.
