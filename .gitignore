@@ -6,12 +6,10 @@ env/
 examples/Run.jl
 examples/Run gl.jl
 RenNinjaToken.txt
-data/Full_model/lcia_data/
 data/ZCS_tests/
 
 # Python virtual env
 .venv/
-
 
 # Byte-compiled / Python cache
 __pycache__/
@@ -47,7 +45,6 @@ docs/build/
 /src/SolveModel/Solve_LP_stochastic.jl
 /src/ReadData/user_defined/PieceWiseFunctions.jl
 /src/ReadData/opt_data/StochasticData.jl
-/src/data/Full_model/lca_data/
 /src/test/parallel_solve.jl
 /src/Multi_scen_para.jl
 /job_script.sh
