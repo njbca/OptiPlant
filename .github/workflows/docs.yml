@@ -3,12 +3,10 @@ name: Documentation
 on:
   push:
     branches:
-      - main
-      - Development
+      - master
   pull_request:
     branches:
-      - main
-      - Development
+      - master
   workflow_dispatch:
 
 jobs:
