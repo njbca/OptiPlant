@@ -25,7 +25,7 @@ Install a Git client (choose one you’re comfortable with):
 1. On the OptiPlantPtX repository that you forked, click on the green "<> Code" button, go to HTTPS and copy the URL
 2. In GitHub desktop, go to `File > Clone repository` 
 3. Go in the URL tab and paste the OptiPlant repository URL
-4. Choose the path to clone the repository locally: **installing on a Drive may cause problems!**  
+4. Choose the path to clone the repository locally
 
 ## 3. Open in VS Code
 

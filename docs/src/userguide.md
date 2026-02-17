@@ -2,10 +2,6 @@
 
 All of the important files to run the model are in the `data` folder.
 
-```@raw html
-<iframe src="images/Data_folder.png" style="width:25%;"></iframe>
-```
-
 To create your own analysis **copy one of the existing folder and rename it to your convenience**.
 
 Let's use the `data/Example` folder as an example.

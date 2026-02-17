@@ -3,12 +3,10 @@ name: Documentation
 on:
   push:
     branches:
-      - main
-      - Development
+      - master
   pull_request:
     branches:
-      - main
-      - Development
+      - master
   workflow_dispatch:
 
 jobs:
@@ -16,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 

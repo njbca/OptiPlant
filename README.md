@@ -1,6 +1,6 @@
 # OptiPlantPtX
 
-[![Build Status](https://github.com/njbca/OptiPlant.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/njbca/OptiPlant.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![Build Status](https://github.com/njbca/OptiPlant/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/njbca/OptiPlant/actions/workflows/CI.yml?query=branch%3Amaster)
 
 OptiPlant can be used to model and optimize Power-to-X fuel production systems with a high variety of customizable input parameters. The tool is adapted to investigate a large number of scenarios and system configurations in a single run. Please cite https://doi.org/10.1016/j.rser.2022.113057 when using the model.
 

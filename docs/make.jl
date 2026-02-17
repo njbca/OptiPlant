@@ -19,7 +19,7 @@ using Documenter
 modules_list = Module[]
 
 makedocs(
-    sitename = "OptiPlantPtX.jl",    
+    sitename = "OptiPlantPtX",    
     modules = modules_list,
     authors = "Nicolas Campion, Sebastian Banda",
     repo = "https://github.com/njbca/OptiPlant",
@@ -33,7 +33,7 @@ makedocs(
     format = Documenter.HTML(
         prettyurls = get(ENV, "CI", nothing) == "true",
         canonical = "https://njbca.github.io/OptiPlant/",
-        edit_link = "Development",
+        edit_link = "master",
         assets = String[],
         repolink = "https://github.com/njbca/OptiPlant",
     )
@@ -43,6 +43,6 @@ makedocs(
 
 deploydocs(
     repo = "github.com/njbca/OptiPlant",
-    devbranch = "Development",
+    devbranch = "master",
     push_preview = true
 )
