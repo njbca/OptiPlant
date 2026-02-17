@@ -170,8 +170,6 @@ function write_hourly_results_LP(opt_data, opt_results, scenario_number, results
     Fuel_cost_t_noren = zeros(U,T)
 
     Solution_Bought = zeros(T,U)
-    println("Size Solution_Bought: $(size(Solution_Bought))")
-    println("Size Bought: $(size(Bought))")
     for u=1:U, t=1:T
       Solution_Bought[t,u] = Bought[u,t]
     end

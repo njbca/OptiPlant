@@ -303,12 +303,12 @@ function build_profiles_opt_data(
     #Hourly grid impact lcia profiles (all impact categories instead of just CO2)
     Lcia_grid_profile = Dict{Symbol, Vector{Float64}}()
     
-    if !isnothing(Impact_categories_list_p)
+    if !isnothing(Impact_categories_list_p) #If hourly lcia profile exists/are defined
         sanitize(s) = Symbol(replace(lowercase(string(s)), r"[^a-z0-9]+" => "_"))
         for r in eachindex(Impact_categories_list_p)
             cat = sanitize(Impact_categories_list_p[r])
 
-            # Initialize once per category
+            # Initialize once per category, put zero if category is not found
             if !haskey(Lcia_grid_profile, cat)
                 Lcia_grid_profile[cat] = zeros(T)
             end

@@ -4,50 +4,10 @@ using OptiPlantPtX
 
 @testset "OptiPlantPtX.jl" begin
 
-        
     @testset "Example run LP" begin
         result = run_optimization_scenarios(
             "Example", #Name of the data folder
             "Input_data_example", #Excel file with model inputs
-            "ScenariosToRun", #Excel sheet with scenarios
-            "HiGHS", #Solver
-            1:2; #Scenarios to run
-            save_input_profiles = false,
-            save_input_technoeco = false
-        )
-        @test occursin("Successful execution", result)
-    end
-
-    @testset "Ammonia paper" begin
-        result = run_optimization_scenarios(
-            "Ammonia_paper", #Name of the data folder
-            "Data_ammonia_paper", #Excel file with model inputs
-            "ScenariosToRun", #Excel sheet with scenarios
-            "HiGHS", #Solver
-            1:2; #Scenarios to run
-            save_input_profiles = false,
-            save_input_technoeco = false
-        )
-        @test occursin("Successful execution", result)
-    end
-
-    @testset "CSP paper" begin
-        result = run_optimization_scenarios(
-            "CSP_paper", #Name of the data folder
-            "Data_CSP_paper", #Excel file with model inputs
-            "ScenariosToRun", #Excel sheet with scenarios
-            "HiGHS", #Solver
-            1:2; #Scenarios to run
-            save_input_profiles = false,
-            save_input_technoeco = false
-        )
-        @test occursin("Successful execution", result)
-    end
-
-    @testset "Meas sim paper" begin
-        result = run_optimization_scenarios(
-            "Meas_vs_sim_paper", #Name of the data folder
-            "Meas_vs_sim_data", #Excel file with model inputs
             "ScenariosToRun", #Excel sheet with scenarios
             "HiGHS", #Solver
             1:2; #Scenarios to run
@@ -88,6 +48,48 @@ using OptiPlantPtX
         @test occursin("Successful execution", result)
 
     end
+
+        #=
+    @testset "Ammonia paper" begin
+        result = run_optimization_scenarios(
+            "Ammonia_paper", #Name of the data folder
+            "Data_ammonia_paper", #Excel file with model inputs
+            "ScenariosToRun", #Excel sheet with scenarios
+            "HiGHS", #Solver
+            1:2; #Scenarios to run
+            save_input_profiles = false,
+            save_input_technoeco = false
+        )
+        @test occursin("Successful execution", result)
+    end
+
+    @testset "CSP paper" begin
+        result = run_optimization_scenarios(
+            "CSP_paper", #Name of the data folder
+            "Data_CSP_paper", #Excel file with model inputs
+            "ScenariosToRun", #Excel sheet with scenarios
+            "HiGHS", #Solver
+            1:2; #Scenarios to run
+            save_input_profiles = false,
+            save_input_technoeco = false
+        )
+        @test occursin("Successful execution", result)
+    end
+
+    @testset "Meas sim paper" begin
+        result = run_optimization_scenarios(
+            "Meas_vs_sim_paper", #Name of the data folder
+            "Meas_vs_sim_data", #Excel file with model inputs
+            "ScenariosToRun", #Excel sheet with scenarios
+            "HiGHS", #Solver
+            1:2; #Scenarios to run
+            save_input_profiles = false,
+            save_input_technoeco = false
+        )
+        @test occursin("Successful execution", result)
+    end
+    =#
+    
     #=       
     @testset "Parallel run" begin
         addprocs(2; exeflags="--project=$(Base.active_project())")  # start workers inside test

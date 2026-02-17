@@ -1,6 +1,6 @@
 # OptiPlantPtX
 
-[![Build Status](https://github.com/njbca/OptiPlant.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/njbca/OptiPlant.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![Build Status](https://github.com/njbca/OptiPlant/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/njbca/OptiPlant/actions/workflows/CI.yml?query=branch%3Amain)
 
 OptiPlant can be used to model and optimize Power-to-X fuel production systems with a high variety of customizable input parameters. The tool is adapted to investigate a large number of scenarios and system configurations in a single run. Please cite https://doi.org/10.1016/j.rser.2022.113057 when using the model.
 
@@ -12,7 +12,7 @@ If you are already familiar with GitHub, environments, etc... you can basically 
    3. Open in VS Code
    4. [Setup Julia Environment](https://pkgdocs.julialang.org/v1/environments/)
 
-Though, for more detailed instructions and avoid failed installations, it is recommended to read the documentation: https://njbca.github.io/OptiPlant/dev/installation/
+Though, for more detailed instructions and avoid failed installations, it is recommended to read the documentation: https://njbca.github.io/OptiPlant/installation/
 
 ## Running one of the examples
 
@@ -33,7 +33,7 @@ In the `Run.jl`file change the `datafoldername` and `techno_eco_filename` to you
 
 Run and check your results in the results folder. 
 
-More detailed explanations are given in the documentation: https://njbca.github.io/OptiPlant/dev/userguide/ 
+More detailed explanations are given in the documentation: https://njbca.github.io/OptiPlant/userguide/ 
 
 ## Results analysis
 
