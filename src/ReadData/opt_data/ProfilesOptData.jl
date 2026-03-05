@@ -173,6 +173,7 @@ function filter_all_profile_data(
 
     # === Filter by CO2 accounting method
     Data_CO2_profile_reg_filtered = filter_profile(Data_CO2_profile_reg_filtered, indexes.idx_CO2_reg.countmethod, corners.C0_CO2_reg, scen.CO2_count_method_reg)
+
     # === Filter by renewable criterion applied method ===
     Data_rencrit_profile_filtered = filter_profile(Data_rencrit_profile_filtered, indexes.idx_rencrit.subsets, corners.C0_rencrit, scen.Current_rencrit)
 
@@ -286,7 +287,7 @@ function build_profiles_opt_data(
     Grid_CO2_profile_regulated = zeros(T)
     if ! isnothing(Data_CO2_profile_reg)
         for t = 1:T
-            Grid_CO2_profile_regulated[t] = Data_CO2_profile_reg[corners.L0_CO2_reg + Time[t], corners.C0_CO2_reg]
+            Grid_CO2_profile_regulated[t] = Data_CO2_profile_reg[corners.L0_CO2_reg + Time[t], corners.C0_CO2_reg + 1]
         end
     end
 

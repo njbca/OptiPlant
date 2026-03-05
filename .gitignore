@@ -3,7 +3,6 @@ env/
 
 # Other
 
-examples/Run.jl
 examples/Run gl.jl
 RenNinjaToken.txt
 data/ZCS_tests/
