@@ -41,6 +41,8 @@ using OptiPlantPtX
             model = "LP_2obj", #LP_2obj
             N_pareto_points = 6,
             interior_points = 2,
+            objective1 = "costs",
+            objective2 = "emissions_CO2e_regulated", #Choose emissions_CO2e_regulated or an impact category symbol from the lcia file
             profiles_filename = "All_locations/2019_CO2",
             save_input_profiles = false,
             save_input_technoeco = false

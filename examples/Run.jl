@@ -4,7 +4,7 @@ datafoldername = "Full_model"
 techno_eco_filename = "Full_data"
 scenario_set = "ScenariosToRun"
 solver = "Gurobi"
-scenarios_to_run = [5] # 1:16 --> From one to 16 ; [2,4] Scenarios 2 and 4 ; 5:5 Sc
+scenarios_to_run = 12:17 # 1:16 --> From one to 16 ; [2,4] Scenarios 2 and 4 ; 5:5 Sc
 
 result = run_optimization_scenarios(
     datafoldername,
