@@ -446,7 +446,7 @@ function write_main_results_LP(opt_data, opt_results, scenario_number, resultsfo
       "Fixed O&M ($(default_results_cost_scale*results_currency))", "Variable O&M ($(default_results_cost_scale*results_currency))", 
       "CO2 tax infrastructure ($(default_results_cost_scale*results_currency))", "CO2 tax process ($(default_results_cost_scale*results_currency))", 
       "Fuel cost ($(default_results_cost_scale*results_currency))", "Sale ($(default_results_cost_scale*results_currency))", 
-      "Cost per unit ($(default_results_cost_scale*results_currency))",
+      "Annualised costs per unit ($(default_results_cost_scale*results_currency))",
       "Yearly production", "Units production", "Electricity consumption ($unit_el_cons)", 
       "Load average", "Full load hours",
       "Production cost fuel ($results_currency/$unit_prod_kg)", 

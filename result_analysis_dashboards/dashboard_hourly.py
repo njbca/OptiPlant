@@ -35,8 +35,8 @@ FLOWS_RESULTS_FOLDER = (
 # ============================================================
 TECH_COLORS: Dict[str, str] = {
     "Biogas1": "#6DAF62",
-    "Membrane upgrading": "#2E8B2E",
-    "MeOH plant - biogas": "#459E45",
+    "Membrane upgrading": "#197219",
+    "MeOH plant - biogas": "#032803",
     "Biogas2": "#6DAF62",
     "MeOH plant - biogasdirect": "#3C943C",
     "Biogas3": "#6DAF62",
@@ -128,7 +128,7 @@ TECH_COLORS: Dict[str, str] = {
     "Discharge batteries": "#BDBDBD",
 
     # SIMPLIFIED: Batteries now darker by default
-    "Batteries": "#9E9E9E",
+    "Batteries": "#E323C6",
 }
 
 # ============================================================

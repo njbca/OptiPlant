@@ -29,8 +29,8 @@ main_results_folder = Path.cwd() / "results" / "Full_model" / "GLS_analysis" / "
 TECH_COLORS: Dict[str, str] = {
     # --- Biogas chain (greens; olive–forest range) ---
     "Biogas1": "#6DAF62",
-    "Membrane upgrading": "#2E8B2E",
-    "MeOH plant - biogas": "#459E45",
+    "Membrane upgrading": "#197219",
+    "MeOH plant - biogas": "#032803",
     "Biogas2": "#6DAF62",
     "MeOH plant - biogasdirect": "#3C943C",
     "Biogas3": "#6DAF62",
@@ -138,7 +138,7 @@ TECH_COLORS: Dict[str, str] = {
     "Discharge batteries": "#BDBDBD",
 
     # UPDATED default color for Batteries (same as Hourly Dashboard)
-    "Batteries":           "#9E9E9E",
+    "Batteries":           "#E323C6",
 }
 
 # Aliases → canonical labels
@@ -549,7 +549,7 @@ for tech in techs_drawn:
 # Plot
 # ------------------------
 st.write(f"**Comparing:** {', '.join(scenario_labels_ordered)}")
-fig, ax = plt.subplots(figsize=(10.8, 6.2))
+fig, ax = plt.subplots(figsize=(11.5, 6.8))
 
 bottom_pos = [0.0] * plot_df.shape[1]
 bottom_neg = [0.0] * plot_df.shape[1]
@@ -579,11 +579,14 @@ if ymax == 0 and ymin == 0:
     ymax, ymin = 1, -1
 ax.set_ylim(ymin * 1.05, ymax * 1.05)
 
-# Labels
+# Labels and title
 ax.set_ylabel(selected_col)
 ax.set_xlabel("Scenario")
-ax.set_title(f"{selected_col} by Technology and Scenario (grouped by color type)")
+ax.set_title(f"{selected_col} by Technology and Scenario")
 ax.ticklabel_format(axis="y", style="plain")
+
+# FIX: Rotate x-labels so they don't overlap
+plt.xticks(rotation=45, ha="right")
 
 # Legend (deduplicated)
 handles, labels = ax.get_legend_handles_labels()
@@ -592,12 +595,18 @@ dedup_h, dedup_l = [], []
 for h, l in zip(handles, labels):
     if l not in seen:
         dedup_h.append(h); dedup_l.append(l); seen.add(l)
+
 if dedup_l:
     ax.legend(dedup_h, dedup_l, loc="upper left",
               bbox_to_anchor=(1.02, 1.0), frameon=False)
 
-plt.subplots_adjust(left=0.12, right=0.80, top=0.92, bottom=0.20)
-plt.xticks(rotation=0)
+# FIX: Increase bottom margin so labels are fully visible
+plt.subplots_adjust(bottom=0.35, right=0.80)
+
+# FIX: Let matplotlib auto-fix layout → prevents clipping
+plt.tight_layout()
+
+# Display in Streamlit
 st.pyplot(fig, clear_figure=False)
 
 # ------------------------
