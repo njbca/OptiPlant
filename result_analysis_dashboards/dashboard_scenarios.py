@@ -3,6 +3,7 @@
 # =============================================
 
 import os
+import re
 from pathlib import Path
 import io
 import hashlib
@@ -13,14 +14,83 @@ import matplotlib.pyplot as plt
 import streamlit as st
 from matplotlib.colors import to_rgb
 
+# ----------------------
+# Folder selection
+# ---------------------
+
+st.subheader("Choose results folder under a base directory")
+
+# Result folder (adjust if needed)
+
+BASE_DIR = Path.cwd() / "results" / "Full_model" / "GLS_analysis"
+
+# Optional: allow changing the base dir from the UI
+with st.expander("Change base directory"):
+    base_input = st.text_input("Base directory path", value=str(BASE_DIR))
+    if base_input:
+        BASE_DIR = Path(base_input).expanduser().resolve()
+
+# 2) Helper to list subdirectories (you can control depth)
+def list_subdirs(root: Path, depth: int = 3) -> list[Path]:
+    """Return a flat list of subdirectories including root up to a given depth."""
+    out = []
+    if not root.exists():
+        return out
+    out.append(root)
+    if depth <= 0:
+        return out
+    for p in root.iterdir():
+        if p.is_dir():
+            out.extend(list_subdirs(p, depth - 1))
+    return out
+
+if not BASE_DIR.exists():
+    st.error(f"Base directory does not exist: {BASE_DIR}")
+    main_results_folder = None
+else:
+    subdirs = [p for p in list_subdirs(BASE_DIR, depth=3) if p.is_dir()]
+    if not subdirs:
+        st.warning(f"No subfolders found under: {BASE_DIR}")
+        main_results_folder = None
+    else:
+        # 3) Remember last chosen folder (no hard-coded path)
+        key_last = "results_dir_last_choice"
+        last_choice = Path(st.session_state[key_last]) if key_last in st.session_state else None
+
+        # If we have a last choice and it still exists under BASE_DIR, preselect it
+        def is_under_base(p: Path, base: Path) -> bool:
+            try:
+                p.resolve().relative_to(base.resolve())
+                return True
+            except Exception:
+                return False
+
+        if last_choice and last_choice.exists() and is_under_base(last_choice, BASE_DIR):
+            default_index = subdirs.index(last_choice) if last_choice in subdirs else 0
+        else:
+            # 4) Dynamic default: pick the "deepest" subdirectory (most parts) under BASE_DIR
+            default_index = max(range(len(subdirs)), key=lambda i: len(subdirs[i].parts))
+
+        choice = st.selectbox(
+            "Select a folder:",
+            options=subdirs,
+            index=default_index,
+            format_func=lambda p: str(p.relative_to(BASE_DIR)) if p != BASE_DIR else ".",
+        )
+
+        if choice and choice.is_dir():
+            main_results_folder = choice
+            st.session_state[key_last] = str(choice)
+        else:
+            st.warning("Please select a valid folder.")
+            main_results_folder = None
+
+
 # ------------------------
 # Page config
 # ------------------------
 st.set_page_config(page_title="Scenario Comparison - Stacked Bars", layout="wide")
 st.title("Scenario Comparison - Stacked Bar Chart")
-
-# Result folder (adjust if needed)
-main_results_folder = Path.cwd() / "results" / "Full_model" / "GLS_analysis" / "Main results"
 
 # ------------------------
 # Publication-grade palette
@@ -30,7 +100,7 @@ TECH_COLORS: Dict[str, str] = {
     # --- Biogas chain (greens; olive–forest range) ---
     "Biogas1": "#6DAF62",
     "Membrane upgrading": "#197219",
-    "MeOH plant - biogas": "#032803",
+    "MeOH plant - biogas": "#0B4D0B",
     "Biogas2": "#6DAF62",
     "MeOH plant - biogasdirect": "#3C943C",
     "Biogas3": "#6DAF62",
@@ -337,19 +407,25 @@ def load_csv(path: str) -> pd.DataFrame:
 
 # ------------------------
 # File discovery
-# ------------------------
+# ----------------------------
+
+def natural_sort_key(name: str):
+    # Sort "Scenario 2.csv" before "Scenario 10.csv"
+    return [int(t) if t.isdigit() else t.lower() for t in re.findall(r"\d+|\D+", name)]
+
 csv_files: List[str] = []
 if main_results_folder:
     folder_path = Path(main_results_folder)
     if folder_path.exists() and folder_path.is_dir():
+        # Pick ALL CSVs and sort naturally
         csv_files = sorted(
-            [f for f in os.listdir(folder_path)
-             if f.lower().startswith("scenario") and f.lower().endswith(".csv")]
+            [f.name for f in folder_path.glob("*.csv")],
+            key=natural_sort_key
         )
         if csv_files:
-            st.success(f"Found {len(csv_files)} scenario CSV files in the folder.")
+            st.success(f"Found {len(csv_files)} CSV files in the folder.")
         else:
-            st.info("No files found matching 'scenario*.csv' in this folder.")
+            st.info("No CSV files found in this folder.")
     else:
         st.warning("The provided folder path does not exist or is not a directory.")
 
@@ -392,7 +468,6 @@ if compare_cols:
         compare_cols, index=0)
 else:
     selected_col = None
-    st.sidebar.info("No common numeric columns found to compare.")
 
 # Technology column detection
 tech_col = None
@@ -548,7 +623,6 @@ for tech in techs_drawn:
 # ------------------------
 # Plot
 # ------------------------
-st.write(f"**Comparing:** {', '.join(scenario_labels_ordered)}")
 fig, ax = plt.subplots(figsize=(11.5, 6.8))
 
 bottom_pos = [0.0] * plot_df.shape[1]
@@ -623,3 +697,32 @@ st.download_button(
 )
 
 plt.close(fig)
+
+# ----------------------------------------
+# Show results table
+# ----------------------------------------
+st.markdown("## Results Table")
+
+# Create a clean copy of the plotted data
+results_table = plot_df.loc[techs_drawn]
+
+# Apply custom names to the row index (technologies)
+results_table.index = [custom_names.get(t, t) for t in results_table.index]
+
+# Display table in Streamlit
+st.dataframe(results_table.style.format("{:,.2f}"), use_container_width=True)
+
+
+# ----------------------------------------
+# CSV download button
+# ----------------------------------------
+csv_buffer = io.StringIO()
+results_table.to_csv(csv_buffer)
+csv_data = csv_buffer.getvalue()
+
+st.download_button(
+    label="Download results as CSV",
+    data=csv_data,
+    file_name="scenario_results_table.csv",
+    mime="text/csv"
+)

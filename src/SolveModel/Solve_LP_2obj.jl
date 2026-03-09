@@ -302,7 +302,7 @@ function generate_adaptive_pareto_curve(opt_data, solver, N_scen, resultsfolder,
                           default_results_production_units, remove_lcia_phases;
                           model="LP_2obj", pareto_results_folder = pareto_results_folder, Sol_number=N_pareto_points)
 
-    write_hourly_results_LP(opt_data, opt_obj1, N_scen, resultsfolder, results_currency_multiplier;
+    write_hourly_results_LP(opt_data, opt_obj2, N_scen, resultsfolder, results_currency_multiplier;
                           model ="LP_2obj", pareto_results_folder = pareto_results_folder, Sol_number=N_pareto_points)
 
 
@@ -344,7 +344,7 @@ function generate_adaptive_pareto_curve(opt_data, solver, N_scen, resultsfolder,
                                   default_results_production_units, remove_lcia_phases;
                                   model="LP_2obj", pareto_results_folder = pareto_results_folder, Sol_number=sol_id)
             
-            write_hourly_results_LP(opt_data, opt_obj1, N_scen, resultsfolder, results_currency_multiplier;
+            write_hourly_results_LP(opt_data, opt_results, N_scen, resultsfolder, results_currency_multiplier;
                                     model ="LP_2obj", pareto_results_folder = pareto_results_folder, Sol_number=sol_id)
         end
     end

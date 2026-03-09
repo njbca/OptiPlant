@@ -1,6 +1,7 @@
 module Results_LP
 
 include("../ReadData/user_defined/Fuel_energy_content.jl")
+include("../ReadData/user_defined/Lcia_norm_factors.jl")
 include("HelperFunctionsWrite.jl")
 
 using CSV, DataFrames, XLSX
@@ -299,6 +300,7 @@ function write_main_results_LP(opt_data, opt_results, scenario_number, resultsfo
       for phase in (:inf, :use, :disp, :hourly, :total)
           Result[Symbol(string(cat_symbol) * "_" * String(phase))] = zeros(U)
           Result[Symbol(string(cat_symbol) * "_" * String(phase)* "_perGJ")] = zeros(U)
+          Result[Symbol(string(cat_symbol) * "_" * String(phase)* "_norm")] = zeros(U)
       end
     end
   end
@@ -530,6 +532,13 @@ function add_lcia_results!(Result::Dict{Symbol,Any}, opt_data, opt_results, u::I
     Result[Symbol(string(cat_sym) * "_disp")][u]  = disp_val
     Result[Symbol(string(cat_sym) * "_total")][u] = total_val
 
+    #Results normalized per average person
+    Result[Symbol(string(cat_sym) * "_inf")][u]   = inf_val/Lcia_EF_normalisation_factors[cat_sym]
+    Result[Symbol(string(cat_sym) * "_use")][u]   = use_val/Lcia_EF_normalisation_factors[cat_sym]
+    Result[Symbol(string(cat_sym) * "_disp")][u]  = disp_val/Lcia_EF_normalisation_factors[cat_sym]
+    Result[Symbol(string(cat_sym) * "_total_norm")][u] = total_val/Lcia_EF_normalisation_factors[cat_sym]
+
+
     #Results per GJ of fuel produced
     Result[Symbol(string(cat_sym) * "_inf_perGJ")][u]   = inf_val / total_energy_content_GJ
     Result[Symbol(string(cat_sym) * "_use_perGJ")][u]   = use_val / total_energy_content_GJ
@@ -551,6 +560,9 @@ function append_lcia_columns!(cols::Vector, Result_name::Vector{String}, Result:
           push!(cols, Result[Symbol(cat_name * "_" * String(phase))])
         end
         for phase in (:inf, :use, :disp, :hourly, :total)
+          push!(cols, Result[Symbol(cat_name * "_" * String(phase) * "_norm")])
+        end
+        for phase in (:inf, :use, :disp, :hourly, :total)
           push!(cols, Result[Symbol(cat_name * "_" * String(phase) * "_perGJ")])
         end
 
@@ -560,7 +572,12 @@ function append_lcia_columns!(cols::Vector, Result_name::Vector{String}, Result:
             cat_name * " operation [$(unit[cat_sym].use)]",
             cat_name * " disposal [$(unit[cat_sym].disp)]",
             cat_name * " hourly [$(unit[cat_sym].hourly)]",
-            cat_name * " total [$(unit[cat_sym].total)]",            
+            cat_name * " total [$(unit[cat_sym].total)]", 
+            cat_name * " construction norm [person]",
+            cat_name * " operation [person]",
+            cat_name * " disposal [person)]",
+            cat_name * " hourly [person]",
+            cat_name * " total norm [person]" ,          
             cat_name * " construction [$(unit[cat_sym].inf)/$unit_tot_energyJ]",
             cat_name * " operation [$(unit[cat_sym].use)/$unit_tot_energyJ]",
             cat_name * " disposal [$(unit[cat_sym].disp)/$unit_tot_energyJ]",

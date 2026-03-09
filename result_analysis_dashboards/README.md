@@ -12,7 +12,8 @@ If there is some authorization errors when activating the environment, in powers
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
-Make sure to update the result folder in the dashboard python scripts: 
+Make sure to update the result folder on top of the dashboard python scripts: 
 
-# Result folder (you can adjust this fallback)
+```python
 main_results_folder = Path.cwd() / "results" / "Full_model" / "GLS_analysis" / "Main results"
+```
