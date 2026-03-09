@@ -1,13 +1,6 @@
 # =============================================
 # Hourly Series Dashboard (Aligned with Scenario Dashboard)
-# - Slider + optional manual hour input
-# - Two plots: Energy (kWh) and Mass (kg)
-# - Easy color normalization (strip unit suffixes)
-# - Same TECH_COLORS and ALIASES as Scenario Dashboard
-# - Zero-only series filtered automatically
-# - Scenario info extracted and collapsed by default
-# - Index-based x-axis (no datetime weirdness)
-# - Battery line visibility fix
+# Simplified: default "Batteries" color darkened
 # =============================================
 
 import os
@@ -38,7 +31,7 @@ FLOWS_RESULTS_FOLDER = (
 )
 
 # ============================================================
-# EXACT SAME TECH COLORS AS SCENARIO DASHBOARD
+# TECH COLORS (Batteries color simplified here)
 # ============================================================
 TECH_COLORS: Dict[str, str] = {
     "Biogas1": "#6DAF62",
@@ -133,11 +126,13 @@ TECH_COLORS: Dict[str, str] = {
     "Curtailment": "#8C8C8C",
     "Charge batteries": "#CFCFCF",
     "Discharge batteries": "#BDBDBD",
-    "Batteries": "#F2F2F2",
+
+    # SIMPLIFIED: Batteries now darker by default
+    "Batteries": "#9E9E9E",
 }
 
 # ============================================================
-# ALIASES (same as scenario dashboard)
+# ALIASES
 # ============================================================
 ALIASES = {
     "meoh plant - biogas direct": "MeOH plant - biogasdirect",
@@ -158,20 +153,15 @@ ALIASES = {
     "post-combustion capture": "CO2 capture PS",
 }
 
-# ============================================================
-# EASY LABEL NORMALIZATION: strip "[unit]" + apply aliases
-# ============================================================
 UNIT_SUFFIX_RE = re.compile(r"\s*\[[^\]]+\]\s*$")
 
 def normalize_label(label: str) -> str:
     s = str(label).strip()
-    s = UNIT_SUFFIX_RE.sub("", s)  # strip "[kWhe]" etc.
+    s = UNIT_SUFFIX_RE.sub("", s)
     s = s.replace("–", "-").replace("—", "-")
     s = re.sub(r"\s+", " ", s).strip()
     low = s.lower()
-    if low in ALIASES:
-        return ALIASES[low]
-    return s
+    return ALIASES.get(low, s)
 
 def stable_color_from_name(name: str) -> str:
     h = hashlib.md5(str(name).encode("utf-8")).hexdigest()[:6]
@@ -204,39 +194,29 @@ selected_file = st.sidebar.selectbox("Select scenario:", csv_files)
 df = load_csv_any(folder_path / selected_file)
 
 # ============================================================
-# EXTRACT SCENARIO INFORMATION COLUMN
+# EXTRACT SCENARIO INFO
 # ============================================================
-info_col = None
-for c in df.columns:
-    if str(c).strip().lower() in ("information", "informations"):
-        info_col = c
-        break
+info_col = next((c for c in df.columns 
+                 if str(c).strip().lower() in ("information", "informations")), None)
 
 info_pairs = []
 if info_col:
-    lines = (
-        df[info_col]
-        .dropna()
-        .astype(str)
-        .head(30)
-        .tolist()
-    )
+    lines = df[info_col].dropna().astype(str).head(30).tolist()
     for line in lines:
         line = line.strip()
-        if not line:
-            continue
-        if ":" in line:
-            k, v = line.split(":", 1)
-            info_pairs.append((k.strip(), v.strip()))
-        else:
-            info_pairs.append(("", line))
+        if line:
+            if ":" in line:
+                k, v = line.split(":", 1)
+                info_pairs.append((k.strip(), v.strip()))
+            else:
+                info_pairs.append(("", line))
 
 if info_pairs:
     with st.expander("Scenario information", expanded=False):
         st.table(pd.DataFrame(info_pairs, columns=["Field", "Value"]))
 
 # ============================================================
-# DETECT TIME COLUMN (NO PARSING; WE USE INDEX ONLY)
+# TIME COLUMN DETECTION
 # ============================================================
 possible_time_cols = [
     c for c in df.columns if "time" in c.lower() or "hour" in c.lower()
@@ -244,7 +224,7 @@ possible_time_cols = [
 time_col = possible_time_cols[0] if possible_time_cols else df.columns[0]
 
 # ============================================================
-# GROUP COLUMNS BY NORMALIZED LABEL (exclude time & info)
+# GROUP COLUMNS BY NORMALIZED LABEL
 # ============================================================
 exclude = {time_col}
 if info_col:
@@ -273,7 +253,7 @@ if not selected_labels:
     st.stop()
 
 # ============================================================
-# TIME RANGE SELECTION (SLIDER + OPTIONAL MANUAL)
+# TIME RANGE SELECTION
 # ============================================================
 st.sidebar.markdown("---")
 st.sidebar.subheader("Time range")
@@ -297,7 +277,7 @@ df_view = df.iloc[first_hour:last_hour].copy()
 x_idx = list(range(first_hour, last_hour))
 
 # ============================================================
-# BUILD SERIES + ZERO FILTERING
+# BUILD SERIES
 # ============================================================
 def build_series_for_label(lab: str) -> pd.Series:
     cols = cols_by_label.get(lab, [])
@@ -322,7 +302,7 @@ if not nonzero_labels:
     st.stop()
 
 # ============================================================
-# CUSTOMIZATION (ONLY NONZERO SERIES)
+# SIDEBAR CUSTOMIZATION
 # ============================================================
 st.sidebar.markdown("---")
 st.sidebar.subheader("Customize series")
@@ -338,31 +318,18 @@ for lab in nonzero_labels:
 if zero_labels:
     st.sidebar.caption("Hidden (all-zero): " + ", ".join(zero_labels))
 
-# Batteries visibility fix
-def color_for_line(lab: str, hexcode: str) -> str:
-    if lab == "Batteries" and hexcode.lower() == "#f2f2f2":
-        return "#9e9e9e"
-    return hexcode
-
 # ============================================================
-# UNIT CLASSIFICATION (energy vs mass)
+# UNIT CLASSIFICATION
 # ============================================================
 def detect_unit_type(original_cols: List[str]) -> str:
     unit_string = " ".join(original_cols).lower()
-
-    # Energy units
     if any(x in unit_string for x in ["kwh", "kwhe", "kwhth", "mwh", "mwhe"]):
         return "energy"
-
-    # Mass units
     if any(x in unit_string for x in ["kg", "kgh2", "kgco2", "kgmeoh", "kgo2"]):
         return "mass"
-
     return "other"
 
-energy_labels = []
-mass_labels = []
-other_labels = []
+energy_labels, mass_labels, other_labels = [], [], []
 
 for lab in nonzero_labels:
     cols = cols_by_label.get(lab, [])
@@ -375,7 +342,7 @@ for lab in nonzero_labels:
         other_labels.append(lab)
 
 # ============================================================
-# PLOT 1 — ENERGY (kWh)
+# ENERGY PLOT
 # ============================================================
 if energy_labels:
     st.subheader("Energy flows (kWh)")
@@ -384,16 +351,13 @@ if energy_labels:
 
     for lab in energy_labels:
         s = series_map[lab]
-        color = color_for_line(lab, series_colors[lab])
+        color = series_colors[lab]
         ax1.plot(x_idx, s.values, label=display_names[lab], color=color, linewidth=1.8)
         vmax = pd.to_numeric(s, errors="coerce").max()
         if pd.notna(vmax):
             ymax1 = max(ymax1, float(vmax))
 
-    if ymax1 <= 0:
-        ymax1 = 1.0
-
-    ax1.set_ylim(0, ymax1 * 1.05)
+    ax1.set_ylim(0, ymax1 * 1.05 if ymax1 > 0 else 1.0)
     ax1.set_xlabel("Hour (index)")
     ax1.set_ylabel("kWh")
     ax1.grid(True)
@@ -404,7 +368,7 @@ else:
     st.info("No energy (kWh) series in this window.")
 
 # ============================================================
-# PLOT 2 — MASS (kg)
+# MASS PLOT
 # ============================================================
 if mass_labels:
     st.subheader("Mass flows (kg)")
@@ -413,16 +377,13 @@ if mass_labels:
 
     for lab in mass_labels:
         s = series_map[lab]
-        color = color_for_line(lab, series_colors[lab])
+        color = series_colors[lab]
         ax2.plot(x_idx, s.values, label=display_names[lab], color=color, linewidth=1.8)
         vmax = pd.to_numeric(s, errors="coerce").max()
         if pd.notna(vmax):
             ymax2 = max(ymax2, float(vmax))
 
-    if ymax2 <= 0:
-        ymax2 = 1.0
-
-    ax2.set_ylim(0, ymax2 * 1.05)
+    ax2.set_ylim(0, ymax2 * 1.05 if ymax2 > 0 else 1.0)
     ax2.set_xlabel("Hour (index)")
     ax2.set_ylabel("kg")
     ax2.grid(True)
@@ -436,8 +397,7 @@ else:
 # PNG DOWNLOAD
 # ============================================================
 buf = io.BytesIO()
-# Save the last plot (mass or energy). User typically downloads one.
-fig2.savefig(buf, format="png", bbox_inches="tight", dpi=200) if mass_labels else fig1.savefig(buf, format="png", bbox_inches="tight", dpi=200)
+(fig2 if mass_labels else fig1).savefig(buf, format="png", bbox_inches="tight", dpi=200)
 buf.seek(0)
 
 st.download_button(
@@ -447,5 +407,4 @@ st.download_button(
     mime="image/png"
 )
 
-# Info footer
 st.info(f"Showing hours from {first_hour} to {last_hour-1}")

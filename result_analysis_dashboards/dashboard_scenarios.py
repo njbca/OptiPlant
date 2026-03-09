@@ -81,9 +81,9 @@ TECH_COLORS: Dict[str, str] = {
     "Sale of oxygen": "#CC79A7",
 
     # --- Water systems (TEAL family; desal red kept as accent) ---
-    "Desalination plant": "#D81B60",  # strong red accent
-    "Waste water plant":   "#1FA4A9", # teal
-    "Drinking water":      "#66C2B7", # light teal
+    "Desalination plant": "#D81B60",
+    "Waste water plant":   "#1FA4A9",
+    "Drinking water":      "#66C2B7",
 
     # --- Heat links (warm neutrals) ---
     "Heat from district heating": "#C9A26B",
@@ -136,7 +136,9 @@ TECH_COLORS: Dict[str, str] = {
     "Curtailment":               "#8C8C8C",
     "Charge batteries":    "#CFCFCF",
     "Discharge batteries": "#BDBDBD",
-    "Batteries":           "#F2F2F2",
+
+    # UPDATED default color for Batteries (same as Hourly Dashboard)
+    "Batteries":           "#9E9E9E",
 }
 
 # Aliases → canonical labels
@@ -184,7 +186,7 @@ def normalize_label(label: str) -> str:
     return ALIASES.get(str(label).strip(), str(label).strip())
 
 # ------------------------
-# Group map (used for default grouped-by-color-type stacking order)
+# Group map
 # ------------------------
 GROUP_MAP: Dict[str, str] = {
     # Biogas & methanol from biogas
@@ -315,7 +317,7 @@ def _srgb_to_linear(c: float) -> float:
 
 def relative_luminance_hex(hex_color: str) -> float:
     """WCAG relative luminance (0..1)."""
-    r, g, b = to_rgb(hex_color)  # sRGB 0..1
+    r, g, b = to_rgb(hex_color)
     R = _srgb_to_linear(r)
     G = _srgb_to_linear(g)
     B = _srgb_to_linear(b)
@@ -352,12 +354,11 @@ if main_results_folder:
         st.warning("The provided folder path does not exist or is not a directory.")
 
 # ------------------------
-# Sidebar controls (no extra ordering UI)
+# Sidebar controls
 # ------------------------
 st.sidebar.title("Scenario Options")
 selected_files = st.sidebar.multiselect("Select scenarios:", csv_files, default=[])
 
-# Read selected scenario files
 dfs: Dict[str, pd.DataFrame] = {}
 for file in selected_files:
     path = os.path.join(main_results_folder, file)
@@ -366,13 +367,13 @@ for file in selected_files:
     except Exception as e:
         st.sidebar.error(f"Failed to read {file}: {e}")
 
-# Find common columns across selected scenarios
+# Find common columns
 if dfs:
     common_cols = set.intersection(*(set(df.columns) for df in dfs.values()))
 else:
     common_cols = set()
 
-# Exclude ID-like columns and keep only numeric columns for comparison
+# Filter non-numeric
 exclude_name_parts = ["id", "name", "site", "scenario"]
 exclude_cols = {col for col in common_cols if any(x in col.lower() for x in exclude_name_parts)}
 
@@ -388,31 +389,22 @@ compare_cols = sorted([c for c in candidate_cols if is_numeric_in_all(c)])
 if compare_cols:
     selected_col = st.sidebar.selectbox(
         "Select result to compare across scenarios:",
-        compare_cols,
-        index=0
-    )
+        compare_cols, index=0)
 else:
     selected_col = None
     st.sidebar.info("No common numeric columns found to compare.")
 
-# Detect technology column
+# Technology column detection
 tech_col = None
-for col_candidate in ["Type of unit", "Type of unit\n", "Technology"]:
-    if dfs and all(col_candidate.strip() in df.columns for df in dfs.values()):
-        tech_col = col_candidate.strip()
+for c in ["Type of unit", "Type of unit\n", "Technology"]:
+    if dfs and all(c.strip() in df.columns for df in dfs.values()):
+        tech_col = c.strip()
         break
 
 # ------------------------
-# Scenario names from inside each CSV (column "Scenario")
+# Scenario names
 # ------------------------
 def choose_scenario_name(df: pd.DataFrame, fallback: str) -> str:
-    """
-    Robust scenario display name:
-    - If 'Scenario' exists:
-        use the mode (most frequent) non-empty string;
-        fall back to the first non-empty if no clear mode.
-    - Else: use fallback (file stem).
-    """
     if df is not None and "Scenario" in df.columns:
         s = df["Scenario"].dropna().astype(str).str.strip()
         s = s[s != ""]
@@ -424,7 +416,6 @@ def choose_scenario_name(df: pd.DataFrame, fallback: str) -> str:
     return fallback
 
 def deduplicate_labels(labels: List[str]) -> List[str]:
-    """Ensure labels are unique by appending '(2)', '(3)', ... when needed."""
     seen = {}
     out = []
     for lab in labels:
@@ -437,14 +428,13 @@ def deduplicate_labels(labels: List[str]) -> List[str]:
     return out
 
 scenario_name_map: Dict[str, str] = {}
-proposed_labels = []
+proposed = []
 for file in selected_files:
     df_here = dfs.get(file)
     fallback = Path(file).stem
-    label = choose_scenario_name(df_here, fallback)
-    proposed_labels.append(label)
+    proposed.append(choose_scenario_name(df_here, fallback))
 
-unique_labels = deduplicate_labels(proposed_labels)
+unique_labels = deduplicate_labels(proposed)
 for file, label in zip(selected_files, unique_labels):
     scenario_name_map[file] = label
 
@@ -452,14 +442,13 @@ for file, label in zip(selected_files, unique_labels):
 # Build tech × scenario data
 # ------------------------
 if not selected_files:
-    st.info("Select scenarios and technologies in the sidebar to compare.")
+    st.info("Select scenarios and technologies to compare.")
     st.stop()
 
 if not selected_col:
     st.warning("Please select a numeric column to compare.")
     st.stop()
 
-# Build universe of technologies (normalized)
 techs = set()
 if dfs:
     if tech_col:
@@ -471,20 +460,17 @@ if dfs:
             techs.update(df.index.astype(str))
 techs = sorted(list(techs))
 
-# Technology selection
+# Tech selection
 st.sidebar.markdown("---")
 st.sidebar.subheader("Technologies")
-select_all_techs = st.sidebar.checkbox("Select all technologies", value=True)
-if select_all_techs:
-    selected_techs = techs[:]
-else:
-    selected_techs = st.sidebar.multiselect("Technologies to include:", options=techs, default=[])
+select_all_techs = st.sidebar.checkbox("Select all technologies", True)
+selected_techs = techs[:] if select_all_techs else st.sidebar.multiselect("Technologies:", techs)
 
 if not selected_techs:
-    st.info("No technologies selected. Choose at least one to draw the chart.")
+    st.info("No technologies selected.")
     st.stop()
 
-# Build a dict of Series per scenario
+# Data matrix
 bar_data = {}
 for file_key, df in dfs.items():
     df_local = df.copy()
@@ -497,68 +483,67 @@ for file_key, df in dfs.items():
         s = s.reindex(selected_techs).fillna(0)
     bar_data[file_key] = s
 
-# Assemble dataframe and rename columns to scenario labels
 plot_df = pd.DataFrame(bar_data)
-plot_df = plot_df.loc[selected_techs, selected_files]  # keep sidebar order
+plot_df = plot_df.loc[selected_techs, selected_files]
 plot_df.columns = [scenario_name_map[c] for c in plot_df.columns]
 scenario_labels_ordered = [scenario_name_map[f] for f in selected_files]
 
-# Keep only technologies that actually have any nonzero values across scenarios
+# Keep only nonzero techs
 nonzero_mask = (plot_df.abs().sum(axis=1) > 0)
 techs_to_plot = [t for t in selected_techs if nonzero_mask.get(t, False)]
 if not techs_to_plot:
-    st.info("All selected technologies have zero values across the chosen scenarios.")
+    st.info("All selected technologies have zero values.")
     st.stop()
 
 # ------------------------
-# Ordering — GROUPED BY COLOR TYPE (sum across selected scenarios)
+# Ordering
 # ------------------------
 pos_group_total, neg_group_total = {}, {}
 tech_pos_sum, tech_neg_abs = {}, {}
 
 for tech in techs_to_plot:
     vec = plot_df.loc[tech]
-    pos_sum = vec.clip(lower=0).sum()
-    neg_abs = vec.clip(upper=0).abs().sum()
+    pos = vec.clip(lower=0).sum()
+    neg = vec.clip(upper=0).abs().sum()
+    g = get_group(tech)
 
-    g = GROUP_MAP.get(tech, "Other")
-    tech_pos_sum[tech] = float(pos_sum)
-    tech_neg_abs[tech] = float(neg_abs)
-    pos_group_total[g] = pos_group_total.get(g, 0.0) + float(pos_sum)
-    neg_group_total[g] = neg_group_total.get(g, 0.0) + float(neg_abs)
+    tech_pos_sum[tech] = float(pos)
+    tech_neg_abs[tech] = float(neg)
+    pos_group_total[g] = pos_group_total.get(g, 0.0) + float(pos)
+    neg_group_total[g] = neg_group_total.get(g, 0.0) + float(neg)
 
 groups_pos_sorted = sorted([g for g, v in pos_group_total.items() if v > 0],
                            key=lambda g: pos_group_total[g], reverse=True)
 groups_neg_sorted = sorted([g for g, v in neg_group_total.items() if v > 0],
                            key=lambda g: neg_group_total[g])
 
-techs_ordered_pos: List[str] = []
+techs_ordered_pos = []
 for g in groups_pos_sorted:
     ts = [t for t in techs_to_plot if get_group(t) == g and tech_pos_sum[t] > 0]
     ts = sorted(ts, key=lambda t: tech_pos_sum[t], reverse=True)
     techs_ordered_pos.extend(ts)
 
-techs_ordered_neg: List[str] = []
+techs_ordered_neg = []
 for g in groups_neg_sorted:
     ts = [t for t in techs_to_plot if get_group(t) == g and tech_neg_abs[t] > 0]
-    ts = sorted(ts, key=lambda t: tech_neg_abs[t])  # draw smallest |neg| first
+    ts = sorted(ts, key=lambda t: tech_neg_abs[t])
     techs_ordered_neg.extend(ts)
 
 techs_drawn = techs_ordered_pos + [t for t in techs_ordered_neg if t not in techs_ordered_pos]
 
 # ------------------------
-# Customize (allow rename & color override, no new controls)
+# Sidebar rename & color override
 # ------------------------
 st.sidebar.markdown("---")
 st.sidebar.subheader("Customize technologies on chart")
 
 custom_names, custom_colors = {}, {}
 for tech in techs_drawn:
-    display_name = st.sidebar.text_input(f"Display name — {tech}", value=tech, key=f"display_name_{tech}")
-    color_default = TECH_COLORS.get(tech, stable_color_from_name(tech))
-    color = st.sidebar.color_picker(f"Color — {tech}", value=color_default, key=f"color_{tech}")
-    custom_names[tech] = display_name
-    custom_colors[tech] = color
+    display = st.sidebar.text_input(f"Display name — {tech}", tech)
+    default_col = TECH_COLORS.get(tech, stable_color_from_name(tech))
+    chosen = st.sidebar.color_picker(f"Color — {tech}", default_col)
+    custom_names[tech] = display
+    custom_colors[tech] = chosen
 
 # ------------------------
 # Plot
@@ -569,19 +554,19 @@ fig, ax = plt.subplots(figsize=(10.8, 6.2))
 bottom_pos = [0.0] * plot_df.shape[1]
 bottom_neg = [0.0] * plot_df.shape[1]
 
-# Positives
+# Positive bars
 for tech in techs_ordered_pos:
     label = custom_names.get(tech, tech)
-    fill = custom_colors.get(tech, TECH_COLORS.get(tech, stable_color_from_name(tech)))
+    fill = custom_colors.get(tech)
     values = plot_df.loc[tech].clip(lower=0).tolist()
     ax.bar(plot_df.columns, values, label=label, bottom=bottom_pos,
            color=fill, edgecolor=edge_for_fill(fill), linewidth=0.6)
     bottom_pos = [b + v for b, v in zip(bottom_pos, values)]
 
-# Negatives
+# Negative bars
 for tech in techs_ordered_neg:
     label = custom_names.get(tech, tech)
-    fill = custom_colors.get(tech, TECH_COLORS.get(tech, stable_color_from_name(tech)))
+    fill = custom_colors.get(tech)
     values = plot_df.loc[tech].clip(upper=0).tolist()
     ax.bar(plot_df.columns, values, label=label, bottom=bottom_neg,
            color=fill, edgecolor=edge_for_fill(fill), linewidth=0.6)
@@ -592,25 +577,24 @@ ymax = max(bottom_pos) if bottom_pos else 0
 ymin = min(bottom_neg) if bottom_neg else 0
 if ymax == 0 and ymin == 0:
     ymax, ymin = 1, -1
-pad_up = ymax * 0.05 if ymax != 0 else 0.05
-pad_dn = ymin * 0.05 if ymin != 0 else -0.05
-ax.set_ylim(ymin + pad_dn, ymax + pad_up)
+ax.set_ylim(ymin * 1.05, ymax * 1.05)
 
-# Labels and title
+# Labels
 ax.set_ylabel(selected_col)
 ax.set_xlabel("Scenario")
 ax.set_title(f"{selected_col} by Technology and Scenario (grouped by color type)")
-
-# Axis, legend
 ax.ticklabel_format(axis="y", style="plain")
+
+# Legend (deduplicated)
 handles, labels = ax.get_legend_handles_labels()
-seen, dedup_h, dedup_l = set(), [], []
+seen = set()
+dedup_h, dedup_l = [], []
 for h, l in zip(handles, labels):
     if l not in seen:
         dedup_h.append(h); dedup_l.append(l); seen.add(l)
 if dedup_l:
-    ax.legend(dedup_h, dedup_l, loc="upper left", bbox_to_anchor=(1.02, 1.0),
-              borderaxespad=0.0, frameon=False)
+    ax.legend(dedup_h, dedup_l, loc="upper left",
+              bbox_to_anchor=(1.02, 1.0), frameon=False)
 
 plt.subplots_adjust(left=0.12, right=0.80, top=0.92, bottom=0.20)
 plt.xticks(rotation=0)
@@ -622,6 +606,11 @@ st.pyplot(fig, clear_figure=False)
 buf = io.BytesIO()
 fig.savefig(buf, format="png", bbox_inches="tight", dpi=220)
 buf.seek(0)
-st.download_button("Download chart as PNG", data=buf,
-                   file_name="scenario_comparison.png", mime="image/png")
+st.download_button(
+    "Download chart as PNG",
+    data=buf,
+    file_name="scenario_comparison.png",
+    mime="image/png"
+)
+
 plt.close(fig)
