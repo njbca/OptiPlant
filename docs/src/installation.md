@@ -13,7 +13,7 @@ Done! Try to run some of the examples following the user-guide
 ## 1. Fork the repository
 
 Set up a [GitHub account](https://github.com/signup) and sign-in.
-On the online repository, click on **Fork >  Create a new fork** and name it as you wish i.e. `OptiPlantPtX`.
+On the online repository, click on **Fork >  Create a new fork**.
 
 ## 2. Clone the repository to your local machine
 
@@ -22,7 +22,7 @@ Install a Git client (choose one you’re comfortable with):
 - [Git](https://git-scm.com/downloads)  
 
 ### Steps (with GitHub Desktop):
-1. On the OptiPlantPtX repository that you forked, click on the green "<> Code" button, go to HTTPS and copy the URL
+1. On the OptiPlant repository that you forked, click on the green "<> Code" button, go to HTTPS and copy the URL
 2. In GitHub desktop, go to `File > Clone repository` 
 3. Go in the URL tab and paste the OptiPlant repository URL
 4. Choose the path to clone the repository locally
@@ -35,7 +35,7 @@ Make sure to select the "Add to PATH" option when installing.
 ![Add_to_PATH](images/VSCode_addtopath.png)
 
 1. Open VS Code  
-2. Go to `File > Open Folder` → select your `OptiPlantPtX` folder  
+2. Go to `File > Open Folder` → select your `OptiPlant` folder  
 
 ## 4. Setup Julia Environment
 
@@ -49,7 +49,7 @@ Make sure to select the "Add to PATH" option when installing.
    - Option 2, open the command palette (`Ctrl+Shift+P`) and run: `Julia: Start REPL`
 
 4. This is now a condensed version of the [Julia documentation](https://pkgdocs.julialang.org/v1/environments/) to use someone else's project:
-   - In the REPL, run this command to move one directory up (where the folder where `OptiPlantPtX` is located):  
+   - In the REPL, run this command to move one directory up (where the folder where `OptiPlant` is located):  
    ```julia
    cd("..")
    ```
@@ -57,7 +57,7 @@ Make sure to select the "Add to PATH" option when installing.
 
    - To set up the environment write:
    ```julia
-   activate OptiPlantPtX 
+   activate OptiPlant 
    ```
    !!! warning
        If your folder is called differently i.e. "MyOptiPlant" write `activate MyOptiPlant` instead

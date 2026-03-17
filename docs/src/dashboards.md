@@ -4,9 +4,9 @@
 
 OptiPlantPtX includes three specialized dashboards for different types of analysis:
 
-- **Dashboard_hourly.py**: Hourly time series visualization for operational analysis  
-- **Dashboard_scenarios.py**: Multi-scenario comparative analysis
-- **dashboard_impact_categories.py**: Life cycle impact assessment analysis
+- **dashboard\_hourly.py**: Hourly time series visualization for operational analysis  
+- **dashboard\_scenarios.py**: Multi-scenario comparative analysis
+- **dashboard\_impact\_categories.py**: Life cycle impact assessment analysis
 
 ## Installation and Setup
 
@@ -40,7 +40,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```bash
 python -m pip install -r requirements.txt
 ```
-6- Change the default result folder on top of the dashboard python scripts to your own (in the result_analysis_dashboards folder): 
+6- Change the default result folder on top of the dashboard python scripts to your own (in the result\_analysis\_dashboards folder): 
 
 ```python
 main_results_folder = Path.cwd() / "results" / "Example" / "Your_folder_name" / "Main results"
