@@ -303,7 +303,7 @@ function apply_scenario_changes!(
     C_scen_name = get_col_index(ScenchangeTags.c_scen_name)
 
     # Identify scenario rows
-    Scenario_def_name = Data_scenarios_def[corners.L1_sd:end, C_scen_name]
+    Scenario_def_name = [x for x in Data_scenarios_def[corners.L1_sd:end, C_scen_name] if x != 0] #Remove zero values in case there is some appearing on the scenario names
     Reference_scenario = Data_scenarios_def[corners.L1_sd:end, C_reference]
     scen_name = scen.Scenario
     ref_scen = Reference_scenario[findfirst(x -> x == scen_name, Scenario_def_name)]
@@ -322,6 +322,7 @@ function apply_scenario_changes!(
     for i in 1:nCurscen
         row = corners.L1_sd + Current_scenario[i] - 1
         unit = Data_scenarios_def[row, C_unit_changed]
+        println("unit: $unit")
         param = Data_scenarios_def[row, C_parameter_changed]
         year_val = string(Data_scenarios_def[row, C_year_new_value])
         new_val = Data_scenarios_def[row, C_new_value]
