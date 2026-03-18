@@ -22,7 +22,7 @@ st.subheader("Choose results folder under a base directory")
 
 # Result folder (adjust if needed)
 
-BASE_DIR = Path.cwd() / "results" / "Full_model" / "GLS_analysis"
+BASE_DIR = Path.cwd() / "results" / "ZCS_tests" / "Results_base_case"
 
 # Optional: allow changing the base dir from the UI
 with st.expander("Change base directory"):
