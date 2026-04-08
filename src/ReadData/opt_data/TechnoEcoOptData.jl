@@ -322,7 +322,6 @@ function apply_scenario_changes!(
     for i in 1:nCurscen
         row = corners.L1_sd + Current_scenario[i] - 1
         unit = Data_scenarios_def[row, C_unit_changed]
-        println("unit: $unit")
         param = Data_scenarios_def[row, C_parameter_changed]
         year_val = string(Data_scenarios_def[row, C_year_new_value])
         new_val = Data_scenarios_def[row, C_new_value]

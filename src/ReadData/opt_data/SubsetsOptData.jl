@@ -147,7 +147,7 @@ function build_subsets_opt_data(
     for u = 1:nRPU
         if RPU_p[u] == 0
             unit_names = Data_units[L1:end, idx_t.units[2]]
-            @error("No profile available for $(unit_names[RPU[u]]) in the selected location: check that the techno-econmic and profiles subsets are matching or exclude the missing unit from the optimization")
+            @error("No profile available for $(unit_names[RPU[u]]) in the selected location: check that the techno-economic and profiles subsets are matching or exclude the missing unit from the optimization")
         end
     end
 

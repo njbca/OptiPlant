@@ -166,8 +166,11 @@ function Solve_OptiPlant_LP_2obj(opt_data, solver;
   #Capacity constraints
 
   if scd.Option_max_capacity == true
-    @constraint(Model_LP,[u=1:U], Capacity[u] <= td.Max_Cap[u]) #Maximal capacity that can be installed
-    #@constraint(Model_LP,[i=1:sd.nGe], Capacity[sd.Grid_in[i]] <= 30000)  #Maximal grid capacity that can be installed
+    for u=1:U
+      if isa(td.Max_Cap[u], Number) && td.Max_Cap[u] >= 0 #Enforce the constraint if the max capacity is a number above zero (otherwise no constraint)
+        @constraint(Model_LP, Capacity[u] <= td.Max_Cap[u]*yearly_demand_scaling_factor) #Maximal capacity that can be installed
+      end
+    end
   end
   
   @constraint(Model_LP,[u=1:U,t in Tstart], X[u,t] >= Capacity[u]*td.Load_min[u]) #Min flow
