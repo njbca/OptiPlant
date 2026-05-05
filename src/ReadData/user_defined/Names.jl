@@ -219,6 +219,10 @@ SubsetTags = (
 )
 
 
+#*****************************Sentinel values ****************************************
+
+const CHECK_TECHNO_ECO = "Check_techno_eco"  # use the scenario's own file reference instead of a fixed filename
+
 #*****************************Change data based on scenarios**************************
 
 ScenchangeTags = (

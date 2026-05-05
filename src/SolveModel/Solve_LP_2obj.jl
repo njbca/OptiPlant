@@ -8,12 +8,13 @@ using JuMP, CSV, DataFrames, XLSX, Gurobi, HiGHS
 export Solve_OptiPlant_LP_2obj, OptiPlantResultsLP_2obj, generate_adaptive_pareto_curve
 
 struct OptiPlantResultsLP_2obj
-    Flows::Matrix{Float64}     
-    Sold::Matrix{Float64}     
-    Bought::Matrix{Float64}     
+    Flows::Matrix{Float64}
+    Sold::Matrix{Float64}
+    Bought::Matrix{Float64}
     Capacity::Vector{Float64}
     Objectives::Dict{Symbol, Float64}     # all objective values (Costs, Emissions, LandUse, etc.)
     yearly_demand_scaling_factor::Float64
+    status::Bool                          # true only when solver reached OPTIMAL
 end
 
 function Solve_OptiPlant_LP_2obj(opt_data, solver;
@@ -46,11 +47,12 @@ function Solve_OptiPlant_LP_2obj(opt_data, solver;
   @variable(Model_LP,Capacity[1:U] >= 0) #  Production capacity of each unit (kg/h or kW)
   @variable(Model_LP,Sold[1:U,t in Time] >= 0) # Quantity of products sold (kg/h or kW)
   @variable(Model_LP,Bought[1:U,t in Time] >= 0) # Quantity of input bought (kg/h or kW)
-  for t in Time, u=1:U
-    if td.Used_Unit[u]==0
-      for var in [X[u, t], Capacity[u], Sold[u, t], Bought[u, t]]
-        @constraint(Model_LP, var <= 0)
-      end
+  for u = 1:U
+    if td.Used_Unit[u] == 0
+      @constraint(Model_LP, Capacity[u] <= 0)
+      @constraint(Model_LP, [t in Time], X[u, t] <= 0)
+      @constraint(Model_LP, [t in Time], Sold[u, t] <= 0)
+      @constraint(Model_LP, [t in Time], Bought[u, t] <= 0)
     end
   end
 
@@ -130,7 +132,7 @@ function Solve_OptiPlant_LP_2obj(opt_data, solver;
   #Enforcement of a maximum WTT operational emissions over a year in kg CO2e, Treshold also mean that grid electricity intensity is below x value. 
   if scd.CO2WTTop_treshold >= 0
     @constraint(Model_LP, sum(pd.Grid_CO2_profile_regulated[t]*Bought[sd.Grid_buy[u],Time[t]] for t=1:T if sd.Grid_buy[u] > 0)
-    + sum(td.CO2_proc_fixed_reg[u]*X[u,t] for u=1:U,t in Time) <= scd.CO2WTTop_treshold*Fuel_energy_content*sum(Sold[i,t] for t in Time, i in sd.MinD))
+    + sum(td.CO2_proc_fixed_reg[u]*X[u,t] for u=1:U,t in Time) <= scd.CO2WTTop_treshold*Fuel_energy_content_list[scd.Fuel]*sum(Sold[i,t] for t in Time, i in sd.MinD))
   end
 
   #Enforcement of renewable criterion satisfied at all time
@@ -142,12 +144,14 @@ function Solve_OptiPlant_LP_2obj(opt_data, solver;
 
   #Demand constraint
 
+  yearly_demand_scaling_factor = 1.0
   if scd.periodic_demand_targets == true
-    Demand_targets = zeros(1,Numbers_of_period)
-    for i = 1:1, p =1:Numbers_of_period
-      Demand_targets[i,p] = td.Demand[sd.MinD[i]]/Numbers_of_period
+    nPeriods = length(scd.T_period)
+    Demand_targets = zeros(sd.nMinD, nPeriods)
+    for i = 1:sd.nMinD, p = 1:nPeriods
+      Demand_targets[i,p] = td.Demand[sd.MinD[i]]/nPeriods
     end
-    @constraint(Model_LP,[i=1:sd.nMinD, p=1:Numbers_of_period], sum(Sold[sd.MinD[i],t] for t in T_period[p] ) == Demand_targets[i,p])
+    @constraint(Model_LP,[i=1:sd.nMinD, p=1:nPeriods], sum(Sold[sd.MinD[i],t] for t in scd.T_period[p] ) == Demand_targets[i,p])
   else
     yearly_demand_scaling_factor = 10^(-floor(log10(td.Demand[sd.MainFuel[1]])))
     @constraint(Model_LP,[i in sd.MinD], sum(Sold[i,t] for t in Time) == td.Demand[i]*yearly_demand_scaling_factor)
@@ -226,17 +230,19 @@ function Solve_OptiPlant_LP_2obj(opt_data, solver;
       Bought_vals,
       Capacity_vals,
       Objectives_vals,
-      yearly_demand_scaling_factor
+      yearly_demand_scaling_factor,
+      true
     )
   else
     println("No optimal solution available")
-        return OptiPlantResultsLP_2obj(
-        zeros(size(X)),
-        zeros(size(Sold)),
-        zeros(size(Bought)),
-        zeros(U),
-        Dict{Symbol, Float64}(),  # empty objectives
-        0.0
+    return OptiPlantResultsLP_2obj(
+      zeros(size(X)),
+      zeros(size(Sold)),
+      zeros(size(Bought)),
+      zeros(U),
+      Dict{Symbol, Float64}(),
+      0.0,
+      false
     )
   end
 
@@ -338,6 +344,8 @@ function generate_adaptive_pareto_curve(opt_data, solver, N_scen, resultsfolder,
                                                   objective_to_minimize=objective1,
                                                   epsilon_objective=objective2,
                                                   Max_value=e)
+
+            !opt_results.status && continue
 
             add_solution!(pareto_front, pareto_front_scaled, sol_id, opt_results)
 

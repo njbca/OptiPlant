@@ -1,5 +1,7 @@
 module Solve_LP
 
+include("../ReadData/user_defined/Fuel_energy_content.jl")
+
 using JuMP, CSV, DataFrames, XLSX, Gurobi, HiGHS
 
 export Solve_OptiPlant_LP, OptiPlantResultsLP
@@ -39,11 +41,12 @@ function Solve_OptiPlant_LP(opt_data, solver)
   @variable(Model_LP,Capacity[1:U] >=0) #  Production capacity of each unit (kg/h or kW)
   @variable(Model_LP,Sold[1:U,t in Time] >= 0) # Quantity of products sold (kg/h or kW)
   @variable(Model_LP,Bought[1:U,t in Time] >= 0) # Quantity of input bought (kg/h or kW)
-  for t in Time, u=1:U
-    if td.Used_Unit[u]==0
-      for var in [X[u, t], Capacity[u], Sold[u, t], Bought[u, t]]
-        @constraint(Model_LP, var <= 0)
-      end
+  for u = 1:U
+    if td.Used_Unit[u] == 0
+      @constraint(Model_LP, Capacity[u] <= 0)
+      @constraint(Model_LP, [t in Time], X[u, t] <= 0)
+      @constraint(Model_LP, [t in Time], Sold[u, t] <= 0)
+      @constraint(Model_LP, [t in Time], Bought[u, t] <= 0)
     end
   end
 
@@ -67,7 +70,7 @@ function Solve_OptiPlant_LP(opt_data, solver)
   #Enforcement of a maximum WTT operational emissions over a year in kg CO2e, Treshold also mean that grid electricity intensity is below x value. 
   if scd.CO2WTTop_treshold >= 0
     @constraint(Model_LP, sum(pd.Grid_CO2_profile_regulated[t]*Bought[sd.Grid_buy[u],Time[t]] for t=1:T if sd.Grid_buy[u] > 0)
-    + sum(td.CO2_proc_fixed_reg[u]*X[u,t] for u=1:U,t in Time) <= scd.CO2WTTop_treshold*Fuel_energy_content*sum(Sold[i,t] for t in Time, i in sd.MinD))
+    + sum(td.CO2_proc_fixed_reg[u]*X[u,t] for u=1:U,t in Time) <= scd.CO2WTTop_treshold*Fuel_energy_content_list[scd.Fuel]*sum(Sold[i,t] for t in Time, i in sd.MinD))
   end
 
   #Enforcement of renewable criterion satisfied at all time
@@ -79,16 +82,17 @@ function Solve_OptiPlant_LP(opt_data, solver)
 
   #Demand constraint
 
+  yearly_demand_scaling_factor = 1.0
   if scd.periodic_demand_targets == true
-    Demand_targets = zeros(1,Numbers_of_period)
-    for i = 1:1, p =1:Numbers_of_period
-      Demand_targets[i,p] = td.Demand[sd.MinD[i]]/Numbers_of_period
+    nPeriods = length(scd.T_period)
+    Demand_targets = zeros(sd.nMinD, nPeriods)
+    for i = 1:sd.nMinD, p = 1:nPeriods
+      Demand_targets[i,p] = td.Demand[sd.MinD[i]]/nPeriods
     end
-    @constraint(Model_LP,[i=1:sd.nMinD, p=1:Numbers_of_period], sum(Sold[sd.MinD[i],t] for t in T_period[p] ) == Demand_targets[i,p])
+    @constraint(Model_LP,[i=1:sd.nMinD, p=1:nPeriods], sum(Sold[sd.MinD[i],t] for t in scd.T_period[p] ) == Demand_targets[i,p])
   else
     yearly_demand_scaling_factor = 10^(-floor(log10(td.Demand[sd.MainFuel[1]])))
     @constraint(Model_LP,[i in sd.MinD], sum(Sold[i,t] for t in Time) == td.Demand[i]*yearly_demand_scaling_factor)
-    #@constraint(Model_LP,[i in sd.MinD], sum(Sold[i,t] for t in Time) == td.Demand[i])
   end
 
   if scd.Option_connection_limit == true

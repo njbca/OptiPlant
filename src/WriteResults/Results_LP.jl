@@ -64,7 +64,7 @@ function write_hourly_results_LP(opt_data, opt_results, scenario_number, results
 
     #Counted grid "real" emissions (emissions not affected by regulations and taxes)
     Grid_real_emissions = zeros(T, 1)
-    if haskey(pd.Lcia_grid_profile, :climate_change)
+    if sd.nGb > 0 && haskey(pd.Lcia_grid_profile, :climate_change)
       for t = 1:T
         Grid_real_emissions[t, 1] = pd.Lcia_grid_profile[:climate_change][t] * Bought[sd.Grid_buy[1], t]
       end
@@ -72,8 +72,10 @@ function write_hourly_results_LP(opt_data, opt_results, scenario_number, results
 
     #Counted grid "legal" emissions (emissions affected by regulations and taxes)
     Grid_legal_emissions = zeros(T, 1)
-    for t = 1:T
-      Grid_legal_emissions[t, 1] = pd.Grid_CO2_profile_regulated[t] * Bought[sd.Grid_buy[1], t]
+    if sd.nGb > 0
+      for t = 1:T
+        Grid_legal_emissions[t, 1] = pd.Grid_CO2_profile_regulated[t] * Bought[sd.Grid_buy[1], t]
+      end
     end
 
 
@@ -342,7 +344,7 @@ function write_main_results_LP(opt_data, opt_results, scenario_number, resultsfo
   end
 
   # Heat sales
-  if scd.Option_hourly_heat_sale && sd.Heat_sell[1] > 0 && sd.Heal_sell_p[1] > 0
+  if scd.Option_hourly_heat_sale && sd.Heat_sell[1] > 0 && sd.Heat_sell_p[1] > 0
       for u = 1:sd.nHs
           Result[:fuelsold_t][sd.Heat_sell[u]] =
           scale_c(
@@ -362,7 +364,10 @@ function write_main_results_LP(opt_data, opt_results, scenario_number, resultsfo
   #Energy content and convertions for main fuel
   yearly_prod_kg, unit_prod_kg = scale_mass_power_energy_units(sum(X[u, t] for u in sd.MainFuel, t =1:T), td.Output_units[sd.MainFuel[1]]; force_unit_prefix = "kg") #Convert yearly production in kilos
   total_energy_content_GJ, unit_tot_energyJ = scale_mass_power_energy_units(yearly_prod_kg * Fuel_energy_content_list[scd.Fuel],"MJ$(scd.Fuel)"; force_unit_prefix="GJ") #Convert in GJ fuel per year
-  total_energy_content_MWh, unit_tot_energyWh = scale_mass_power_energy_units(yearly_prod_kg * Fuel_energy_content_list[scd.Fuel]/3.6,"kWh$(scd.Fuel)"; force_unit_prefix="MWh") #Convert in MWh fuel per year
+  total_energy_content_MWh, unit_tot_energyWh = scale_mass_power_energy_units(yearly_prod_kg * Fuel_energy_content_list[scd.Fuel]/3.6,"kWh$(scd.Fuel)"; force_unit_prefix="MWh") # /3.6: MJ → MWh conversion (1 MWh = 3.6 MJ)
+
+  # Precompute per-unit flow sums (reused multiple times per unit in the loop below)
+  X_unit_sums = [sum(X[u, t] for t = 1:T) for u = 1:U]
 
   # Write the results in a table
   for u = 1:U
@@ -389,25 +394,25 @@ function write_main_results_LP(opt_data, opt_results, scenario_number, resultsfo
     Result[:investment][u]            = scale_c(td.Invest[u] * Capacity[u])
     Result[:investment_annualised][u] = Result[:investment][u] * td.Annuity_factor[u]
     Result[:fixedOM][u]               = scale_c(td.FixOM[u] * Capacity[u])
-    Result[:varOM][u]                 = scale_c(sum(td.VarOM[u] * X[u, t] for t =1:T))
+    Result[:varOM][u]                 = scale_c(td.VarOM[u] * X_unit_sums[u])
     Result[:TotCO2tax_up][u]          = scale_c(scd.CO2taxWTTup * td.CO2_inf_reg[u] * Capacity[u])
-    Result[:TotCO2tax_op][u]          = scale_c(sum(scd.CO2taxWTTop * td.CO2_proc_fixed_reg[u] * X[u, t] for t =1:T) + scd.CO2taxWTTop * Result[:CO2_proc_reg_t][u])
+    Result[:TotCO2tax_op][u]          = scale_c(scd.CO2taxWTTop * td.CO2_proc_fixed_reg[u] * X_unit_sums[u] + scd.CO2taxWTTop * Result[:CO2_proc_reg_t][u])
     Result[:fuelprice][u]             = scale_c(sum(td.Fuel_Buying_fixed[u] * Bought[u, t] for t =1:T)) + Result[:fuelprice_t][u]
     Result[:sold][u]                  = - scale_c(sum(td.Fuel_Selling_fixed[u] * Sold[u, t] for t =1:T)) + Result[:fuelsold_t][u]
-    Result[:cost_unit][u]             = Result[:investment_annualised][u] + Result[:fixedOM][u] + Result[:varOM][u] + 
+    Result[:cost_unit][u]             = Result[:investment_annualised][u] + Result[:fixedOM][u] + Result[:varOM][u] +
                                         Result[:fuelprice][u] + Result[:sold][u] +
                                         Result[:TotCO2tax_up][u] + Result[:TotCO2tax_op][u]
-    Result[:production][u], Result[:unit_production][u] = scale_mass_power_energy_units(sum(X[u, t] for t =1:T), td.Output_units[u]; force_unit_prefix = default_results_production_units)
-    Result[:el_cons][u], unit_el_cons = scale_mass_power_energy_units(sum(td.Sc_nom[u]*X[u,t] for t =1:T),td.Output_units[sd.PU[1]] ; force_unit_prefix = default_results_production_units)
-    Result[:FLH][u]                   = sum(X[u, t] / Capacity[u] for t =1:T)
+    Result[:production][u], Result[:unit_production][u] = scale_mass_power_energy_units(X_unit_sums[u], td.Output_units[u]; force_unit_prefix = default_results_production_units)
+    Result[:el_cons][u], unit_el_cons = scale_mass_power_energy_units(td.Sc_nom[u] * X_unit_sums[u], td.Output_units[sd.PU[1]]; force_unit_prefix = default_results_production_units)
+    Result[:FLH][u]                   = Capacity[u] == 0 ? 0.0 : X_unit_sums[u] / Capacity[u]
     Result[:load_average][u]          = Result[:FLH][u] / T
     Result[:prodcost_perunit][u]      = Result[:production][u] == 0 ? 0 : Result[:cost_unit][u] / Result[:production][u]
-    Result[:CO2_regulated][u], unit_co2_reg = scale_mass_power_energy_units(Capacity[u]*td.CO2_inf_reg[u] + 
-                                        sum(X[u, t] for t =1:T) * td.CO2_proc_fixed_reg[u] + Result[:CO2_proc_reg_t][u],
+    Result[:CO2_regulated][u], unit_co2_reg = scale_mass_power_energy_units(Capacity[u]*td.CO2_inf_reg[u] +
+                                        X_unit_sums[u] * td.CO2_proc_fixed_reg[u] + Result[:CO2_proc_reg_t][u],
                                         "kgCO2e"; force_unit_prefix = "kg"
                                         ) # In kg CO2e (adapt if input data are not in kgCO2e anymore)
     Result[:CO2_regulated_GJ][u]      = Result[:CO2_regulated][u] / total_energy_content_GJ #Results in kgCO2e per GJ
-    Result[:CO2_regulated_per_unit][u] = Result[:CO2_regulated][u] / sum(X[u, t] for t =1:T)  #By default in kgCO2e/Basic output unit (i.e. kWh)
+    Result[:CO2_regulated_per_unit][u] = X_unit_sums[u] == 0 ? 0.0 : Result[:CO2_regulated][u] / X_unit_sums[u]  #By default in kgCO2e/Basic output unit (i.e. kWh)
 
     #********* Add the Lca results (optional)************
     if write_lca_results == true && !isnothing(dat_lcia)
@@ -533,9 +538,9 @@ function add_lcia_results!(Result::Dict{Symbol,Any}, opt_data, opt_results, u::I
     Result[Symbol(string(cat_sym) * "_total")][u] = total_val
 
     #Results normalized per average person
-    Result[Symbol(string(cat_sym) * "_inf")][u]   = inf_val/Lcia_EF_normalisation_factors[cat_sym]
-    Result[Symbol(string(cat_sym) * "_use")][u]   = use_val/Lcia_EF_normalisation_factors[cat_sym]
-    Result[Symbol(string(cat_sym) * "_disp")][u]  = disp_val/Lcia_EF_normalisation_factors[cat_sym]
+    Result[Symbol(string(cat_sym) * "_inf_norm")][u]   = inf_val/Lcia_EF_normalisation_factors[cat_sym]
+    Result[Symbol(string(cat_sym) * "_use_norm")][u]   = use_val/Lcia_EF_normalisation_factors[cat_sym]
+    Result[Symbol(string(cat_sym) * "_disp_norm")][u]  = disp_val/Lcia_EF_normalisation_factors[cat_sym]
     Result[Symbol(string(cat_sym) * "_total_norm")][u] = total_val/Lcia_EF_normalisation_factors[cat_sym]
 
 
@@ -574,8 +579,8 @@ function append_lcia_columns!(cols::Vector, Result_name::Vector{String}, Result:
             cat_name * " hourly [$(unit[cat_sym].hourly)]",
             cat_name * " total [$(unit[cat_sym].total)]", 
             cat_name * " construction norm [person]",
-            cat_name * " operation [person]",
-            cat_name * " disposal [person)]",
+            cat_name * " operation norm [person]",
+            cat_name * " disposal norm [person]",
             cat_name * " hourly [person]",
             cat_name * " total norm [person]" ,          
             cat_name * " construction [$(unit[cat_sym].inf)/$unit_tot_energyJ]",

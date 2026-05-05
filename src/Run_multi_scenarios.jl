@@ -16,6 +16,8 @@ using .CombinedOptData, .LciaOptData, .ProfilesOptData, .ScenariosOptData, .Tech
 using .Solve_LP, .Solve_LP_2obj
 using .Results_LP
 
+const CHECK_TECHNO_ECO = CHECK_TECHNO_ECO
+
 export run_optimization_scenarios
 
 function run_optimization_scenarios(
@@ -29,8 +31,8 @@ function run_optimization_scenarios(
     interior_points::Int=2,
     objective1::String="costs",
     objective2::String="emissions_CO2e_regulated",
-    profiles_filename::String = "Check_techno_eco",
-    lcia_filename::String = "Check_techno_eco",
+    profiles_filename::String = CHECK_TECHNO_ECO,
+    lcia_filename::String = CHECK_TECHNO_ECO,
     results_currency::String = "EUR",
     results_currency_multiplier::Float64 = 1.0,
     default_results_cost_scale = "M", #Million
@@ -48,14 +50,14 @@ function run_optimization_scenarios(
     Datafile_techno_economics = joinpath(@__DIR__, "..", "data", datafoldername, "model_inputs", techno_eco_filename*".xlsx")
     resultsfolder = joinpath(@__DIR__, "..", "results", datafoldername)
 
-    if profiles_filename != "Check_techno_eco" #If the profile name is user-defined as an option
+    if profiles_filename != CHECK_TECHNO_ECO #If the profile name is user-defined as an option
       Datafile_profile = joinpath(@__DIR__, "..", "data", datafoldername, "profiles", profiles_filename*".xlsx")
       # Load profile data
       wb_profile = XLSX.readxlsx(Datafile_profile)
       Available_sheets_profiles = XLSX.sheetnames(wb_profile)
     end
 
-    if lcia_filename != "Check_techno_eco"
+    if lcia_filename != CHECK_TECHNO_ECO
       Datafile_LCIA = joinpath(@__DIR__, "..", "data", datafoldername,"lcia_data",lcia_filename*".xlsx")
       # Load lcia data
       wb_lcia = XLSX.readxlsx(Datafile_LCIA)
@@ -72,7 +74,7 @@ function run_optimization_scenarios(
       scen_data = build_scenario_opt_data(wb_techno, scenario_set, Available_sheets_techno, scenario_number)
 
       # If defined by the user in the excel, get profile data from the scenario list (inconvenient: open the file at each iteration)
-      if profiles_filename == "Check_techno_eco"
+      if profiles_filename == CHECK_TECHNO_ECO
         if scen_data.Profile_folder_name == "None"
           Datafile_profile = joinpath(@__DIR__, "..", "data", datafoldername, "profiles", scen_data.Profile_name*".xlsx")
         else
@@ -82,7 +84,7 @@ function run_optimization_scenarios(
         Available_sheets_profiles = XLSX.sheetnames(wb_profile)
       end
 
-      if lcia_filename == "Check_techno_eco"
+      if lcia_filename == CHECK_TECHNO_ECO
         if scen_data.Lcia_filename != "None"
           Datafile_LCIA = joinpath(@__DIR__, "..", "data", datafoldername, "lcia_data", scen_data.Lcia_filename*".xlsx")
           wb_lcia = XLSX.readxlsx(Datafile_LCIA)
