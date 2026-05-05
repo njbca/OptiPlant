@@ -290,6 +290,7 @@ function generate_adaptive_pareto_curve(opt_data, solver, N_scen, resultsfolder,
     opt_obj1 = Solve_OptiPlant_LP_2obj(opt_data, solver;
                                        objective_to_minimize=objective1)
 
+    !opt_obj1.status && error("Extreme point solve infeasible for objective: $objective1")
     add_solution!(pareto_front, pareto_front_scaled, 1, opt_obj1)
 
     write_main_results_LP(opt_data, opt_obj1, N_scen, resultsfolder,
@@ -304,6 +305,7 @@ function generate_adaptive_pareto_curve(opt_data, solver, N_scen, resultsfolder,
     # Minimize objective 2
     opt_obj2 = Solve_OptiPlant_LP_2obj(opt_data, solver;
                                        objective_to_minimize=objective2)
+    !opt_obj2.status && error("Extreme point solve infeasible for objective: $objective2")
     add_solution!(pareto_front, pareto_front_scaled, N_pareto_points, opt_obj2)
     write_main_results_LP(opt_data, opt_obj2, N_scen, resultsfolder,
                           results_currency, results_currency_multiplier,
